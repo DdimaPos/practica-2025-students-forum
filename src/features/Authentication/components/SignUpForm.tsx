@@ -1,34 +1,57 @@
+'use client';
 import {Button} from '@/components/ui/button';
 import {
   Card,
   CardAction,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {FC} from 'react';
+import {Toaster} from '@/components/ui/sonner';
+import {toast} from 'sonner';
+import {FC, useActionState, useEffect} from 'react';
+import {FormState} from '../actions/login';
+import {useFormStatus} from 'react-dom';
+import Link from 'next/link';
 
 interface Props {
-  onSubmit: (formData: FormData) => void;
+  onSubmit: (prevState: FormState, formData: FormData) => Promise<FormState>;
 }
 
 export const SignUpForm: FC<Props> = ({onSubmit}) => {
+  const initialState: FormState = {success: false, message: ''};
+  const {pending} = useFormStatus();
+  const [state, formAction] = useActionState(onSubmit, initialState);
+
+  useEffect(() => {
+    if (!state.success && state.message) {
+      toast.error(state.message);
+    }
+
+    if (state.success) {
+      toast.success(state.message || 'Signed in. Check your email');
+    }
+  }, [state]);
   return (
     <Card className='w-full max-w-sm'>
+      <Toaster richColors />
       <CardHeader>
         <CardTitle>Create account</CardTitle>
         <CardDescription>
           Enter your email below to create your account
         </CardDescription>
         <CardAction>
-          <Button variant='link'>Sign In</Button>
+          <Link href='/login'>
+            <Button variant='link'>Log in</Button>
+          </Link>
         </CardAction>
       </CardHeader>
       <CardContent>
-        <form>
+        <form id='loginform' action={formAction}>
           <div className='flex flex-col gap-6'>
             <div className='grid gap-2'>
               <Label htmlFor='email'>Email</Label>
@@ -36,7 +59,7 @@ export const SignUpForm: FC<Props> = ({onSubmit}) => {
                 id='email'
                 type='email'
                 name='email'
-                placeholder='m@example.com'
+                placeholder='mail@example.com'
                 required
               />
             </div>
@@ -53,14 +76,18 @@ export const SignUpForm: FC<Props> = ({onSubmit}) => {
               <Input id='password' name='password' type='password' required />
             </div>
           </div>
-          <Button type='submit' formAction={onSubmit} className='w-full'>
-            Sign up
-          </Button>
-          <Button variant='outline' className='w-full'>
-            Sign up with Google
-          </Button>
         </form>
       </CardContent>
+      <CardFooter className='flex-col gap-2'>
+        <Button
+          type='submit'
+          form='loginform'
+          className='w-full'
+          disabled={pending}
+        >
+          {pending ? 'Signing in...' : 'Sign in'}
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

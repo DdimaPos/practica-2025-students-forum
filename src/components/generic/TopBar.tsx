@@ -6,5 +6,5 @@ interface Props {
 }
 
 export const TopBar: FC<Props> = ({className}) => {
-  return <div className={cn(className, 'bg-white')}>sdjkfa</div>;
+  return <div className={cn(className, 'bg-primary-foreground')}>sdjkfa</div>;
 };
