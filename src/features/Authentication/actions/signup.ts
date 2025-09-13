@@ -1,11 +1,7 @@
 'use server';
 
 import {createClient} from '@/utils/supabase/server';
-
-export type FormState = {
-  success: boolean;
-  message: string;
-};
+import {FormState} from '../types';
 
 export async function signup(
   prevState: FormState,
@@ -23,12 +19,14 @@ export async function signup(
     };
   }
 
+  //At this state will have to perform many checks regarding the user input
   if (password.length < 6) {
     return {
       success: false,
       message: 'Password must be at least 6 characters long.',
     };
   }
+
   const {data} = await supabase
     .from('users')
     .select('*')

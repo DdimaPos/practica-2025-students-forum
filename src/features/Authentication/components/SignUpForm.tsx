@@ -1,4 +1,10 @@
 'use client';
+import {FC, useActionState, useTransition} from 'react';
+import type {FormState} from '../types';
+import Link from 'next/link';
+import {useFormStateToast} from '../hooks/useToast';
+import {TermsAndConditions} from './TermsAndConditions';
+
 import {Button} from '@/components/ui/button';
 import {
   Card,
@@ -12,11 +18,6 @@ import {
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Toaster} from '@/components/ui/sonner';
-import {toast} from 'sonner';
-import {FC, useActionState, useEffect} from 'react';
-import {FormState} from '../actions/login';
-import {useFormStatus} from 'react-dom';
-import Link from 'next/link';
 
 interface Props {
   onSubmit: (prevState: FormState, formData: FormData) => Promise<FormState>;
@@ -24,21 +25,21 @@ interface Props {
 
 export const SignUpForm: FC<Props> = ({onSubmit}) => {
   const initialState: FormState = {success: false, message: ''};
-  const {pending} = useFormStatus();
   const [state, formAction] = useActionState(onSubmit, initialState);
 
-  useEffect(() => {
-    if (!state.success && state.message) {
-      toast.error(state.message);
-    }
+  const [isPending, startTransition] = useTransition();
 
-    if (state.success) {
-      toast.success(state.message || 'Signed in. Check your email');
-    }
-  }, [state]);
+  useFormStateToast(state, 'Signed up. Check your email for verification.');
+
+  const formActionWithTransition = (formData: FormData) => {
+    startTransition(() => {
+      formAction(formData);
+    });
+  };
+
   return (
-    <Card className='w-full max-w-sm'>
-      <Toaster richColors />
+    <Card className='w-full max-w-md'>
+      <Toaster richColors position='top-center' />
       <CardHeader>
         <CardTitle>Create account</CardTitle>
         <CardDescription>
@@ -51,10 +52,25 @@ export const SignUpForm: FC<Props> = ({onSubmit}) => {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <form id='loginform' action={formAction}>
-          <div className='flex flex-col gap-6'>
-            <div className='grid gap-2'>
-              <Label htmlFor='email'>Email</Label>
+        <form id='signupform' action={formActionWithTransition}>
+          <div className='grid gap-8'>
+            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
+              <Label htmlFor='username' className='text-right'>
+                Username
+              </Label>
+              <Input
+                id='username'
+                type='text'
+                name='username'
+                placeholder='ion_moraru'
+                required
+              />
+            </div>
+
+            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
+              <Label htmlFor='email' className='text-right'>
+                Email
+              </Label>
               <Input
                 id='email'
                 type='email'
@@ -63,29 +79,32 @@ export const SignUpForm: FC<Props> = ({onSubmit}) => {
                 required
               />
             </div>
-            <div className='grid gap-2'>
-              <div className='flex items-center'>
-                <Label htmlFor='password'>Password</Label>
-                <a
-                  href='#'
-                  className='ml-auto inline-block text-sm underline-offset-4 hover:underline'
-                >
-                  Forgot your password?
-                </a>
-              </div>
+
+            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
+              <Label htmlFor='password' className='text-right'>
+                Password
+              </Label>
               <Input id='password' name='password' type='password' required />
             </div>
+
+            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
+              <Label htmlFor='picture' className='text-right'>
+                Profile Pic
+              </Label>
+              <Input className='bg-accent' id='picture' type='file' />
+            </div>
+            <TermsAndConditions />
           </div>
         </form>
       </CardContent>
       <CardFooter className='flex-col gap-2'>
         <Button
           type='submit'
-          form='loginform'
+          form='signupform'
           className='w-full'
-          disabled={pending}
+          disabled={isPending}
         >
-          {pending ? 'Signing in...' : 'Sign in'}
+          {isPending ? 'Creating account...' : 'Create account'}
         </Button>
       </CardFooter>
     </Card>

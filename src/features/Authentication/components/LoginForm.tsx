@@ -1,5 +1,12 @@
 'use client';
 
+import Link from 'next/link';
+import {FC, useActionState, useTransition} from 'react';
+import {OAuthGroup} from './OAuthGroup';
+
+import type {FormState} from '../types';
+import {useFormStateToast} from '../hooks/useToast';
+
 import {Button} from '@/components/ui/button';
 import {
   Card,
@@ -13,46 +20,29 @@ import {
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Separator} from '@/components/ui/separator';
-import Link from 'next/link';
-import {FC, useActionState, useEffect} from 'react';
-import {OAuthGroup} from './OAuthGroup';
-
-import {useFormStatus} from 'react-dom';
-import type {FormState} from '../actions/login';
 import {Toaster} from '@/components/ui/sonner';
-import {toast} from 'sonner';
 
 interface Props {
   onSubmit: (prevState: FormState, formData: FormData) => Promise<FormState>;
-}
-
-function SubmitButton() {
-  const {pending} = useFormStatus();
-  return (
-    <Button
-      type='submit'
-      form='loginform'
-      className='w-full'
-      disabled={pending}
-    >
-      {pending ? 'Logging in...' : 'Login'}
-    </Button>
-  );
 }
 
 export const LoginForm: FC<Props> = ({onSubmit}) => {
   const initialState: FormState = {success: false, message: ''};
   const [state, formAction] = useActionState(onSubmit, initialState);
 
-  useEffect(() => {
-    if (!state.success && state.message) {
-      toast.error(state.message);
-    }
-  }, [state]);
+  const [isPending, startTransition] = useTransition();
+
+  useFormStateToast(state, 'Signed up. Check your email for verification.');
+
+  const formActionWithTransition = (formData: FormData) => {
+    startTransition(() => {
+      formAction(formData);
+    });
+  };
 
   return (
-    <Card className='w-full max-w-sm'>
-      <Toaster richColors />
+    <Card className='w-full max-w-md'>
+      <Toaster richColors position='top-center' />
       <CardHeader>
         <CardTitle>Login to your account</CardTitle>
         <CardDescription>
@@ -65,7 +55,7 @@ export const LoginForm: FC<Props> = ({onSubmit}) => {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <form id='loginform' action={formAction}>
+        <form id='loginform' action={formActionWithTransition}>
           <div className='flex flex-col gap-6'>
             <div className='grid gap-2'>
               <Label htmlFor='email'>Email</Label>
@@ -93,7 +83,14 @@ export const LoginForm: FC<Props> = ({onSubmit}) => {
         </form>
       </CardContent>
       <CardFooter className='flex-col gap-2'>
-        <SubmitButton />
+        <Button
+          type='submit'
+          form='loginform'
+          className='w-full'
+          disabled={isPending}
+        >
+          {isPending ? 'Logging in...' : 'Login'}
+        </Button>
         <Separator />
         <OAuthGroup />
       </CardFooter>

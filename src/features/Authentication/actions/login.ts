@@ -2,11 +2,7 @@
 
 import {redirect} from 'next/navigation';
 import {createClient} from '@/utils/supabase/server';
-
-export type FormState = {
-  success: boolean;
-  message: string;
-};
+import {FormState} from '../types';
 
 export async function login(
   prevState: FormState, // The previous state
