@@ -14,9 +14,7 @@ export default function SearchBar() {
       </div>
 
       <div>
-        <Button variant='secondary' className='w-full bg-[#0F172A] text-white'>
-          Write a new post
-        </Button>
+        <Button>Write a new post</Button>
       </div>
     </div>
   );
