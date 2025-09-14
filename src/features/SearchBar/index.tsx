@@ -13,9 +13,7 @@ export default function SearchBar() {
         <Filter className='h-5 w-5 cursor-pointer text-gray-500 transition-colors hover:text-black' />
       </div>
 
-      <div>
-        <Button>Write a new post</Button>
-      </div>
+      <Button>Write a new post</Button>
     </div>
   );
 }
