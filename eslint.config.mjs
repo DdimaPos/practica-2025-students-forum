@@ -4,7 +4,6 @@ import {FlatCompat} from '@eslint/eslintrc';
 
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import unicorn from 'eslint-plugin-unicorn';
 import prettierConfig from 'eslint-config-prettier';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -30,18 +29,11 @@ const eslintConfig = [
 
   ...compat.extends('next/core-web-vitals'),
 
-  unicorn.configs['flat/recommended'],
-
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
-
-      // Unicorn rule override
-      'unicorn/filename-case': 'off',
-      'unicorn/prevent-abbreviations': 'off',
-      'unicorn/no-array-for-each': 'off',
 
       // Add any other custom rule overrides here
       // "some-rule": "warn",
