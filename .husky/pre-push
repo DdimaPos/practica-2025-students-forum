@@ -11,7 +11,7 @@ if ! echo "$branch_name" | grep -Eq "$valid_branch_regex"; then
   printf "\n\033[1;31mError: Invalid branch name.\033[0m\n"
   printf "Your branch name '\033[1;33m%s\033[0m' does not follow the required convention.\n" "$branch_name"
   printf "\nPlease use one of the following formats:\n"
-  printf "  \033[0;36mfeature your-task-name\033[0m\n"
+  printf "  \033[0;36mfeature/ your-task-name\033[0m\n"
   printf "  \033[0;36mfix/your-task-name\033[0m\n"
   printf "  \033[0;36mbug/your-task-name\033[0m\n"
   printf "  \033[0;36mhotfix/your-task-name\033[0m\n"
