@@ -22,9 +22,7 @@ export default function ReplyForm({postId}: ReplyFormProps) {
       <Textarea
         value={message}
         onChange={e => setMessage(e.target.value)}
-        placeholder='Write reply...'
-        className='flex-1 resize-none'
-        rows={1}
+        className='w-250 flex-1 resize-none overflow-y-auto'
       />
 
       <Button onClick={handleSubmit} className='ml-auto cursor-pointer p-2'>
@@ -33,3 +31,5 @@ export default function ReplyForm({postId}: ReplyFormProps) {
     </div>
   );
 }
+
+//fdffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
