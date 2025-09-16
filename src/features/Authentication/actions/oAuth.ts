@@ -31,5 +31,4 @@ export const oAuth = async (provider: ProviderTypes) => {
 
   if (data.url) redirect(data.url);
   if (error) redirect('/error');
-  redirect('/');
 };
