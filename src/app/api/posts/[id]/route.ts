@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import db from '@/db';
-import {posts} from '@/db/schema';
+import {posts, users} from '@/db/schema';
 import {eq} from 'drizzle-orm';
 import calculateRating from './functions/calculateRating';
 
@@ -24,7 +24,19 @@ export async function GET(
 
     const rating = await calculateRating(Number(id));
 
-    return NextResponse.json({...post, rating});
+    let authorName = 'Anonymous';
+    if (post.authorId && !post.isAnonymous) {
+      const authorResult = await db
+        .select({name: users.firstName, lastName: users.lastName})
+        .from(users)
+        .where(eq(users.id, post.authorId));
+
+      if (authorResult.length > 0) {
+        authorName = authorResult[0].name + ' ' + authorResult[0].lastName;
+      }
+    }
+
+    return NextResponse.json({...post, rating, authorName});
   } catch (err) {
     console.error(err);
     return NextResponse.json({error: 'Internal Server Error'}, {status: 500});

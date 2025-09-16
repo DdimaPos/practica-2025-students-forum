@@ -5,4 +5,5 @@ export type Post_type = {
   authorId: string;
   createdAt: string;
   rating: number;
+  authorName: string;
 };
