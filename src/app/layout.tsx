@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import {Geist, Geist_Mono} from 'next/font/google';
 import './globals.css';
 import Navbar from '@/features/navigation';
-import SearchBar from '@/features/TopBar';
+import SearchBar from '@/features/SearchBar';
 import { SearchProvider } from '@/features/search/context/SearchContext';
 
 const geistSans = Geist({
