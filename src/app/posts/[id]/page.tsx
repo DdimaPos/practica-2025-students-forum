@@ -1,27 +1,33 @@
-import { createClient } from "@/utils/supabase/server";
+type Post = {
+  id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  createdAt: string;
+};
 
-export default async function PostPage(props: { params: Promise<{ id: string }> }) {
-  const { id } = await props.params;
+async function fetchPost(id: string): Promise<Post> {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-  const supabase = await createClient();
+  const res = await fetch(`${baseUrl}/api/posts/${id}`, {
+    cache: 'no-store',
+  });
 
-  const { data: post, error } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("id", id)
-    .single();
+  if (!res.ok) throw new Error('Post not found');
+  return res.json();
+}
 
-  if (error || !post) {
-    return <p>Post have not found.</p>;
-  }
+export default async function PostPage(props: {params: Promise<{id: string}>}) {
+  const {id} = await props.params;
+  const post = await fetchPost(id);
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold">{post.title}</h1>
-      <p className="mt-2">{post.content}</p>
-      <p className="text-gray-500 text-sm mt-4">
-        Автор ID: {post.author_id}, создано:{" "}
-        {new Date(post.created_at).toLocaleString()}
+    <div className='p-4'>
+      <h1 className='text-xl font-bold'>{post.title}</h1>
+      <p className='mt-2'>{post.content}</p>
+      <p className='mt-4 text-sm text-gray-500'>
+        Author ID: {post.authorId}, created:{' '}
+        {new Date(post.createdAt).toLocaleString()}
       </p>
     </div>
   );
