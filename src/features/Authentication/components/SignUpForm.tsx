@@ -18,6 +18,8 @@ import {
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Toaster} from '@/components/ui/sonner';
+import {Separator} from '@/components/ui/separator';
+import {OAuthGroup} from './OAuthGroup';
 
 interface Props {
   onSubmit: (prevState: FormState, formData: FormData) => Promise<FormState>;
@@ -106,6 +108,8 @@ export const SignUpForm: FC<Props> = ({onSubmit}) => {
         >
           {isPending ? 'Creating account...' : 'Create account'}
         </Button>
+        <Separator />
+        <OAuthGroup />
       </CardFooter>
     </Card>
   );
