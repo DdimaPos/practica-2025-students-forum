@@ -1,8 +1,8 @@
 'use server';
 
-import {redirect} from 'next/navigation';
-import {createClient} from '@/utils/supabase/server';
-import {FormState} from '../types';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/utils/supabase/server';
+import { FormState } from '../types';
 
 export async function login(
   prevState: FormState, // The previous state
@@ -22,7 +22,7 @@ export async function login(
     };
   }
 
-  const {error} = await supabase.auth.signInWithPassword(data);
+  const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
     console.error('Login error:', error.message);

@@ -1,7 +1,7 @@
 {
   "arrowParens": "avoid",
   "bracketSameLine": false,
-  "bracketSpacing": false,
+  "bracketSpacing": true,
   "jsxSingleQuote": true,
   "plugins": [
     "prettier-plugin-tailwindcss"

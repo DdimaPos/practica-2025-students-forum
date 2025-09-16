@@ -1,7 +1,7 @@
 'use server';
 
-import {createClient} from '@/utils/supabase/server';
-import {FormState} from '../types';
+import { createClient } from '@/utils/supabase/server';
+import { FormState } from '../types';
 
 export async function signup(
   prevState: FormState,
@@ -27,7 +27,7 @@ export async function signup(
     };
   }
 
-  const {data} = await supabase
+  const { data } = await supabase
     .from('users')
     .select('*')
     .eq('email', email) // the email to check if it exists
@@ -42,7 +42,7 @@ export async function signup(
     };
   }
 
-  const {error} = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
   });
