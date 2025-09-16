@@ -6,7 +6,7 @@ import {Button} from '@/components/ui/button';
 import {Send} from 'lucide-react';
 
 interface ReplyFormProps {
-  postId: string;
+  postId: number;
 }
 
 export default function ReplyForm({postId}: ReplyFormProps) {
