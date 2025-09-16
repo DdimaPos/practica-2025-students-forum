@@ -12,7 +12,7 @@ export default async function PostPage(props: { params: Promise<{ id: string }> 
     .single();
 
   if (error || !post) {
-    return <p>Пост не найден</p>;
+    return <p>Post have not found.</p>;
   }
 
   return (
