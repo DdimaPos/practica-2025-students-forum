@@ -10,13 +10,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/features/Profile/card"
+} from "@/components/ui/card"
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/features/Profile/chart"
+} from "@/components/ui/chart"
 
 export const description = "A multiple line chart"
 
