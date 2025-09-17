@@ -1,12 +1,13 @@
-# The regular expression for your branch naming convention
-valid_branch_regex="^(feature|fix|bug|hotfix|test)\/[a-z0-9-]+$"
+#!/bin/sh
+# Husky pre-push hook
 
-# Get the name of the current branch
+valid_branch_regex="^(feature|fix|bug|hotfix|test)/[a-z0-9-]+$"
+
+# Get the current branch name
 branch_name=$(git rev-parse --abbrev-ref HEAD)
 
-# Check if the branch name matches the pattern
-if ! [[ $branch_name =~ $valid_branch_regex ]]; then
-  # If it doesn't match, print an error message and exit with a non-zero status
+# Validate branch name against regex using grep (POSIX-safe)
+if ! echo "$branch_name" | grep -Eq "$valid_branch_regex"; then
   printf "\n\033[1;31mError: Invalid branch name.\033[0m\n"
   printf "Your branch name '\033[1;33m%s\033[0m' does not follow the required convention.\n" "$branch_name"
   printf "\nPlease use one of the following formats:\n"
