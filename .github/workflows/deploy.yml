@@ -33,12 +33,12 @@ jobs:
 
       # 6. Deploy to Vercel (PREVIEW)
       - name: Deploy Project to Vercel (Preview)
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/master'
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
 
       # 7. Deploy to Vercel (PRODUCTION)
       - name: Deploy Project to Vercel (Production)
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
     env:
