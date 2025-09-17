@@ -1,0 +1,173 @@
+[
+  {
+    "id": 1,
+    "author": "nextjs",
+    "title": "Introducing Next.js 15",
+    "content": "The React Framework - fast, flexible, and powered by Vercel. The React Framework - fast, flexible, and powered by Vercel. The React Framework - fast, flexible, and powered by Vercel. The React Framework - fast, flexible, and powered by Vercel. The React Framework - fast, flexible, and powered by Vercel.",
+    "created_at": "2025-09-05T12:00:00Z",
+    "rating": 128,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 2,
+    "author": "vercel",
+    "title": "Vercel AI SDK",
+    "content": "Build AI-powered apps with streaming and React Server Components.",
+    "created_at": "2025-09-05T13:15:00Z",
+    "rating": 95,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 3,
+    "author": "reactjs",
+    "title": "React 19 Beta",
+    "content": "Concurrent features and improved server rendering experience.",
+    "created_at": "2025-09-06T09:30:00Z",
+    "rating": 214,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 4,
+    "author": "typescript",
+    "title": "TypeScript 6.0 Released",
+    "content": "Bringing stronger inference and performance improvements.",
+    "created_at": "2025-09-06T15:50:00Z",
+    "rating": 172,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 5,
+    "author": "nodejs",
+    "title": "Node.js 23 Released",
+    "content": "Major performance improvements and new Web APIs.",
+    "created_at": "2025-09-07T08:10:00Z",
+    "rating": 201,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 6,
+    "author": "github",
+    "title": "GitHub Copilot Enterprise",
+    "content": "AI-assisted coding for large teams and organizations.",
+    "created_at": "2025-09-07T12:45:00Z",
+    "rating": 153,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 7,
+    "author": "openai",
+    "title": "GPT-5 Launch",
+    "content": "The next generation of language models for developers.",
+    "created_at": "2025-09-08T10:00:00Z",
+    "rating": 309,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 8,
+    "author": "mongodb",
+    "title": "MongoDB 8.0 Announced",
+    "content": "More scalability and new vector search capabilities.",
+    "created_at": "2025-09-08T17:20:00Z",
+    "rating": 132,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 9,
+    "author": "tailwindcss",
+    "title": "Tailwind v4 Released",
+    "content": "CSS framework reimagined with faster build times.",
+    "created_at": "2025-09-09T14:30:00Z",
+    "rating": 187,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 10,
+    "author": "docker",
+    "title": "Docker Desktop Update",
+    "content": "Improved performance and new Kubernetes integrations.",
+    "created_at": "2025-09-10T08:00:00Z",
+    "rating": 77,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 11,
+    "author": "kubernetes",
+    "title": "Kubernetes 2.0",
+    "content": "The next-gen orchestration engine for cloud workloads.",
+    "created_at": "2025-09-10T12:10:00Z",
+    "rating": 221,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 12,
+    "author": "apple",
+    "title": "iPhone 17 Pro",
+    "content": "Apple introduces advanced AI and AR features.",
+    "created_at": "2025-09-11T10:30:00Z",
+    "rating": 410,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 13,
+    "author": "google",
+    "title": "Android 16 Beta",
+    "content": "New AI-powered battery saver and improved privacy tools.",
+    "created_at": "2025-09-11T18:45:00Z",
+    "rating": 265,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 14,
+    "author": "microsoft",
+    "title": "Windows 13 Insider Preview",
+    "content": "AI Copilot integrated deeply into the OS.",
+    "created_at": "2025-09-12T09:00:00Z",
+    "rating": 356,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 15,
+    "author": "ubuntu",
+    "title": "Ubuntu 26.04 LTS",
+    "content": "Enhanced desktop performance and cloud features.",
+    "created_at": "2025-09-12T14:20:00Z",
+    "rating": 140,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 16,
+    "author": "jetbrains",
+    "title": "IntelliJ IDEA 2025",
+    "content": "Smarter AI code completion and faster indexing.",
+    "created_at": "2025-09-13T11:10:00Z",
+    "rating": 233,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 17,
+    "author": "figma",
+    "title": "Figma AI Tools",
+    "content": "Design faster with AI-generated layouts and assets.",
+    "created_at": "2025-09-13T19:40:00Z",
+    "rating": 189,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 18,
+    "author": "slack",
+    "title": "Slack AI Assistant",
+    "content": "Automating workflows and answering questions inside Slack.",
+    "created_at": "2025-09-14T09:25:00Z",
+    "rating": 97,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  },
+  {
+    "id": 19,
+    "author": "spotify",
+    "title": "Spotify AI Playlists",
+    "content": "Generate playlists based on your mood instantly.",
+    "created_at": "2025-09-14T17:00:00Z",
+    "rating": 278,
+    "photo": "https://tribuna.md/wp-content/uploads/2021/01/utm.jpg"
+  }
+]
