@@ -6,7 +6,7 @@ import ReplyForm from './ReplyForm';
 import {Calendar} from 'lucide-react';
 import {useState} from 'react';
 
-export default function FooterRight({post}: {post: Post_type}) {
+export default function Footer({post}: {post: Post_type}) {
   const [showReply, setShowReply] = useState(false);
 
   const handleMessage = () => {

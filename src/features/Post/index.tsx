@@ -1,6 +1,6 @@
 import {Post_type} from '@/features/Post/types/Post_type';
 import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
-import FooterRight from './components/FooterMechanicComponent'; 
+import Footer from './components/FooterMechanicComponent'; 
 import {
   Card,
   CardHeader,
@@ -33,7 +33,7 @@ export default function Post({...post}: Post_type) {
         <CardDescription className='px-4 py-2'>{post.content}</CardDescription>
 
         <CardFooter className='px-0'>  
-          <FooterRight post={post} />
+          <Footer post={post} />
         </CardFooter>
       </Card>
 
