@@ -1,9 +1,12 @@
 import Post from '@/features/Post';
-import {getPostById} from '@/features/Post/fetch/fetch';
+import { getPostById } from '@/features/Post/fetch/fetch';
 
-export default async function PostPage({params}: {params: {id: string}}) {
-  const parameters = await params;
-  const id = await parameters.id;
+export default async function PostPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const post = await getPostById(id);
 
   if (!post) {
