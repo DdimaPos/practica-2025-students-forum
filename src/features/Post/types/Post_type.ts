@@ -11,3 +11,4 @@ export type Post_type = {
   rating: number;
   authorName: string;
 };
+

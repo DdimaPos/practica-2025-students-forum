@@ -41,3 +41,4 @@ export async function getPostById(id: string): Promise<Post_type | null> {
     authorName,
   };
 }
+
