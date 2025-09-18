@@ -8,14 +8,17 @@ export default async function CommentSection({ postId }: { postId: number }) {
     <div>
       {comments.length === 0 ? (
         <div className='flex h-24 items-center justify-center'>
-          <p className='text-muted-foreground text-3xl'>Be the first to comment!</p>
-          
+          <p className='text-muted-foreground text-3xl'>
+            Be the first to comment!
+          </p>
         </div>
       ) : (
-        <>
-          {comments.map(c => (
-            <CommentCard key={c.id} comment={c} />
-          ))}
+        <div>
+          <div className='border-l-3 border-white pl-6 shadow-[-1px_0_0_0_rgba(0,0,0,0.25)]'>
+            {comments.map(c => (
+              <CommentCard key={c.id} comment={c} />
+            ))}
+          </div>
 
           {total > comments.length && (
             <p className='mt-4 text-center text-sm text-gray-500'>
@@ -25,7 +28,7 @@ export default async function CommentSection({ postId }: { postId: number }) {
               </button>
             </p>
           )}
-        </>
+        </div>
       )}
     </div>
   );
