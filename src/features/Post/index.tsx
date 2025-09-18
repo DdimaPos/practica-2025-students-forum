@@ -1,6 +1,6 @@
-import {Post_type} from '@/features/Post/types/Post_type';
-import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
-import Footer from './components/FooterMechanicComponent'; 
+import { Post_type } from '@/features/Post/types/Post_type';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Footer from './components/FooterMechanicComponent';
 import {
   Card,
   CardHeader,
@@ -9,11 +9,10 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 
-export default function Post({...post}: Post_type) { 
-
+export default function Post({ ...post }: Post_type) {
   return (
     <div>
-      <Card className='rounded-lg bg-white shadow-md pb-0'>
+      <Card className='mb-4 rounded-lg bg-white pb-0 shadow-md'>
         <CardHeader className='flex items-center justify-between gap-4 pb-4'>
           <div className='flex gap-4'>
             <Avatar>
@@ -32,11 +31,10 @@ export default function Post({...post}: Post_type) {
 
         <CardDescription className='px-4 py-2'>{post.content}</CardDescription>
 
-        <CardFooter className='px-0'>  
+        <CardFooter className='px-0'>
           <Footer post={post} />
         </CardFooter>
       </Card>
-
     </div>
   );
 }
