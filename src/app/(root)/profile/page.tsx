@@ -4,12 +4,12 @@ import Image from "next/image";
 
 export default function Profile() {
   return (
-    <div className='flex min-h-screen bg-[#F3F4F6]'>
+    <div className="bg-background text-foreground" >
 
       <main className='flex-1 p-6'>
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
           <section className='col-span-2 rounded-xl border bg-white p-8 shadow-sm'>
-            <div className='flex flex-col items-center gap-4'>
+            <div className="bg-background text-foreground" >
               <Image
                 src='/window.svg'
                 alt='Profile avatar'
@@ -19,7 +19,7 @@ export default function Profile() {
               />
               <div className='text-center'>
                 <h1 className='text-2xl font-semibold'>Macho Man - you are alive!</h1>
-                <div className='mt-2 space-y-1 text-[#818181]'>
+                <div className="bg-background text-foreground" >
                   <p>Joined us: 24 july 2021</p>
                   <p>Total posts: 2024</p>
                   <p>Total comments: 1024</p>
@@ -39,6 +39,6 @@ export default function Profile() {
           <PostsContainer />
         </section>
       </main>
-    </div>
+    </div >
   );
 }
