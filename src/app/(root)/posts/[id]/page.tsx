@@ -1,5 +1,5 @@
 import Post from '@/features/Post';
-import { getPostById } from '@/features/Post/fetch/fetch';
+import { getPostById } from '@/features/Post/db_api/getPostById';
 import { createClient } from '@/utils/supabase/server';
 import CommentSection from '@/features/Post/components/Comments/CommentSection';
 
@@ -12,7 +12,11 @@ export default async function PostPage({
   const post = await getPostById(id);
 
   if (!post) {
-    return <div>Post not found</div>;
+    return (
+      <div className='vertical-align:middle flex h-24 h-[80vh] items-center justify-center'>
+        <p className='text-muted-foreground text-3xl'>Post not found</p>
+      </div>
+    );
   }
 
   const supabase = await createClient();
@@ -24,7 +28,7 @@ export default async function PostPage({
     <div className='mt-5 max-w-4xl'>
       <Post {...post} />
 
-      <CommentSection postId={post.id}/>
+      <CommentSection postId={post.id} />
 
       <div className='bg-muted mt-6 rounded-lg border p-4'>
         {user ? (

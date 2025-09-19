@@ -1,4 +1,4 @@
-import { getComments } from '../../fetch/getComments';
+import { getComments } from '../../db_api/getComments';
 import CommentCard from './components/CommentCard';
 
 export default async function CommentSection({ postId }: { postId: number }) {
