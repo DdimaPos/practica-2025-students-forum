@@ -1,5 +1,5 @@
 import { getComments } from '../../db_api/getComments';
-import CommentCard from './components/CommentCard';
+import CommentThread from './components/CommentThread/CommentThread';
 
 export default async function CommentSection({ postId }: { postId: number }) {
   const { comments, total } = await getComments(postId);
@@ -14,9 +14,9 @@ export default async function CommentSection({ postId }: { postId: number }) {
         </div>
       ) : (
         <div>
-          <div className='border-l-3 border-white pl-6 shadow-[-1px_0_0_0_rgba(0,0,0,0.25)]'>
-            {comments.map(c => (
-              <CommentCard key={c.id} comment={c} />
+          <div className='border-l-2 border-gray-200 pl-4'>
+            {comments.map((c, index) => (
+              <CommentThread key={index} comment={c} />
             ))}
           </div>
 

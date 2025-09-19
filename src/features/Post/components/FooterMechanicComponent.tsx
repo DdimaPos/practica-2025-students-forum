@@ -1,12 +1,11 @@
 'use client';
 
-import {ArrowUp, ArrowDown, MessageCircle} from 'lucide-react';
-import {Post_type} from '@/features/Post/types/Post_type';
+import { ArrowUp, ArrowDown, MessageCircle, Calendar } from 'lucide-react';
+import { Post_type } from '@/features/Post/types/Post_type';
 import ReplyForm from './ReplyForm';
-import {Calendar} from 'lucide-react';
-import {useState} from 'react';
+import { useState } from 'react';
 
-export default function Footer({post}: {post: Post_type}) {
+export default function Footer({ post }: { post: Post_type }) {
   const [showReply, setShowReply] = useState(false);
 
   const handleMessage = () => {
@@ -23,7 +22,7 @@ export default function Footer({post}: {post: Post_type}) {
 
   return (
     <div className='w-full'>
-      <div className='flex  justify-between px-4 py-2 text-sm text-gray-500'>
+      <div className='flex justify-between px-4 py-2 text-sm text-gray-500'>
         <div className='flex items-center gap-2'>
           <Calendar className='h-4 w-4' />
           {post.createdAt && new Date(post.createdAt).toLocaleDateString()}
