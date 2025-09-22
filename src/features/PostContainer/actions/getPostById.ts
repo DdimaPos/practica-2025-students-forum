@@ -1,7 +1,9 @@
+'use server';
+
 import db from '@/db';
 import { posts, users, postReactions } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
-import { Post_type } from '@/features/Post/types/Post_type';
+import { Post_type } from '../types/Post_type';
 
 export async function getPostById(id: string): Promise<Post_type | null> {
   const result = await db

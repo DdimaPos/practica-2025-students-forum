@@ -1,11 +1,13 @@
+'use server';
+
 import db from '@/db';
 import { comments, users, commentReactions } from '@/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { eq, isNull, and, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { CommentType } from '../types/Comment_type';
 
-export async function getReplies(
-  parentCommentId: number,
+export async function getComments(
+  postId: number,
   limit = 5,
   offset = 0
 ): Promise<{
@@ -28,20 +30,20 @@ export async function getReplies(
       total: sql<number>`COUNT(*) OVER()`.as('total'),
       repliesCount: sql<number>`COUNT(${child.id})`.as('repliesCount'),
       rating: sql<number>`
-        COALESCE(SUM(
-          CASE 
-            WHEN ${commentReactions.reactionType} = 'upvote' THEN 1
-            WHEN ${commentReactions.reactionType} = 'downvote' THEN -1
-            ELSE 0
-          END
-        ), 0)
-      `.as('rating'),
+  COALESCE(SUM(
+    CASE 
+      WHEN ${commentReactions.reactionType} = 'upvote' THEN 1
+      WHEN ${commentReactions.reactionType} = 'downvote' THEN -1
+      ELSE 0
+    END
+  ), 0)
+`.as('rating'),
     })
     .from(comments)
     .leftJoin(users, eq(users.id, comments.authorId))
     .leftJoin(child, eq(child.parentCommentId, comments.id))
     .leftJoin(commentReactions, eq(commentReactions.commentId, comments.id))
-    .where(eq(comments.parentCommentId, parentCommentId))
+    .where(and(eq(comments.postId, postId), isNull(comments.parentCommentId)))
     .groupBy(
       comments.id,
       comments.postId,

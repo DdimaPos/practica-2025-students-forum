@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
-import { addReply } from './server_actions/reply';
+import { addReply } from '../actions/getReply';
 
 interface ReplyFormProps {
   postId: number;
 }
 
-export default function ReplyForm({ postId }: ReplyFormProps) {
+export default function ReplyContainer({ postId }: ReplyFormProps) {
   const [message, setMessage] = useState('');
 
   const handleSubmit = async () => {
@@ -20,15 +20,15 @@ export default function ReplyForm({ postId }: ReplyFormProps) {
   };
 
   return (
-    <div className="mt-4 flex items-center gap-2 rounded-lg border border-gray-300 bg-white p-2">
+    <div className='mt-4 flex items-center gap-2 rounded-lg border border-gray-300 bg-white p-2'>
       <Textarea
         value={message}
         onChange={e => setMessage(e.target.value)}
-        className="w-250 flex-1 resize-none overflow-y-auto"
+        className='w-250 flex-1 resize-none overflow-y-auto'
       />
 
-      <Button onClick={handleSubmit} className="ml-auto cursor-pointer p-2">
-        <Send className="h-5 w-5" />
+      <Button onClick={handleSubmit} className='ml-auto cursor-pointer p-2'>
+        <Send className='h-5 w-5' />
       </Button>
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CommentType } from '@/features/Post/types/Comment_type';
+import { CommentType } from '../types/Comment_type';
 import { Calendar, MessageCircle, ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function CommentCard({

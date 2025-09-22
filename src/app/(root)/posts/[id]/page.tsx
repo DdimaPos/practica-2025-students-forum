@@ -1,7 +1,7 @@
-import Post from '@/features/Post';
-import { getPostById } from '@/features/Post/db_api/getPostById';
+import Post from '@/features/PostContainer';
+import { getPostById } from '@/features/PostContainer/actions/getPostById';
 import { createClient } from '@/utils/supabase/server';
-import CommentSection from '@/features/Post/components/Comments/CommentSection';
+import CommentSection from '@/features/CommentsContainer';
 
 export default async function PostPage({
   params,
@@ -33,13 +33,10 @@ export default async function PostPage({
       <div className='bg-muted mt-6 rounded-lg border p-4'>
         {user ? (
           <p className='text-green-600'>
-            ✅ Вы авторизованы как <b>{user.email}</b>
+            ✅ <b>{user.email}</b>
           </p>
         ) : (
-          <p className='text-red-600'>
-            ❌ Вы не вошли. Войдите или зарегистрируйтесь, чтобы отвечать на
-            пост.
-          </p>
+          <p className='text-red-600'>❌</p>
         )}
       </div>
     </div>

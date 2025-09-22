@@ -1,8 +1,8 @@
 'use client';
 
 import { ArrowUp, ArrowDown, MessageCircle, Calendar } from 'lucide-react';
-import { Post_type } from '@/features/Post/types/Post_type';
-import ReplyForm from './ReplyForm';
+import { Post_type } from '../types/Post_type';
+import ReplyContainer from './ReplyContainer';
 import { useState } from 'react';
 
 export default function Footer({ post }: { post: Post_type }) {
@@ -53,7 +53,7 @@ export default function Footer({ post }: { post: Post_type }) {
         </div>
       </div>
 
-      {showReply && <ReplyForm postId={post.id} />}
+      {showReply && <ReplyContainer postId={post.id} />}
     </div>
   );
 }

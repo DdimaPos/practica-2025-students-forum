@@ -1,6 +1,6 @@
-import { Post_type } from '@/features/Post/types/Post_type';
+import { Post_type } from './types/Post_type';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Footer from './components/FooterMechanicComponent';
+import Footer from './components/PostFooter';
 import {
   Card,
   CardHeader,

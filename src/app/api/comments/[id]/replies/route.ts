@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getReplies } from '@/features/Post/db_api/getReplies';
+import { getReplies } from '@/features/CommentsContainer/actions/getReplies';
 
 export async function GET(
   req: NextRequest,

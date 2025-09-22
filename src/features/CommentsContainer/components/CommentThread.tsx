@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import CommentCard from '../CommentCard';
-import { CommentType } from '@/features/Post/types/Comment_type';
+import CommentCard from './CommentCard';
+import { CommentType } from '../types/Comment_type';
 
 export default function CommentThread({
   comment,
