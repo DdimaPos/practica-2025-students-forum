@@ -22,6 +22,7 @@ export const userTypeEnum = pgEnum('user_type', [
   'professor',
   'admin',
 ]);
+
 export const degreeTypeEnum = pgEnum('degree_type', [
   'bachelor',
   'master',
@@ -68,10 +69,10 @@ export const users = pgTable('users', {
   authId: uuid('auth_id').references(() => authUsers.id, {
     onDelete: 'cascade',
   }),
-  firstName: varchar('first_name', { length: 100 }).notNull(),
-  lastName: varchar('last_name', { length: 100 }).notNull(),
-  email: varchar('email', { length: 200 }).unique().notNull(),
-  userType: userTypeEnum('user_type').notNull(),
+  firstName: varchar('first_name', { length: 100 }),
+  lastName: varchar('last_name', { length: 100 }),
+  email: varchar('email', { length: 200 }).unique(),
+  userType: userTypeEnum('user_type'),
   profilePictureUrl: varchar('profile_picture_url', { length: 500 }),
   bio: text('bio'),
   yearOfStudy: integer('year_of_study'),
