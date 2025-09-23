@@ -26,3 +26,9 @@ export const signupFormSchema = z.object({
 })
 
 export type SignupFormData = z.infer<typeof signupFormSchema>;
+
+export enum ProviderTypes {
+  GOOGLE = 'google',
+  GITHUB = 'github',
+  AZURE = 'azure',
+}
