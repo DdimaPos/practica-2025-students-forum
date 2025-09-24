@@ -10,7 +10,7 @@ export const signupFormSchema = z.object({
   email: z.email({ message: 'Invalid email address' }),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  userType: z.enum(['student', 'professor', 'admin']),
+  userType: z.enum(['student', 'professor', 'admin']).optional(),
   bio: z.string().optional(),
   yearOfStudy: z
     .number()

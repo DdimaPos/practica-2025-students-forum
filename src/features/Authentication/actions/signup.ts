@@ -7,6 +7,11 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 
+async function checkUserExists(email: string) {
+  const ures = await db.select().from(users).where(eq(users.email, email))
+  return ures.length > 0 && ures[0].isVerified;
+}
+
 // id: serial('id').primaryKey(),
 // authId: uuid('auth_id').references(() => authUsers.id, {
 //   onDelete: 'cascade',
@@ -21,8 +26,7 @@ import { eq } from 'drizzle-orm';
 // isVerified: boolean('is_verified').default(false),
 
 async function _signup(data: SignupFormData) {
-  const ures = await db.select().from(users).where(eq(users.email, data.email))
-  if (ures.length > 0 && ures[0].isVerified) {
+  if (await checkUserExists(data.email)) {
     return { error: 'This email is already registered. Please login or reset your password' };
   }
 
@@ -44,12 +48,14 @@ async function _signup(data: SignupFormData) {
     return { error: 'Confirmation email not sent. Please verify if your email is correct or an account already exists.' }
   }
 
+  console.log('user data: ', res.data.user);
+
   await db.insert(users).values({
     authId: res.data.user.id,
     email: data.email,
     firstName: data.firstName,
     lastName: data.lastName,
-    userType: data.userType,
+    userType: data.userType || 'student',
     bio: data.bio,
     yearOfStudy: data.yearOfStudy,
     isVerified: false,
@@ -67,6 +73,7 @@ export async function signup(
 
   const parsed = signupFormSchema.safeParse(data);
   if (!parsed.success) {
+    console.error('Validation error:', parsed.error);
     return {
       success: false,
       message: parsed.error.message
