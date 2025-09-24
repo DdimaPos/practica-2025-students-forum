@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import type { PostSearchResponse } from '@/lib/search/types';
 
 interface SearchContextType {
@@ -8,9 +8,14 @@ interface SearchContextType {
   results: PostSearchResponse | undefined;
   loading: boolean;
   error: string | undefined;
-  search: (newQuery: string) => void;
+  suggestions: PostSearchResponse | undefined;
+  suggestionsLoading: boolean;
+  showDropdown: boolean;
+  search: (query: string) => void;
   searchNow: () => void;
   clearSearch: () => void;
+  setShowDropdown: (show: boolean) => void;
+  performSuggestionSearch: (query: string) => Promise<void>;
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
@@ -18,8 +23,12 @@ const SearchContext = createContext<SearchContextType | undefined>(undefined);
 export function SearchProvider({ children }: { children: React.ReactNode }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<PostSearchResponse | undefined>();
+  const [suggestions, setSuggestions] = useState<PostSearchResponse | undefined>();
   const [loading, setLoading] = useState(false);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const performSearch = useCallback(async (searchQuery: string) => {
     
@@ -51,18 +60,71 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const search = useCallback((newQuery: string) => {
-    setQuery(newQuery);
+  const performSuggestionSearch = useCallback(async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setSuggestions(undefined);
+      setShowDropdown(false);
+      return;
+    }
+
+    setSuggestionsLoading(true);
+
+    try {
+      const url = `/api/search/posts?q=${encodeURIComponent(searchQuery)}&limit=5`;
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Suggestion search failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setSuggestions(data);
+      setShowDropdown(data.results.length > 0);
+    } catch (error_) {
+      console.error('Suggestion search error:', error_);
+      setSuggestions(undefined);
+      setShowDropdown(false);
+    } finally {
+      setSuggestionsLoading(false);
+    }
   }, []);
 
+  const search = useCallback((newQuery: string) => {
+    setQuery(newQuery);
+    
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      performSuggestionSearch(newQuery);
+    }, 300);
+  }, [performSuggestionSearch]);
+
   const searchNow = useCallback(() => {
+    setShowDropdown(false);
     performSearch(query);
   }, [query, performSearch]);
 
   const clearSearch = useCallback(() => {
     setQuery('');
     setResults(undefined);
+    setSuggestions(undefined);
     setError(undefined);
+    setShowDropdown(false);
+    
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
   }, []);
 
   return (
@@ -70,11 +132,16 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       value={{
         query,
         results,
+        suggestions,
         loading,
+        suggestionsLoading,
         error,
+        showDropdown,
         search,
         searchNow,
         clearSearch,
+        setShowDropdown,
+        performSuggestionSearch,
       }}
     >
       {children}

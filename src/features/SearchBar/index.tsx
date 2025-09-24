@@ -3,20 +3,44 @@
 import {Filter} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import { useSearchContext } from '@/features/search/context/SearchContext';
+import SearchDropdown from '@/features/search/components/SearchDropdown';
+import { useRef, useEffect } from 'react';
 
 export default function SearchBar() {
   const {
     query,
     loading,
+    showDropdown,
     search,
     searchNow,
     clearSearch,
+    setShowDropdown,
   } = useSearchContext();
+
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown, setShowDropdown]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       searchNow();
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
     }
   };
 
@@ -37,34 +61,37 @@ export default function SearchBar() {
 
   return (
     <div className='flex w-full justify-between'>
-      <div className='flex w-4/6 rounded-md border border-gray-300 bg-white px-3 py-2'>
-        <input
-          type='text'
-          placeholder='Search...'
-          value={query}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          className='flex-1 text-sm placeholder-gray-500 outline-none'
-          disabled={loading}
-        />
-        <div className='flex items-center gap-2'>
-          {query && (
-            <button
-              onClick={handleClearSearch}
-              className='text-gray-400 hover:text-gray-600 text-sm'
-            >
-              ✕
-            </button>
-          )}
-          <Filter 
-            className={`h-5 w-5 cursor-pointer transition-colors ${
-              loading 
-                ? 'text-blue-500 animate-pulse' 
-                : 'text-gray-500 hover:text-black'
-            }`}
-            onClick={handleFilterClick}
+      <div className='relative w-4/6' ref={searchContainerRef}>
+        <div className='flex rounded-md border border-gray-300 bg-white px-3 py-2'>
+          <input
+            type='text'
+            placeholder='Search...'
+            value={query}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            className='flex-1 text-sm placeholder-gray-500 outline-none'
+            disabled={loading}
           />
+          <div className='flex items-center gap-2'>
+            {query && (
+              <button
+                onClick={handleClearSearch}
+                className='text-gray-400 hover:text-gray-600 text-sm'
+              >
+                ✕
+              </button>
+            )}
+            <Filter 
+              className={`h-5 w-5 cursor-pointer transition-colors ${
+                loading 
+                  ? 'text-blue-500 animate-pulse' 
+                  : 'text-gray-500 hover:text-black'
+              }`}
+              onClick={handleFilterClick}
+            />
+          </div>
         </div>
+        <SearchDropdown />
       </div>
 
       <Button>Write a new post</Button>

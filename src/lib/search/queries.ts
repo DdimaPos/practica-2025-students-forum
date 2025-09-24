@@ -5,6 +5,7 @@ import type { PostSearchResult } from './types';
 
 export async function searchPosts(
   query: string,
+  limit?: number,
 ): Promise<{ results: PostSearchResult[]; total: number}> {
 
   const searchConditions = [];
@@ -20,7 +21,7 @@ export async function searchPosts(
     );
   }
 
-  const results = await db
+  const queryBuilder = db
     .select({
       id: posts.id,
       title: posts.title,
@@ -33,7 +34,11 @@ export async function searchPosts(
     .from(posts)
     .innerJoin(users, eq(users.id, posts.authorId))
     .where(and(...searchConditions))
-    .orderBy(desc(posts.createdAt))
+    .orderBy(desc(posts.createdAt));
+
+  const results = limit && limit > 0 
+    ? await queryBuilder.limit(limit)
+    : await queryBuilder;
 
   const finalResults = results;
 
