@@ -76,7 +76,7 @@ export async function signup(
     console.error('Validation error:', parsed.error);
     return {
       success: false,
-      message: parsed.error.message
+      message: parsed.error.issues.map(issue => issue.message).join(', '),
     }
   }
 
