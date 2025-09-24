@@ -1,4 +1,5 @@
 import PostsContainer from '@/features/postsContainer/PostsContainer';
+import LeaderboardContainer from '@/features/LeadervoardContainer';
 
 export default function HomePage() {
   return (
@@ -7,7 +8,7 @@ export default function HomePage() {
         <PostsContainer />
       </div>
 
-      <div className='w-1/5 bg-white'></div>
+      <LeaderboardContainer />
     </div>
   );
 }
