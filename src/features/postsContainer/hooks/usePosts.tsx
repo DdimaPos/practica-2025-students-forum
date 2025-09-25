@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect, useState} from 'react';
-import axios from 'axios';
+import { useSearchContext } from '@/features/search/context/SearchContext';
 
 export type Post = {
   id: number;
@@ -13,35 +13,56 @@ export type Post = {
   photo: string;
 };
 
-const PAGE_SIZE = 5;
+const loadMore = () => {
+};
 
 export function usePosts() {
-  const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    axios
-      .get<Post[]>('/mocks/posts.json')
-      .then(res => {
-        setAllPosts(res.data);
-        setPosts(res.data.slice(0, PAGE_SIZE));
-      })
-      .catch(error => console.error('Error during loading:', error))
-      .finally(() => setLoading(false));
-  }, []);
+  const { results: searchResults, query: searchQuery, loading: searchLoading } = useSearchContext();
 
-  const loadMore = () => {
-    const start = page * PAGE_SIZE;
-    const end = start + PAGE_SIZE;
-    const nextPosts = allPosts.slice(start, end);
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/posts');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch posts');
+      }
 
-    if (nextPosts.length > 0) {
-      setPosts(prev => [...prev, ...nextPosts]);
-      setPage(prev => prev + 1);
+      const data = await response.json();
+      setPosts(data.posts);
+      
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  return {posts, loading, loadMore};
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const displayPosts = searchQuery && searchResults ? 
+    searchResults.results.map(result => ({
+      id: result.id,
+      title: result.title,
+      content: result.content,
+      author: `${result.author.firstName} ${result.author.lastName}`,
+      created_at: result.createdAt,
+      rating: 0,
+      photo: '',
+    })) : posts;
+
+  const isLoading = searchQuery ? searchLoading : loading;
+
+  return {
+    posts: displayPosts, 
+    loading: isLoading, 
+    loadMore,
+    isSearchMode: !!(searchQuery && searchResults), 
+    searchResultsCount: searchResults?.results.length || 0,
+  };
 }
