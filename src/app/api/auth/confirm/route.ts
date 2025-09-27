@@ -39,9 +39,6 @@ export async function GET(request: NextRequest) {
     redirect('/error');
   }
 
-  // const test = await getUser()
-  // console.log('Confirmed user:', test);
-
   redirect(next);
 
 }
