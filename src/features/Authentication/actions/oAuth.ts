@@ -30,5 +30,6 @@ export const oAuth = async (provider: ProviderTypes) => {
     await supabase.auth.signInWithOAuth(activeOAuthVariant);
 
   if (data.url) redirect(data.url);
+
   if (error) redirect('/error');
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useRef} from 'react';
+import { useEffect, useRef } from 'react';
 
 export function useInfiniteScroll(callback: () => void) {
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -13,11 +13,12 @@ export function useInfiniteScroll(callback: () => void) {
     const observer = new IntersectionObserver(
       entries => {
         const target = entries[0];
+
         if (target.isIntersecting) {
           callback();
         }
       },
-      {threshold: 1}
+      { threshold: 1 }
     );
 
     observer.observe(node);

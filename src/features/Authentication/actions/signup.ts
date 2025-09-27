@@ -34,6 +34,7 @@ export async function signup(
     .single();
 
   console.log('data', data);
+
   if (data) {
     return {
       success: false,
@@ -49,6 +50,7 @@ export async function signup(
 
   if (error) {
     console.error('Sign up error:', error.message);
+
     return {
       success: false,
       message:
