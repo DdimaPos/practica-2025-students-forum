@@ -21,6 +21,7 @@ export async function verifyMFA({
 
   if (error) {
     console.error('Verify MFA error:', error.message);
+
     return { success: false, message: error.message };
   }
 

@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { enrollMFA } from '@/features/Authentication/actions/enrollMFA';
-import { createMfaChallenge } from '@/features/Authentication/actions/createMFAChallenge';
-import { verifyMFA } from '@/features/Authentication/actions/verifyMFA';
+import { enrollMFA } from '../actions/enrollMFA';
+import { createMfaChallenge } from '../actions/createMFAChallenge';
+import { verifyMFA } from '../actions/verifyMFA';
 import { AuthError } from '@supabase/supabase-js';
 
 export function EnrollMFA() {

@@ -1,8 +1,11 @@
 import { SignInWithOAuthCredentials } from '@supabase/supabase-js';
 import { ProviderTypes } from '../types';
 
-const CALLBACK_PATH =
-  'https://peerplex-students-forum.vercel.app/api/auth/callback';
+const CALLBACK_PATH = `${
+  process.env.NODE_ENV === 'production'
+    ? 'https://peerplex-students-forum.vercel.app'
+    : 'http://localhost:3000'
+}/api/auth/callback`;
 
 export const GOOGLE_AUTH_CONFIGURATION: Readonly<SignInWithOAuthCredentials> = {
   provider: ProviderTypes.GOOGLE,

@@ -1,20 +1,21 @@
-import { MFAForm } from '@/features/Authentication/components/MFAForm';
+import { MFAForm } from '@/features/Mfa/components/MFAForm';
 import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
 export default async function MFAPage() {
   const supabase = await createClient();
 
-  // Get current user
   const {
     data: { user },
     error: userError,
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    throw new Error('User not authenticated');
+    redirect('/login');
   }
 
   const factor = user.factors?.[0];
+
   if (!factor) {
     // no MFA factors, send home
     return null;
@@ -28,18 +29,5 @@ export default async function MFAPage() {
     throw new Error(challengeError.message);
   }
 
-  return (
-    <div className='flex min-h-screen items-center justify-center'>
-      <div className='w-full max-w-sm rounded-lg border p-6 shadow'>
-        <h1 className='mb-4 text-xl font-semibold'>
-          Multi-Factor Authentication
-        </h1>
-        <p className='mb-6 text-sm text-gray-600'>
-          Please enter the 6-digit verification code from your authenticator
-          app.
-        </p>
-        <MFAForm factorId={factor.id} challengeId={challenge.id} />
-      </div>
-    </div>
-  );
+  return <MFAForm factorId={factor.id} challengeId={challenge.id} />;
 }

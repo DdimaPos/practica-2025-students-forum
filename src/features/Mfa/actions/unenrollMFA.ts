@@ -17,6 +17,7 @@ export async function unenrollMFA(factorId: string) {
 
   if (error) {
     console.error('Unenroll MFA error:', error.message);
+
     return { success: false, message: error.message };
   }
 
