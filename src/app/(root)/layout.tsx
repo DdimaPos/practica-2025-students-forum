@@ -9,7 +9,7 @@ export default function RootLayout({
   return (
     <div className='flex'>
       <Navbar />
-      <main className='bg-secondary ml-[25%] min-h-screen basis-3/4 p-10'>
+      <main className='bg-secondary ml-[25%] min-h-screen basis-3/4 px-10 pt-5'>
         <SearchBar />
         {children}
       </main>
