@@ -12,5 +12,6 @@ export async function GET(req: NextRequest) {
   }
 
   const data = await getComments(postId, limit, offset);
+
   return NextResponse.json(data);
 }
