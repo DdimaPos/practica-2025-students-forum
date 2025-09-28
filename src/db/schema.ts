@@ -22,6 +22,7 @@ export const userTypeEnum = pgEnum('user_type', [
   'professor',
   'admin',
 ]);
+
 export const degreeTypeEnum = pgEnum('degree_type', [
   'bachelor',
   'master',
@@ -68,10 +69,10 @@ export const users = pgTable('users', {
   authId: uuid('auth_id').references(() => authUsers.id, {
     onDelete: 'cascade',
   }),
-  firstName: varchar('first_name', { length: 100 }).notNull(),
-  lastName: varchar('last_name', { length: 100 }).notNull(),
-  email: varchar('email', { length: 200 }).unique().notNull(),
-  userType: userTypeEnum('user_type').notNull(),
+  firstName: varchar('first_name', { length: 100 }),
+  lastName: varchar('last_name', { length: 100 }),
+  email: varchar('email', { length: 200 }).unique(),
+  userType: userTypeEnum('user_type'),
   profilePictureUrl: varchar('profile_picture_url', { length: 500 }),
   bio: text('bio'),
   yearOfStudy: integer('year_of_study'),
@@ -184,7 +185,9 @@ export const posts = pgTable(
 
 export const pollOptions = pgTable('poll_options', {
   id: serial('id').primaryKey(),
-  postId: integer('post_id').references(() => posts.id, { onDelete: 'cascade' }),
+  postId: integer('post_id').references(() => posts.id, {
+    onDelete: 'cascade',
+  }),
   optionText: varchar('option_text', { length: 500 }).notNull(),
   voteCount: integer('vote_count').default(0),
   optionOrder: integer('option_order').notNull(),
@@ -284,11 +287,8 @@ export const professorReviews = pgTable(
     createdAt: timestamp('created_at').defaultNow(),
   },
   table => [
-    unique().on(
-      table.reviewerId,
-      table.courseProfessorsId
-    ),
-    index('idx_professor_reviews_prof').on(table.courseProfessorsId)
+    unique().on(table.reviewerId, table.courseProfessorsId),
+    index('idx_professor_reviews_prof').on(table.courseProfessorsId),
   ]
 );
 

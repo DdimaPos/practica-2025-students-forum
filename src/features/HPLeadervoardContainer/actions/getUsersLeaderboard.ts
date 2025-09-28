@@ -7,8 +7,8 @@ import { sql, eq, desc } from 'drizzle-orm';
 export async function getUsersLeaderboard(): Promise<{
   users: {
     id: number;
-    firstName: string;
-    lastName: string;
+    firstName: string | null;
+    lastName: string | null;
     profilePictureUrl: string | null;
     avgRating: number;
     ratingsCount: number;
@@ -40,8 +40,8 @@ export async function getUsersLeaderboard(): Promise<{
 
   const usersList = rows.map(row => ({
     id: row.id,
-    firstName: row.firstName,
-    lastName: row.lastName,
+    firstName: row.firstName || '',
+    lastName: row.lastName || '',
     profilePictureUrl: row.profilePictureUrl,
     avgRating: Number(row.avgRating ?? 0),
     ratingsCount: row.ratingsCount ?? 0,

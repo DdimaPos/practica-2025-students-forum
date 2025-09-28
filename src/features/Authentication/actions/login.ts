@@ -5,32 +5,28 @@ import { createClient } from '@/utils/supabase/server';
 import { FormState } from '../types';
 
 export async function login(
-  prevState: FormState, // The previous state
+  prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
   const supabase = await createClient();
 
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  };
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
 
-  if (!data.email || !data.password) {
-    return {
-      success: false,
-      message: 'Email and password are required.',
-    };
-  }
-
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
-    console.error('Login error:', error.message);
-    return {
-      success: false,
-      message: error.message,
-    };
+    return { success: false, message: error.message };
   }
 
-  redirect('/');
+  // If no MFA, go home
+  if (!data.session?.user.factors?.length) {
+    redirect('/');
+  }
+
+  // Otherwise, go to MFA page
+  redirect('/login/mfa');
 }
