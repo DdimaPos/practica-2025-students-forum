@@ -1,43 +1,26 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
-import db from '@/db';
-import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { getUser } from '@/utils/getUser';
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const { error, data } = await supabase.auth.getUser();
-
-    if (error || !data.user || data.user.deleted_at) {
-      console.error('Error fetching user:', error);
-      return NextResponse.json(
-        { error: error?.message || 'No user data' },
-        { status: 401 }
-      );
-    }
-
-    const uRes = await db
-      .select()
-      .from(users)
-      .where(eq(users.authId, data.user.id))
-      .limit(1);
-
-    if (uRes.length === 0 || !uRes[0].isVerified) {
-      return NextResponse.json(
-        { error: 'User not found in database' },
-        { status: 404 }
-      );
-    }
-
-    const user = uRes[0];
-
-    return NextResponse.json({
-      ...data.user,
-      ...user,
-    });
+    const user = await getUser();
+    return NextResponse.json(user);
   } catch (err: unknown) {
-    console.error('Unexpected error in /api/user:', err);
+    let message = 'Unexpected error';
+    if (err instanceof Error) {
+      message = err.message;
+      console.error('Error in /api/user:', message);
+    } else {
+      console.error('Unknown error in /api/user:', err);
+    }
+
+    if (message.includes('No user data')) {
+      return NextResponse.json({ error: message }, { status: 401 });
+    }
+
+    if (message.includes('User not found')) {
+      return NextResponse.json({ error: message }, { status: 404 });
+    }
 
     return NextResponse.json(
       { error: 'Internal Server Error' },
