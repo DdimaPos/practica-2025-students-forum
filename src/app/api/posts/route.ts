@@ -34,9 +34,9 @@ export async function GET() {
       posts: transformedResults,
       count: results.length,
     });
-    
   } catch (error) {
     console.error('Posts fetch error:', error);
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
