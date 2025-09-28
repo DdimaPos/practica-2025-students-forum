@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/features/navigation';
-import SearchBar from '@/features/SearchBar';
-import { SearchProvider } from '@/features/search/context/SearchContext';
-
+import { ThemeProvider } from '@/components/generic/theme-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,21 +27,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='en'>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <SearchProvider>
-          <div className='flex'>
-            <div className='basis-1/4 shadow-[2px_0_5px_rgba(0,0,0,0.1)]'>
-              <Navbar />
-            </div>
-            <main className='basis-3/4 bg-[#EDEDED] p-10'>
-              <SearchBar />
-              {children}
-            </main>
-          </div>
-        </SearchProvider>
+    <html lang='en' suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <ThemeProvider
+          attribute='class'
+          defaultTheme='light'
+          enableSystem={false}
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
