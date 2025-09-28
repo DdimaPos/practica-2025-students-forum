@@ -10,10 +10,8 @@ export default function RootLayout({
   return (
     <div className='flex'>
       <SearchProvider>
-        <div className='basis-1/4 shadow-[2px_0_5px_rgba(0,0,0,0.1)]'>
-          <Navbar />
-        </div>
-        <main className='basis-3/4 bg-[#EDEDED] p-10'>
+        <Navbar />
+        <main className='bg-secondary ml-[25%] min-h-screen basis-3/4 p-10'>
           <SearchBar />
           {children}
         </main>
