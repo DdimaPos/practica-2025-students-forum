@@ -4,9 +4,11 @@ import { getUser } from '@/utils/getUser';
 export async function GET() {
   try {
     const user = await getUser();
+
     return NextResponse.json(user);
   } catch (err: unknown) {
     let message = 'Unexpected error';
+
     if (err instanceof Error) {
       message = err.message;
       console.error('Error in /api/user:', message);

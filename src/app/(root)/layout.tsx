@@ -11,7 +11,7 @@ export default function RootLayout({
     <div className='flex'>
       <SearchProvider>
         <Navbar />
-        <main className='bg-secondary ml-[25%] min-h-screen basis-3/4 p-10'>
+        <main className='bg-secondary ml-[25%] flex min-h-screen basis-3/4 flex-col gap-2 p-10'>
           <SearchBar />
           {children}
         </main>

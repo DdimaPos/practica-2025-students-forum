@@ -185,7 +185,9 @@ export const posts = pgTable(
 
 export const pollOptions = pgTable('poll_options', {
   id: serial('id').primaryKey(),
-  postId: integer('post_id').references(() => posts.id, { onDelete: 'cascade' }),
+  postId: integer('post_id').references(() => posts.id, {
+    onDelete: 'cascade',
+  }),
   optionText: varchar('option_text', { length: 500 }).notNull(),
   voteCount: integer('vote_count').default(0),
   optionOrder: integer('option_order').notNull(),
@@ -285,11 +287,8 @@ export const professorReviews = pgTable(
     createdAt: timestamp('created_at').defaultNow(),
   },
   table => [
-    unique().on(
-      table.reviewerId,
-      table.courseProfessorsId
-    ),
-    index('idx_professor_reviews_prof').on(table.courseProfessorsId)
+    unique().on(table.reviewerId, table.courseProfessorsId),
+    index('idx_professor_reviews_prof').on(table.courseProfessorsId),
   ]
 );
 

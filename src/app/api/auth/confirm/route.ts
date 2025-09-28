@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import db from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-// import { getUser } from '@/features/Authentication/getUser';
+// import { getUser } from '@/utils/getUser';
 
 export async function GET(request: NextRequest) {
   console.log('Confirming email...');
@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
   const next = searchParams.get('next') ?? '/';
+
   if (!token_hash || !type) {
     redirect('/error');
   }
@@ -30,15 +31,14 @@ export async function GET(request: NextRequest) {
       throw error || new Error('Invalid token or user ID');
     }
 
-    await db.update(users)
+    await db
+      .update(users)
       .set({ isVerified: true })
       .where(eq(users.authId, data.user.id));
-
   } catch (error) {
     console.error('Error during email confirmation:', error);
     redirect('/error');
   }
 
   redirect(next);
-
 }

@@ -13,6 +13,7 @@ export function usePostSearch() {
     if (!searchQuery.trim()) {
       setResults(undefined);
       setError(undefined);
+
       return;
     }
 
@@ -22,7 +23,7 @@ export function usePostSearch() {
     try {
       const url = `/api/search/posts?q=${encodeURIComponent(searchQuery)}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Search failed: ${response.status}`);
       }
@@ -30,7 +31,8 @@ export function usePostSearch() {
       const data = await response.json();
       setResults(data);
     } catch (error_) {
-      const errorMessage = error_ instanceof Error ? error_.message : 'Search failed';
+      const errorMessage =
+        error_ instanceof Error ? error_.message : 'Search failed';
       setError(errorMessage);
     } finally {
       setLoading(false);

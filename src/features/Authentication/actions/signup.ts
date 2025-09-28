@@ -6,9 +6,9 @@ import db from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
-
 async function checkUserExists(email: string) {
-  const ures = await db.select().from(users).where(eq(users.email, email))
+  const ures = await db.select().from(users).where(eq(users.email, email));
+
   return ures.length > 0 && ures[0].isVerified;
 }
 
@@ -27,7 +27,10 @@ async function checkUserExists(email: string) {
 
 async function _signup(data: SignupFormData) {
   if (await checkUserExists(data.email)) {
-    return { error: 'This email is already registered. Please login or reset your password' };
+    return {
+      error:
+        'This email is already registered. Please login or reset your password',
+    };
   }
 
   const supabase = await createClient();
@@ -41,11 +44,14 @@ async function _signup(data: SignupFormData) {
   }
 
   if (!res.data.user) {
-    return { error: 'Sign up failed. Please try again.' }
+    return { error: 'Sign up failed. Please try again.' };
   }
 
   if (!res.data.user.role || !res.data.user.confirmation_sent_at) {
-    return { error: 'Confirmation email not sent. Please verify if your email is correct or an account already exists.' }
+    return {
+      error:
+        'Confirmation email not sent. Please verify if your email is correct or an account already exists.',
+    };
   }
 
   console.log('user data: ', res.data.user);
@@ -61,6 +67,7 @@ async function _signup(data: SignupFormData) {
     isVerified: false,
     // profilePictureUrl: data.profilePictureUrl,
   });
+
   return { error: undefined };
 }
 
@@ -68,30 +75,34 @@ export async function signup(
   _: FormState,
   formData: FormData
 ): Promise<FormState> {
-
   const data = Object.fromEntries(formData.entries());
 
   const parsed = signupFormSchema.safeParse(data);
+
   if (!parsed.success) {
     console.error('Validation error:', parsed.error);
+
     return {
       success: false,
       message: parsed.error.issues.map(issue => issue.message).join(', '),
-    }
+    };
   }
 
   const { error } = await _signup(parsed.data);
+
   if (error) {
     console.error('Sign up error:', error);
+
     return {
       success: false,
-      message: error
+      message: error,
     };
   }
 
   return {
     success: true,
-    message: 'Confirmation email sent! Please check your inbox to complete registration.',
+    message:
+      'Confirmation email sent! Please check your inbox to complete registration.',
   };
 
   // Note: If Supabase project has email confirmation disabled,

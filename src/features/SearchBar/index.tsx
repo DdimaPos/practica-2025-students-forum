@@ -1,7 +1,7 @@
 'use client';
 
-import {Filter} from 'lucide-react';
-import {Button} from '@/components/ui/button';
+import { Filter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useSearchContext } from '@/features/search/context/SearchContext';
 import SearchDropdown from '@/features/search/components/SearchDropdown';
 import { useRef, useEffect } from 'react';
@@ -21,7 +21,10 @@ export default function SearchBar() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     }
@@ -46,6 +49,7 @@ export default function SearchBar() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     search(e.target.value);
+
     if (!e.target.value.trim()) {
       clearSearch();
     }
@@ -76,15 +80,15 @@ export default function SearchBar() {
             {query && (
               <button
                 onClick={handleClearSearch}
-                className='text-gray-400 hover:text-gray-600 text-sm'
+                className='text-sm text-gray-400 hover:text-gray-600'
               >
                 ✕
               </button>
             )}
-            <Filter 
+            <Filter
               className={`h-5 w-5 cursor-pointer transition-colors ${
-                loading 
-                  ? 'text-blue-500 animate-pulse' 
+                loading
+                  ? 'animate-pulse text-blue-500'
                   : 'text-gray-500 hover:text-black'
               }`}
               onClick={handleFilterClick}

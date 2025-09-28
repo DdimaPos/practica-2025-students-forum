@@ -1,6 +1,13 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import type { PostSearchResponse } from '@/lib/search/types';
 
 interface SearchContextType {
@@ -23,7 +30,9 @@ const SearchContext = createContext<SearchContextType | undefined>(undefined);
 export function SearchProvider({ children }: { children: React.ReactNode }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<PostSearchResponse | undefined>();
-  const [suggestions, setSuggestions] = useState<PostSearchResponse | undefined>();
+  const [suggestions, setSuggestions] = useState<
+    PostSearchResponse | undefined
+  >();
   const [loading, setLoading] = useState(false);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
@@ -31,10 +40,10 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
   const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const performSearch = useCallback(async (searchQuery: string) => {
-    
     if (!searchQuery.trim()) {
       setResults(undefined);
       setError(undefined);
+
       return;
     }
 
@@ -43,9 +52,9 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const url = `/api/search/posts?q=${encodeURIComponent(searchQuery)}`;
-      
+
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Search failed: ${response.status}`);
       }
@@ -53,7 +62,8 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       setResults(data);
     } catch (error_) {
-      const errorMessage = error_ instanceof Error ? error_.message : 'Search failed';
+      const errorMessage =
+        error_ instanceof Error ? error_.message : 'Search failed';
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -64,6 +74,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     if (!searchQuery.trim()) {
       setSuggestions(undefined);
       setShowDropdown(false);
+
       return;
     }
 
@@ -71,9 +82,9 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const url = `/api/search/posts?q=${encodeURIComponent(searchQuery)}&limit=5`;
-      
+
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Suggestion search failed: ${response.status}`);
       }
@@ -90,17 +101,20 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const search = useCallback((newQuery: string) => {
-    setQuery(newQuery);
-    
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
+  const search = useCallback(
+    (newQuery: string) => {
+      setQuery(newQuery);
 
-    debounceTimeoutRef.current = setTimeout(() => {
-      performSuggestionSearch(newQuery);
-    }, 300);
-  }, [performSuggestionSearch]);
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+
+      debounceTimeoutRef.current = setTimeout(() => {
+        performSuggestionSearch(newQuery);
+      }, 300);
+    },
+    [performSuggestionSearch]
+  );
 
   const searchNow = useCallback(() => {
     setShowDropdown(false);
@@ -113,7 +127,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     setSuggestions(undefined);
     setError(undefined);
     setShowDropdown(false);
-    
+
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
@@ -151,8 +165,10 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
 export function useSearchContext() {
   const context = useContext(SearchContext);
+
   if (context === undefined) {
     throw new Error('useSearchContext must be used within a SearchProvider');
   }
+
   return context;
 }
