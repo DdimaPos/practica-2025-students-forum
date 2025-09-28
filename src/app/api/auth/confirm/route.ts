@@ -3,27 +3,42 @@ import { type NextRequest } from 'next/server';
 
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
+import db from '@/db';
+import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+// import { getUser } from '@/utils/getUser';
 
 export async function GET(request: NextRequest) {
+  console.log('Confirming email...');
+
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
   const next = searchParams.get('next') ?? '/';
 
-  if (token_hash && type) {
-    const supabase = await createClient();
+  if (!token_hash || !type) {
+    redirect('/error');
+  }
 
-    const { error } = await supabase.auth.verifyOtp({
+  try {
+    const supabase = await createClient();
+    const { error, data } = await supabase.auth.verifyOtp({
       type,
       token_hash,
     });
 
-    if (!error) {
-      // redirect user to specified redirect URL or root of app
-      redirect(next);
+    if (error || !data.user?.id) {
+      throw error || new Error('Invalid token or user ID');
     }
+
+    await db
+      .update(users)
+      .set({ isVerified: true })
+      .where(eq(users.authId, data.user.id));
+  } catch (error) {
+    console.error('Error during email confirmation:', error);
+    redirect('/error');
   }
 
-  // redirect the user to an error page with some instructions
-  redirect('/error');
+  redirect(next);
 }
