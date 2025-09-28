@@ -6,7 +6,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     
     const query = searchParams.get('q') || '';
-    const limit = parseInt(searchParams.get('limit') || '0');
+    const limit = Math.min(Math.max(0, parseInt(searchParams.get('limit') || '0')), 100); // Cap limit
+
+    if (query.length > 100) {
+      return NextResponse.json(
+        { error: 'Search query too long' },
+        { status: 400 }
+      );
+    }
 
     const result = await searchPosts(query, limit);
     return NextResponse.json(result);
