@@ -1,6 +1,6 @@
-import {useInfiniteScroll} from './hooks/useInfiniteScroll';
+import { useInfiniteScroll } from './hooks/useInfiniteScroll';
 import PostCard from './components/PostCard';
-import {PostProp} from './types/post';
+import { PostProp } from './types/post';
 
 type PostsProps = {
   posts: PostProp[];
@@ -8,7 +8,7 @@ type PostsProps = {
   loadMore: () => void;
 };
 
-export default function Posts({posts, loading, loadMore}: PostsProps) {
+export default function Posts({ posts, loading, loadMore }: PostsProps) {
   const loaderRef = useInfiniteScroll(loadMore);
 
   if (loading && (!posts || posts.length === 0)) {

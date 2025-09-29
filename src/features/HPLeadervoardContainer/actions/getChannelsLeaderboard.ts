@@ -4,7 +4,7 @@ import db from '@/db';
 import { posts, channels, postReactions } from '@/db/schema';
 import { sql, eq } from 'drizzle-orm';
 
-export async function getChannelsLeaderboard( ): Promise<{
+export async function getChannelsLeaderboard(): Promise<{
   channels: {
     id: number;
     name: string;
@@ -45,5 +45,5 @@ export async function getChannelsLeaderboard( ): Promise<{
     reactionsCount: row.reactionsCount ?? 0,
   }));
 
-  return { channels: channelsList , total: rows[0].total ?? 0 };
+  return { channels: channelsList, total: rows[0].total ?? 0 };
 }

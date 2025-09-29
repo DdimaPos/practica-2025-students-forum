@@ -15,7 +15,7 @@ export default function ChannelCard({
 }: ChannelCardProps) {
   return (
     <Link href={`/channels/${id}`}>
-      <div className='mb-2 flex cursor-pointer items-center justify-between rounded-lg px-4 py-3 shadow-md transition hover:shadow-lg border'>
+      <div className='mb-2 flex cursor-pointer items-center justify-between rounded-lg border px-4 py-3 shadow-md transition hover:shadow-lg'>
         <span className='font-medium text-gray-800'>{name}</span>
         <span className='font-semibold text-green-600'>{usersCount} users</span>
       </div>

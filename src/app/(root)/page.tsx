@@ -3,12 +3,12 @@ import LeaderboardContainer from '@/features/HPLeadervoardContainer';
 
 export default function HomePage() {
   return (
-    <div className='flex justify-between pt-2 max-h-[87vh]'>
-      <div className='w-6/9 overflow-y-auto rounded-lg bg-background p-4 shadow-sm hide-scrollbar'>
+    <div className='flex max-h-[87vh] justify-between pt-2'>
+      <div className='bg-background hide-scrollbar w-6/9 overflow-y-auto rounded-lg p-4 shadow-sm'>
         <PostsContainer />
       </div>
 
-      <div className='hide-scrollbar overflow-y-auto '>
+      <div className='hide-scrollbar overflow-y-auto'>
         <LeaderboardContainer />
       </div>
     </div>

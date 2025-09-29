@@ -16,7 +16,12 @@ export default async function ChannelsLeaderboard() {
           usersCount={channel.postsCount + channel.reactionsCount}
         />
       ))}
-      <Link className='text-sm text-gray-500 hover:underline' href={`/channels_leaderboard`}>Show more</Link>
+      <Link
+        className='text-sm text-gray-500 hover:underline'
+        href={`/channels_leaderboard`}
+      >
+        Show more
+      </Link>
     </div>
   );
 }
