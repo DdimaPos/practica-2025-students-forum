@@ -1,16 +1,17 @@
 'use client';
 
-import {usePosts} from './hooks/usePosts';
+import { usePosts } from './hooks/usePosts';
 import Posts from '../postList';
 
 export default function PostsContainer() {
-  const {posts, loading, loadMore, isSearchMode, searchResultsCount} = usePosts();
+  const { posts, loading, loadMore, isSearchMode, searchResultsCount } =
+    usePosts();
 
   return (
     <div>
       {isSearchMode && (
-        <div className='mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md'>
-          <p className='text-blue-700 text-sm'>
+        <div className='mb-4 rounded-md border border-blue-200 bg-blue-50 p-3'>
+          <p className='text-sm text-blue-700'>
             🔍 Search Results: {searchResultsCount} post(s) found
           </p>
         </div>

@@ -1,48 +1,19 @@
 import NavLink from './components/NavLink';
-import { NavItem } from './types/NavItem';
-import {
-  User,
-  Settings,
-  BookOpen,
-  Users2,
-  Github,
-  DollarSign,
-  PlusCircle,
-  Layers,
-  House,
-} from 'lucide-react';
+import { navSections } from './constants/navSections';
 import Logout from './components/Logout';
+import { getUser } from '@/utils/getUser';
+import Link from 'next/link';
+import { LogIn } from 'lucide-react';
 
-const navSections: NavItem[][] = [
-  [
-    { href: '/', label: 'Go to main', icon: House },
-    { href: '/profile', label: 'Profile', icon: User },
-    { href: '/settings', label: 'Settings', icon: Settings },
-  ],
-  [
-    { href: '/students', label: 'Students', icon: Users2 },
-    { href: '/professors', label: 'Professors', icon: BookOpen },
-    { href: '/clubs', label: 'Clubs', icon: Layers },
-    { href: '/channels', label: 'All Channels', icon: Layers },
-    { href: '/create-channel', label: 'Create Channel', icon: PlusCircle },
-  ],
-  [
-    {
-      href: 'https://github.com/DdimaPos/practica_2025_documentation_vault',
-      label: 'Github',
-      icon: Github,
-      external: true,
-    },
-    {
-      href: 'https://github.com/DdimaPos/practica_2025_documentation_vault',
-      label: 'Support',
-      icon: DollarSign,
-      external: true,
-    },
-  ],
-];
+export default async function Navbar() {
+  let user;
+  try {
+    user = await getUser();
+  } catch (err) {
+    console.error('Failed to fetch user in Navbar:', err);
+    user = null;
+  }
 
-export default function Navbar() {
   return (
     <nav className='fixed flex h-screen w-[25%] flex-col justify-center gap-15 border-r pl-[8%] text-[#818181]'>
       {navSections.map((section, sectionIndex) => (
@@ -52,7 +23,17 @@ export default function Navbar() {
           ))}
         </div>
       ))}
-      <Logout />
+
+      {user ? (
+        <Logout />
+      ) : (
+        <Link
+          href='/login'
+          className='flex cursor-pointer items-center gap-2 transition-colors duration-300 hover:text-black'
+        >
+          <LogIn className='h-5 w-5' /> Login
+        </Link>
+      )}
     </nav>
   );
 }

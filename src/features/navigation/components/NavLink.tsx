@@ -1,7 +1,12 @@
 import Link from 'next/link';
-import {NavItem} from '../types/NavItem';
+import { NavItem } from '../types/NavItem';
 
-export default function NavLink({href, label, icon: Icon, external}: NavItem) {
+export default function NavLink({
+  href,
+  label,
+  icon: Icon,
+  external,
+}: NavItem) {
   const baseClass =
     'flex items-center gap-2 transition-colors duration-300 hover:text-black';
 
