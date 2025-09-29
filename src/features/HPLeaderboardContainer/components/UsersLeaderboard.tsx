@@ -18,7 +18,7 @@ export default async function UsersLeaderboard() {
       ))}
       <Link
         className='text-sm text-gray-500 hover:underline'
-        href={`/users_leaderboard`}
+        href={`/leaderboard?tab=users`}
       >
         Show more
       </Link>

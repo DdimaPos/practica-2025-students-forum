@@ -4,7 +4,10 @@ import db from '@/db';
 import { users, studentRatings } from '@/db/schema';
 import { sql, eq, desc } from 'drizzle-orm';
 
-export async function getUsersLeaderboard(): Promise<{
+export async function getUsersLeaderboard(
+  limit: number = 4,
+  offset: number = 0
+): Promise<{
   users: {
     id: number;
     firstName: string | null;
@@ -32,7 +35,8 @@ export async function getUsersLeaderboard(): Promise<{
     .leftJoin(studentRatings, eq(studentRatings.ratedStudentId, users.id))
     .groupBy(users.id, users.firstName, users.lastName, users.profilePictureUrl)
     .orderBy(desc(avg), desc(count))
-    .limit(4);
+    .limit(limit)
+    .offset(offset);
 
   if (rows.length === 0) {
     return { users: [], total: 0 };

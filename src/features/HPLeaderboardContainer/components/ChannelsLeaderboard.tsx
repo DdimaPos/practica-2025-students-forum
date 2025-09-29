@@ -18,7 +18,7 @@ export default async function ChannelsLeaderboard() {
       ))}
       <Link
         className='text-sm text-gray-500 hover:underline'
-        href={`/channels_leaderboard`}
+        href={`/leaderboard?tab=channels`}
       >
         Show more
       </Link>
