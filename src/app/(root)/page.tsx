@@ -1,5 +1,5 @@
 import PostsContainer from '@/features/postsContainer/PostsContainer';
-import LeaderboardContainer from '@/features/HPLeadervoardContainer';
+import LeaderboardContainer from '@/features/HPLeaderboardContainer';
 
 export default function HomePage() {
   return (
