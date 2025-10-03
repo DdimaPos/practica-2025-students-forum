@@ -3,6 +3,15 @@ import db from '@/db';
 import { posts, users } from '@/db/schema';
 import type { PostSearchResult } from './types';
 
+function sanitizeSearchQuery(query: string): string {
+  if (!query || typeof query !== 'string') return '';
+  
+  return query
+    .trim()
+    .replace(/[%_\\]/g, '\\$&') 
+    .replace(/['";`-]/g, ''); 
+}
+
 export async function searchPosts(
   query: string,
   limit?: number,
@@ -12,11 +21,13 @@ export async function searchPosts(
   
   searchConditions.push(eq(posts.isActive, true));
   
-  if (query.trim()) {
+  const sanitizedQuery = sanitizeSearchQuery(query);
+  
+  if (sanitizedQuery) {
     searchConditions.push(
       or(
-        ilike(posts.title, `%${query}%`),
-        ilike(posts.content, `%${query}%`)
+        ilike(posts.title, `%${sanitizedQuery}%`),
+        ilike(posts.content, `%${sanitizedQuery}%`)
       )
     );
   }
