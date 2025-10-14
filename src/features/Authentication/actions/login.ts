@@ -13,7 +13,7 @@ export async function login(
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
@@ -22,11 +22,16 @@ export async function login(
     return { success: false, message: error.message };
   }
 
-  // If no MFA, go home
-  if (!data.session?.user.factors?.length) {
-    redirect('/');
+  const { data: aalLevel, error: aalError } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
+  if (aalError) {
+    return { success: false, message: aalError.message };
   }
 
-  // Otherwise, go to MFA page
-  redirect('/login/mfa');
+  if (aalLevel.nextLevel === 'aal2') {
+    redirect('/login/mfa');
+  }
+
+  redirect('/');
 }
