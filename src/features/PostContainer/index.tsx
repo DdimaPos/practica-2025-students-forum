@@ -1,6 +1,7 @@
 import { Post_type } from './types/Post_type';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Footer from './components/PostFooter';
+import { getUser } from '@/utils/getUser';
 import {
   Card,
   CardHeader,
@@ -9,7 +10,17 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 
-export default function Post({ ...post }: Post_type) {
+export default async function Post({ ...post }: Post_type) {
+  
+  let user;
+  try {
+      user = await getUser();
+    } catch (err) {
+      console.error('Failed to fetch user in Navbar:', err);
+      user = {id: null};
+    }
+
+
   return (
     <div>
       <Card className='mb-4 rounded-lg bg-white pb-0 shadow-md'>
@@ -32,7 +43,7 @@ export default function Post({ ...post }: Post_type) {
         <CardDescription className='px-4 py-2'>{post.content}</CardDescription>
 
         <CardFooter className='px-0'>
-          <Footer post={post} />
+          <Footer post={post} userId={user.id}/>
         </CardFooter>
       </Card>
     </div>
