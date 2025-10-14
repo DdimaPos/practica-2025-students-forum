@@ -11,15 +11,13 @@ import {
 } from '@/components/ui/card';
 
 export default async function Post({ ...post }: Post_type) {
-  
   let user;
   try {
-      user = await getUser();
-    } catch (err) {
-      console.error('Failed to fetch user in Navbar:', err);
-      user = {id: null};
-    }
-
+    user = await getUser();
+  } catch (err) {
+    console.error('Failed to fetch user in Navbar:', err);
+    user = { id: null };
+  }
 
   return (
     <div>
@@ -43,7 +41,7 @@ export default async function Post({ ...post }: Post_type) {
         <CardDescription className='px-4 py-2'>{post.content}</CardDescription>
 
         <CardFooter className='px-0'>
-          <Footer post={post} userId={user.id}/>
+          <Footer post={post} userId={user.id} />
         </CardFooter>
       </Card>
     </div>

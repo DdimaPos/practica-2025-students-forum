@@ -6,11 +6,15 @@ import { Post_type } from '../types/Post_type';
 import ReplyContainer from './ReplyContainer';
 import { useState } from 'react';
 
-export default function Footer({ post, userId }: { post: Post_type; userId: number | null }) {
+export default function Footer({
+  post,
+  userId,
+}: {
+  post: Post_type;
+  userId: number | null;
+}) {
   const [showReply, setShowReply] = useState(false);
   const router = useRouter();
-  console.log('PostFooter userId:', userId);
-  console.log('PostFooter post:', post.id);
 
   const handleMessage = () => {
     if (!userId) {
@@ -62,7 +66,9 @@ export default function Footer({ post, userId }: { post: Post_type; userId: numb
         </div>
       </div>
 
-      {userId && showReply && <ReplyContainer postId={post.id} authorId = {userId} />}
+      {userId && showReply && (
+        <ReplyContainer postId={post.id} authorId={userId} />
+      )}
     </div>
   );
 }
