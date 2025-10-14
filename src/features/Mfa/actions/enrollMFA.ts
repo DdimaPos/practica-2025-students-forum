@@ -14,13 +14,33 @@ export async function enrollMFA() {
     throw new Error('You must be logged in to enroll MFA.');
   }
 
-  const { data, error } = await supabase.auth.mfa.enroll({
+  const { data: factors, error: listError } =
+    await supabase.auth.mfa.listFactors();
+
+  if (listError) {
+    throw new Error(listError.message);
+  }
+
+  const unverifiedTotpFactor = factors?.all.find(
+    factor => factor.factor_type === 'totp' && factor.status === 'unverified'
+  );
+
+  if (unverifiedTotpFactor) {
+    const { error: unenrollError } = await supabase.auth.mfa.unenroll({
+      factorId: unverifiedTotpFactor.id,
+    });
+
+    if (unenrollError) {
+      throw new Error(unenrollError.message);
+    }
+  }
+
+  const { data, error: enrollError } = await supabase.auth.mfa.enroll({
     factorType: 'totp',
   });
 
-  if (error) {
-    console.error('Enroll MFA error:', error.message);
-    throw new Error(error.message);
+  if (enrollError) {
+    throw new Error(enrollError.message);
   }
 
   return {
