@@ -17,13 +17,10 @@ export const signupFormSchema = z.object({
     .min(1, { message: 'Year of study must be at least 1' })
     .max(5, { message: 'Year of study must be at most 5' })
     .optional(),
-  password: z
-    .string()
-    .min(
-      passwordLength,
-      { message: `Password must be at least ${passwordLength} characters long` }
-    ),
-})
+  password: z.string().min(passwordLength, {
+    message: `Password must be at least ${passwordLength} characters long`,
+  }),
+});
 
 export type SignupFormData = z.infer<typeof signupFormSchema>;
 

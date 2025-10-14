@@ -36,6 +36,7 @@ import { toast } from 'sonner';
 interface Props {
   factorId: string;
   challengeId: string;
+  redirectTo?: string;
 }
 
 const FormSchema = z.object({
@@ -47,7 +48,7 @@ const FormSchema = z.object({
     .regex(/^\d+$/, { message: 'Must contain only numbers' }),
 });
 
-export function MFAForm({ factorId, challengeId }: Props) {
+export function MFAForm({ factorId, challengeId, redirectTo }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -74,7 +75,7 @@ export function MFAForm({ factorId, challengeId }: Props) {
       return;
     }
 
-    router.push('/');
+    router.push(redirectTo ?? '/');
   }
 
   return (
