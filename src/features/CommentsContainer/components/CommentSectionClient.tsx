@@ -10,16 +10,20 @@ export default function CommentSectionClient({
   postId,
   initialComments,
   total,
+  userId
 }: {
   postId: number;
   initialComments: CommentWithMeta[];
   total: number;
+  userId: number | null;
 }) {
   const [comments, setComments] = useState(initialComments);
   const [offset, setOffset] = useState(initialComments.length);
   const [loading, setLoading] = useState(false);
 
   const limit = 5;
+
+
 
   async function loadMore() {
     setLoading(true);
@@ -48,7 +52,7 @@ export default function CommentSectionClient({
     <div>
       <div className='border-l-2 border-gray-200 pl-4'>
         {comments.map(c => (
-          <CommentThread key={c.id} comment={c} />
+          <CommentThread key={c.id} postId={postId} comment={c} authorId={userId} />
         ))}
       </div>
 

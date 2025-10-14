@@ -4,11 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CommentType } from '../types/Comment_type';
 import { Calendar, MessageCircle, ArrowUp, ArrowDown } from 'lucide-react';
 
+interface CommentCardProps {
+  comment: CommentType & { repliesCount?: number; rating?: number };
+  onReplyClick?: () => void;
+}
+
 export default function CommentCard({
   comment,
-}: {
-  comment: CommentType & { repliesCount?: number; rating?: number };
-}) {
+  onReplyClick,
+}: CommentCardProps) {
   return (
     <Card className='mb-3 gap-0 shadow-sm'>
       <CardHeader className='px-3 py-1'>
@@ -29,7 +33,10 @@ export default function CommentCard({
           </div>
 
           <div className='flex items-center gap-2'>
-            <button className='flex items-center gap-1 hover:text-black'>
+            <button
+              onClick={onReplyClick}
+              className='flex items-center gap-1 hover:text-black'
+            >
               <MessageCircle className='h-4 w-4' />
               <span>Reply</span>
             </button>

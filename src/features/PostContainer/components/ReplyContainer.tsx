@@ -64,23 +64,25 @@ export default function ReplyContainer({
   };
 
   return (
-    <div className='mt-4 flex flex-col gap-2 rounded-lg border border-gray-300 bg-white p-3'>
-      <Textarea
-        value={message}
-        onChange={e => setMessage(e.target.value)}
-        className='w-full flex-1 resize-none overflow-y-auto'
-        placeholder='Write a reply...'
-        disabled={loading}
-      />
-
-      <div className='flex items-center justify-end gap-2'>
-        <Button
-          onClick={handleSubmit}
-          className='cursor-pointer p-2'
+    <div>
+      <div className='mt-4 flex gap-2 rounded-lg border border-gray-300 bg-white p-3'>
+        <Textarea
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          className='w-full flex-1 resize-none overflow-y-auto'
+          placeholder='Write a reply...'
           disabled={loading}
-        >
-          <Send className='h-5 w-5' />
-        </Button>
+        />
+
+        <div className='flex items-center justify-end gap-2'>
+          <Button
+            onClick={handleSubmit}
+            className='cursor-pointer p-2'
+            disabled={loading}
+          >
+            <Send className='h-5 w-5' />
+          </Button>
+        </div>
       </div>
 
       {success && (
