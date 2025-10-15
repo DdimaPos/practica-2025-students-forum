@@ -10,20 +10,21 @@ export const signupFormSchema = z.object({
   email: z.email({ message: 'Invalid email address' }),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  userType: z.enum(['student', 'professor', 'admin']).optional(),
+  userType: z.enum(['student', 'professor']).optional(),
   bio: z.string().optional(),
   yearOfStudy: z
-    .number()
-    .min(1, { message: 'Year of study must be at least 1' })
-    .max(5, { message: 'Year of study must be at most 5' })
+    .string()
+    .transform(val => (val ? parseInt(val, 10) : undefined))
+    .refine(val => val === undefined || (val >= 1 && val <= 5), {
+      message: 'Year of study must be between 1 and 5',
+    })
     .optional(),
   password: z
     .string()
-    .min(
-      passwordLength,
-      { message: `Password must be at least ${passwordLength} characters long` }
-    ),
-})
+    .min(passwordLength, {
+      message: `Password must be at least ${passwordLength} characters long`,
+    }),
+});
 
 export type SignupFormData = z.infer<typeof signupFormSchema>;
 

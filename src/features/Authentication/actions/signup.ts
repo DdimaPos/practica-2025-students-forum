@@ -34,9 +34,21 @@ async function _signup(data: SignupFormData) {
   }
 
   const supabase = await createClient();
+  const displayName =
+    data.firstName && data.lastName
+      ? `${data.firstName} ${data.lastName}`
+      : data.firstName || data.lastName || '';
+
   const res = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
+    options: {
+      data: {
+        display_name: displayName,
+        first_name: data.firstName,
+        last_name: data.lastName,
+      },
+    },
   });
 
   if (res.error) {
