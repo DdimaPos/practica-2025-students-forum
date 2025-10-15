@@ -18,9 +18,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
-    const author_id = Number(authorId);
-    const post_id = Number(postId);
-    const parent_comment_id = parentCommentId ? Number(parentCommentId) : null;
+    const author_id = String(authorId);
+    const post_id = String(postId);
+    const parent_comment_id = parentCommentId ? String(parentCommentId) : null;
 
     const result = await db
       .insert(comments)

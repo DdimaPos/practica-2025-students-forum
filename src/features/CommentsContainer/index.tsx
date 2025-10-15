@@ -3,11 +3,11 @@ import { getComments } from './actions/getComments';
 import CommentSectionClient from './components/CommentSectionClient';
 import { getUser } from '@/utils/getUser';
 
-export default async function CommentSection({ postId }: { postId: number }) {
+export default async function CommentSection({ postId }: { postId: string }) {
   console.log(`🗂️ CommentSection rendering for post ${postId}`);
 
   const getCachedComments = unstable_cache(
-    async (postId: number, limit: number, offset: number) => {
+    async (postId: string, limit: number, offset: number) => {
       console.log(
         `💾 Cache miss - fetching comments from DB with tag comments-${postId}`
       );

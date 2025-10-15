@@ -12,10 +12,10 @@ export default function CommentSectionClient({
   total,
   userId,
 }: {
-  postId: number;
+  postId: string;
   initialComments: CommentWithMeta[];
   total: number;
-  userId?: number;
+  userId?: string;
 }) {
   const [comments, setComments] = useState(initialComments);
   const [offset, setOffset] = useState(initialComments.length);

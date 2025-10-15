@@ -12,7 +12,7 @@ type LoadMoreChannelsProps = {
 };
 
 type ChannelCardProps = {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   postsCount: number;
