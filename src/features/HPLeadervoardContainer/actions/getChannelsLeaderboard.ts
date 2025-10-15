@@ -4,10 +4,7 @@ import db from '@/db';
 import { posts, channels, postReactions } from '@/db/schema';
 import { sql, eq } from 'drizzle-orm';
 
-export async function getChannelsLeaderboard(
-  limit: number = 4,
-  offset: number = 0
-): Promise<{
+export async function getChannelsLeaderboard(): Promise<{
   channels: {
     id: string;
     name: string;
@@ -33,8 +30,8 @@ export async function getChannelsLeaderboard(
     .leftJoin(postReactions, eq(postReactions.postId, posts.id))
     .groupBy(channels.id, channels.name, channels.description)
     .orderBy(sql`COUNT(DISTINCT ${posts.id}) + COUNT(${postReactions.id}) DESC`)
-    .limit(limit)
-    .offset(offset);
+    .limit(4)
+    .offset(0);
 
   if (rows.length === 0) {
     return { channels: [], total: 0 };
