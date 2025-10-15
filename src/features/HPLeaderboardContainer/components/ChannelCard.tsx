@@ -3,7 +3,7 @@
 import Link from 'next/link';
 
 type ChannelCardProps = {
-  id: number;
+  id: string;
   name: string;
   usersCount: number;
 };

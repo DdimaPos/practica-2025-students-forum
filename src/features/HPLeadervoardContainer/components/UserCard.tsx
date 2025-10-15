@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 type UserCardProps = {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   profilePictureUrl: string | null;

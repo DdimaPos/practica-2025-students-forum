@@ -7,7 +7,7 @@ import { Send } from 'lucide-react';
 import { addReply } from '../actions/getReply';
 
 interface ReplyFormProps {
-  postId: number;
+  postId: string;
 }
 
 export default function ReplyContainer({ postId }: ReplyFormProps) {

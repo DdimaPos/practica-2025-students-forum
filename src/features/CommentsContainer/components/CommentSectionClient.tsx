@@ -11,7 +11,7 @@ export default function CommentSectionClient({
   initialComments,
   total,
 }: {
-  postId: number;
+  postId: string;
   initialComments: CommentWithMeta[];
   total: number;
 }) {
