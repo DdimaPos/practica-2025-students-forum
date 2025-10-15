@@ -5,7 +5,7 @@ import { comments } from '@/db/schema';
 import { createClient } from '@/utils/supabase/server';
 
 export async function addReply(
-  postId: number,
+  postId: string,
   message: string,
   isAnonymous = false
 ) {
@@ -16,7 +16,7 @@ export async function addReply(
 
   if(user){
     await db.insert(comments).values({
-    authorId: Number(user.id),
+    authorId: user.id,
     parentCommentId: postId,
     content: message,
     isAnonymous: isAnonymous,

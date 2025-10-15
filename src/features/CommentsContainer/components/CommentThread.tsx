@@ -12,8 +12,8 @@ export default function CommentThread({
   authorId,
 }: {
   comment: CommentType & { repliesCount?: number; rating?: number };
-  postId: number;
-  authorId?: number;
+  postId: string;
+  authorId?: string;
 }) {
   const [replies, setReplies] = useState<CommentType[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -32,7 +32,7 @@ export default function CommentThread({
     setOptimisticReplies(prev => [...prev, optimisticReply]);
   };
 
-  const replaceOptimisticReply = (tempId: number, realComment: CommentType) => {
+  const replaceOptimisticReply = (tempId: string, realComment: CommentType) => {
     setOptimisticReplies(prev =>
       prev.map(reply => (reply.id === tempId ? realComment : reply))
     );
@@ -74,7 +74,7 @@ export default function CommentThread({
           comment.repliesCount > 0 &&
           !loaded &&
           optimisticReplies.length === 0 && (
-            <p className='text-center text-sm text-gray-500 pb-2'>
+            <p className='pb-2 text-center text-sm text-gray-500'>
               Show {comment.repliesCount} repl
               {comment.repliesCount === 1 ? 'y' : 'ies'}
               <button

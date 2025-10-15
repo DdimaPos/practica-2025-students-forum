@@ -8,11 +8,11 @@ import { CommentType } from '@/features/CommentsContainer/types/Comment_type';
 import { useRouter } from 'next/navigation';
 
 interface ReplyFormProps {
-  postId: number;
-  authorId: number;
-  parentCommentId?: number | null;
+  postId: string;
+  authorId: string;
+  parentCommentId?: string | null;
   setOptimisticReply?: (reply: CommentType) => void;
-  replaceOptimisticReply?: (tempId: number, realComment: CommentType) => void;
+  replaceOptimisticReply?: (tempId: string, realComment: CommentType) => void;
 }
 
 export default function ReplyContainer({
@@ -29,7 +29,7 @@ export default function ReplyContainer({
   const handleSubmit = async () => {
     if (!message.trim()) return;
 
-    const tempId = Date.now();
+    const tempId = String(Date.now());
     const optimisticReply = {
       id: tempId,
       postId,

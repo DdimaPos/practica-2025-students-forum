@@ -14,7 +14,7 @@ import {
 import { ArrowUp, ArrowDown, MessageCircle, Calendar } from 'lucide-react';
 
 interface PostProps extends Post_type {
-  userId?: number | null;
+  userId?: string | null;
 }
 
 export default function Post({ userId, ...post }: PostProps) {
