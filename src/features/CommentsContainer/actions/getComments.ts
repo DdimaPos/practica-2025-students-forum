@@ -7,7 +7,7 @@ import { alias } from 'drizzle-orm/pg-core';
 import { CommentType } from '../types/Comment_type';
 
 export async function getComments(
-  postId: number,
+  postId: string,
   limit = 5,
   offset = 0
 ): Promise<{

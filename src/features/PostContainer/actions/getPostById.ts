@@ -30,7 +30,7 @@ export async function getPostById(id: string): Promise<Post_type | null> {
     .from(posts)
     .leftJoin(users, eq(users.id, posts.authorId))
     .leftJoin(postReactions, eq(postReactions.postId, posts.id))
-    .where(eq(posts.id, Number(id)))
+    .where(eq(posts.id, id))
     .groupBy(posts.id, users.firstName, users.lastName);
 
   if (result.length === 0) return null;

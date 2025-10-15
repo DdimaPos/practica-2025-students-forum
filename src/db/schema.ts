@@ -65,7 +65,7 @@ export const ratingCategoryEnum = pgEnum('rating_category', [
 ]);
 
 export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   authId: uuid('auth_id').references(() => authUsers.id, {
     onDelete: 'cascade',
   }),
@@ -80,7 +80,7 @@ export const users = pgTable('users', {
 });
 
 export const faculties = pgTable('faculties', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   name: varchar('name', { length: 200 }).notNull(),
   description: text('description'),
   deanName: varchar('dean_name', { length: 200 }),
@@ -89,8 +89,8 @@ export const faculties = pgTable('faculties', {
 });
 
 export const specialities = pgTable('specialities', {
-  id: serial('id').primaryKey(),
-  facultyId: integer('faculty_id').references(() => faculties.id, {
+  id: uuid('id').defaultRandom().primaryKey(),
+  facultyId: uuid('faculty_id').references(() => faculties.id, {
     onDelete: 'cascade',
   }),
   name: varchar('name', { length: 200 }).notNull(),
@@ -103,11 +103,11 @@ export const specialities = pgTable('specialities', {
 export const userSpecialities = pgTable(
   'user_specialities',
   {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id').references(() => users.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
-    specialityId: integer('speciality_id').references(() => specialities.id, {
+    specialityId: uuid('speciality_id').references(() => specialities.id, {
       onDelete: 'cascade',
     }),
     enrollmentDate: date('enrollment_date'),
@@ -118,12 +118,12 @@ export const userSpecialities = pgTable(
 );
 
 export const courses = pgTable('courses', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   name: varchar('name', { length: 200 }).notNull(),
   code: varchar('code', { length: 20 }).unique().notNull(),
   description: text('description'),
   credits: integer('credits').default(3),
-  facultyId: integer('faculty_id').references(() => faculties.id),
+  facultyId: uuid('faculty_id').references(() => faculties.id),
   semester: integer('semester'),
   createdAt: timestamp('created_at').defaultNow(),
 });
@@ -131,11 +131,11 @@ export const courses = pgTable('courses', {
 export const courseProfessors = pgTable(
   'course_professors',
   {
-    id: serial('id').primaryKey(),
-    courseId: integer('course_id').references(() => courses.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    courseId: uuid('course_id').references(() => courses.id, {
       onDelete: 'cascade',
     }),
-    professorId: integer('professor_id').references(() => users.id, {
+    professorId: uuid('professor_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
     academicYear: varchar('academic_year', { length: 10 }),
@@ -146,28 +146,28 @@ export const courseProfessors = pgTable(
 
 // Channels & Posts
 export const channels = pgTable('channels', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
   channelType: channelTypeEnum('channel_type').notNull(),
-  facultyId: integer('faculty_id').references(() => faculties.id),
-  specialityId: integer('speciality_id').references(() => specialities.id),
+  facultyId: uuid('faculty_id').references(() => faculties.id),
+  specialityId: uuid('speciality_id').references(() => specialities.id),
   isApproved: boolean('is_approved').default(true),
-  createdBy: integer('created_by').references(() => users.id),
+  createdBy: uuid('created_by').references(() => users.id),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
 export const posts = pgTable(
   'posts',
   {
-    id: serial('id').primaryKey(),
+    id: uuid('id').defaultRandom().primaryKey(),
     title: varchar('title', { length: 300 }).notNull(),
     content: text('content').notNull(),
     postType: postTypeEnum('post_type').default('basic'),
-    authorId: integer('author_id').references(() => users.id, {
+    authorId: uuid('author_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
-    channelId: integer('channel_id').references(() => channels.id),
+    channelId: uuid('channel_id').references(() => channels.id),
     isAnonymous: boolean('is_anonymous').default(false),
     locationLat: decimal('location_lat', { precision: 10, scale: 8 }),
     locationLng: decimal('location_lng', { precision: 11, scale: 8 }),
@@ -184,8 +184,8 @@ export const posts = pgTable(
 );
 
 export const pollOptions = pgTable('poll_options', {
-  id: serial('id').primaryKey(),
-  postId: integer('post_id').references(() => posts.id, {
+  id: uuid('id').defaultRandom().primaryKey(),
+  postId: uuid('post_id').references(() => posts.id, {
     onDelete: 'cascade',
   }),
   optionText: varchar('option_text', { length: 500 }).notNull(),
@@ -196,11 +196,11 @@ export const pollOptions = pgTable('poll_options', {
 export const pollVotes = pgTable(
   'poll_votes',
   {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id').references(() => users.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
-    pollOptionId: integer('poll_option_id').references(() => pollOptions.id, {
+    pollOptionId: uuid('poll_option_id').references(() => pollOptions.id, {
       onDelete: 'cascade',
     }),
     votedAt: timestamp('voted_at').defaultNow(),
@@ -211,11 +211,11 @@ export const pollVotes = pgTable(
 export const postReactions = pgTable(
   'post_reactions',
   {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id').references(() => users.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
-    postId: integer('post_id').references(() => posts.id, {
+    postId: uuid('post_id').references(() => posts.id, {
       onDelete: 'cascade',
     }),
     reactionType: reactionTypeEnum('reaction_type').notNull(),
@@ -227,14 +227,14 @@ export const postReactions = pgTable(
 export const comments = pgTable(
   'comments',
   {
-    id: serial('id').primaryKey(),
-    postId: integer('post_id').references(() => posts.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    postId: uuid('post_id').references(() => posts.id, {
       onDelete: 'cascade',
     }),
-    authorId: integer('author_id').references(() => users.id, {
+    authorId: uuid('author_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
-    parentCommentId: integer('parent_comment_id'),
+    parentCommentId: uuid('parent_comment_id'),
     content: text('content').notNull(),
     isAnonymous: boolean('is_anonymous').default(false),
     createdAt: timestamp('created_at').defaultNow(),
@@ -253,11 +253,11 @@ export const comments = pgTable(
 export const commentReactions = pgTable(
   'comment_reactions',
   {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id').references(() => users.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
-    commentId: integer('comment_id').references(() => comments.id, {
+    commentId: uuid('comment_id').references(() => comments.id, {
       onDelete: 'cascade',
     }),
     reactionType: reactionTypeEnum('reaction_type').notNull(),
@@ -270,11 +270,11 @@ export const commentReactions = pgTable(
 export const professorReviews = pgTable(
   'professor_reviews',
   {
-    id: serial('id').primaryKey(),
-    reviewerId: integer('reviewer_id').references(() => users.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    reviewerId: uuid('reviewer_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
-    courseProfessorsId: integer('course_professor_id').references(
+    courseProfessorsId: uuid('course_professor_id').references(
       () => courseProfessors.id,
       { onDelete: 'cascade' }
     ),
@@ -295,11 +295,11 @@ export const professorReviews = pgTable(
 export const studentRatings = pgTable(
   'student_ratings',
   {
-    id: serial('id').primaryKey(),
-    ratedStudentId: integer('rated_student_id').references(() => users.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    ratedStudentId: uuid('rated_student_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
-    raterId: integer('rater_id').references(() => users.id, {
+    raterId: uuid('rater_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
     category: ratingCategoryEnum('category').notNull(),
@@ -380,14 +380,14 @@ export const studentRatings = pgTable(
 export const notifications = pgTable(
   'notifications',
   {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id').references(() => users.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
     title: varchar('title', { length: 200 }).notNull(),
     message: text('message').notNull(),
     notificationType: notificationTypeEnum('notification_type').notNull(),
-    relatedId: integer('related_id'),
+    relatedId: uuid('related_id'),
     isRead: boolean('is_read').default(false),
     createdAt: timestamp('created_at').defaultNow(),
   },
@@ -397,11 +397,11 @@ export const notifications = pgTable(
 export const userFollowers = pgTable(
   'user_followers',
   {
-    id: serial('id').primaryKey(),
-    followerId: integer('follower_id').references(() => users.id, {
+    id: uuid('id').defaultRandom().primaryKey(),
+    followerId: uuid('follower_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
-    followingId: integer('following_id').references(() => users.id, {
+    followingId: uuid('following_id').references(() => users.id, {
       onDelete: 'cascade',
     }),
     createdAt: timestamp('created_at').defaultNow(),
