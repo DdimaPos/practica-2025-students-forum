@@ -11,6 +11,7 @@ interface ReplyFormProps {
   authorId: number;
   parentCommentId?: number | null;
   setOptimisticReply?: (reply: CommentType) => void;
+  replaceOptimisticReply?: (tempId: number, realComment: CommentType) => void;
 }
 
 export default function ReplyContainer({
@@ -18,6 +19,7 @@ export default function ReplyContainer({
   authorId,
   parentCommentId = null,
   setOptimisticReply,
+  replaceOptimisticReply,
 }: ReplyFormProps) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,22 +27,19 @@ export default function ReplyContainer({
   const handleSubmit = async () => {
     if (!message.trim()) return;
 
-    // Create optimistic reply
+    const tempId = Date.now();
     const optimisticReply = {
-      id: Date.now(), // Temporary ID
+      id: tempId,
       postId,
       authorId,
       parentComment: parentCommentId || null,
       content: message.trim(),
       isAnonymous: false,
       createdAt: new Date(),
-      authorName: 'You', // Will be replaced when real data comes back
+      authorName: 'You',
     };
 
-    // Call optimistic update immediately
     setOptimisticReply?.(optimisticReply);
-    setMessage('');
-
     setLoading(true);
 
     try {
@@ -59,6 +58,18 @@ export default function ReplyContainer({
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
         throw new Error(json?.error || 'Failed to send comment');
+      }
+
+      // Get the real comment data from API response
+      const responseData = await res.json();
+
+      if (responseData.comment && replaceOptimisticReply) {
+        // Replace optimistic comment with real data
+        const realComment = {
+          ...responseData.comment,
+          authorName: 'You', // Keep the current user's name
+        };
+        replaceOptimisticReply(tempId, realComment);
       }
     } catch (err: unknown) {
       console.error(err);

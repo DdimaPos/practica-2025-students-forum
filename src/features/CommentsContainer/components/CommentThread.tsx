@@ -32,6 +32,12 @@ export default function CommentThread({
     setOptimisticReplies(prev => [...prev, optimisticReply]);
   };
 
+  const replaceOptimisticReply = (tempId: number, realComment: CommentType) => {
+    setOptimisticReplies(prev =>
+      prev.map(reply => (reply.id === tempId ? realComment : reply))
+    );
+  };
+
   const handleReplyClick = () => {
     if (!authorId) {
       router.push('/login');
@@ -58,16 +64,17 @@ export default function CommentThread({
             authorId={authorId}
             parentCommentId={comment.id}
             setOptimisticReply={setOptimisticReply}
+            replaceOptimisticReply={replaceOptimisticReply}
           />
         )}
       </div>
 
-      <div className='flex flex-col gap-3'>
+      <div className='flex flex-col gap-3 p-0.5'>
         {comment.repliesCount &&
           comment.repliesCount > 0 &&
           !loaded &&
           optimisticReplies.length === 0 && (
-            <p className='text-center text-sm text-gray-500'>
+            <p className='text-center text-sm text-gray-500 pb-2'>
               Show {comment.repliesCount} repl
               {comment.repliesCount === 1 ? 'y' : 'ies'}
               <button
