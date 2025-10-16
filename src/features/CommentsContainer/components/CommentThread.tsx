@@ -45,9 +45,13 @@ export default function CommentThread({
 
   return (
     <div className='ml-6'>
-      <CommentCard comment={comment} onReplyClick={handleReplyClick} />
+      <div className='mb-3'>
+        <CommentCard
+          comment={comment}
+          onReplyClick={handleReplyClick}
+          hasReplyAttached={showReply && !!authorId}
+        />
 
-      <div className='flex flex-col gap-3'>
         {showReply && authorId && (
           <ReplyContainer
             postId={postId}
@@ -56,7 +60,9 @@ export default function CommentThread({
             setOptimisticReply={setOptimisticReply}
           />
         )}
+      </div>
 
+      <div className='flex flex-col gap-3'>
         {comment.repliesCount &&
           comment.repliesCount > 0 &&
           !loaded &&
@@ -74,7 +80,7 @@ export default function CommentThread({
           )}
 
         {(loaded || optimisticReplies.length > 0) && (
-          <div className='border-l-2 border-gray-200 pl-4'>
+          <div className='border-l-2 border-gray-200 pl-0'>
             {allReplies.map(r => (
               <CommentThread
                 key={r.id}

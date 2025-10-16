@@ -48,7 +48,7 @@ export default function CommentSectionClient({
 
   return (
     <div>
-      <div className='border-l-2 border-gray-200 pl-4'>
+      <div className='border-l-2 border-gray-200'>
         {comments.map(c => (
           <CommentThread
             key={c.id}
