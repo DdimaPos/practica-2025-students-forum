@@ -6,7 +6,7 @@ import { sql, eq } from 'drizzle-orm';
 
 export async function getChannelsLeaderboard(): Promise<{
   channels: {
-    id: number;
+    id: string;
     name: string;
     description: string | null;
     postsCount: number;

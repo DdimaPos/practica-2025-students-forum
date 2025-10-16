@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchContext } from '@/features/search/context/SearchContext';
 
 export type Post = {
-  id: number;
+  id: string;
   author: string;
   title: string;
   content: string;

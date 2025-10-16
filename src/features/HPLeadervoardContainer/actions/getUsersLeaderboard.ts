@@ -6,7 +6,7 @@ import { sql, eq, desc } from 'drizzle-orm';
 
 export async function getUsersLeaderboard(): Promise<{
   users: {
-    id: number;
+    id: string;
     firstName: string | null;
     lastName: string | null;
     profilePictureUrl: string | null;
