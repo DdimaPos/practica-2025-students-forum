@@ -9,7 +9,7 @@ export async function getChannelsLeaderboard(
   offset: number = 0
 ): Promise<{
   channels: {
-    id: number;
+    id: string;
     name: string;
     description: string | null;
     postsCount: number;
