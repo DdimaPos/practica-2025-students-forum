@@ -44,9 +44,6 @@ export async function POST(request: Request) {
     // Revalidate cache for comments
     await revalidateCommentsCache(post_id.toString());
 
-    // Revalidate cache for comments
-    await revalidateCommentsCache(post_id.toString());
-
     return NextResponse.json(
       {
         ok: true,
