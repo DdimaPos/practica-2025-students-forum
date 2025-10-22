@@ -1,42 +1,11 @@
 import { ChartLineMultiple } from '@/features/Profile/chart-line-multiple';
 import PostsContainer from '@/features/postsContainer/PostsContainer';
 import Image from 'next/image';
-
-
-
-async function fetchAppUser(baseUrl: string) {
-  
-
-  const res = await fetch(`${baseUrl}/api/user`, { cache: 'no-store' });
-
-  if (!res.ok) {
-    // If unauthorized or not found, return null so the UI can handle it
-    return null;
-  }
-
-  // This endpoint returns just the application user row
-  return (await res.json()) as {
-    id: number;
-    auth_id: string | null;
-    first_name: string | null;
-    last_name: string | null;
-    email: string | null;
-    user_type: string | null;
-    profile_picture_url: string | null;
-    bio: string | null;
-    year_of_study: number | null;
-    is_verified: boolean;
-  } | null;
-}
-
+import { fetchAppUser } from '@/utils/fetchAppUser';
 
 export default async function Profile() {
-  
-
   // Determine base URL for server-side fetch
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const appUser = await fetchAppUser(baseUrl);
 
