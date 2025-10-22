@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
+
 import { MFAForm } from '@/features/Mfa/components/MFAForm';
 
 export default async function MFAPage() {
@@ -27,5 +28,11 @@ export default async function MFAPage() {
     throw new Error(challengeError.message);
   }
 
-  return <MFAForm factorId={factor.id} challengeId={challenge.id} />;
+  return (
+    <MFAForm
+      redirectTo='/update-password'
+      factorId={factor.id}
+      challengeId={challenge.id}
+    />
+  );
 }

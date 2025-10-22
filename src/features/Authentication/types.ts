@@ -19,11 +19,9 @@ export const signupFormSchema = z.object({
       message: 'Year of study must be between 1 and 5',
     })
     .optional(),
-  password: z
-    .string()
-    .min(passwordLength, {
-      message: `Password must be at least ${passwordLength} characters long`,
-    }),
+  password: z.string().min(passwordLength, {
+    message: `Password must be at least ${passwordLength} characters long`,
+  }),
 });
 
 export type SignupFormData = z.infer<typeof signupFormSchema>;
