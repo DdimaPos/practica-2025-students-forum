@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
 import { CommentType } from '@/features/CommentsContainer/types/Comment_type';
+import { useRouter } from 'next/navigation';
 
 interface ReplyFormProps {
   postId: number;
@@ -23,6 +24,7 @@ export default function ReplyContainer({
 }: ReplyFormProps) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async () => {
     if (!message.trim()) return;
@@ -70,7 +72,13 @@ export default function ReplyContainer({
           authorName: 'You', // Keep the current user's name
         };
         replaceOptimisticReply(tempId, realComment);
+      } else {
+        window.location.reload();
       }
+
+      // Always refresh to ensure server components are updated
+      console.log('🔄 Refreshing page to sync server components');
+      router.refresh();
     } catch (err: unknown) {
       console.error(err);
       // Could add toast notification here instead of alert

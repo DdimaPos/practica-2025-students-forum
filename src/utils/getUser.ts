@@ -10,6 +10,8 @@ export async function getUser() {
   const { error, data } = await supabase.auth.getUser();
 
   if (error || !data.user || data.user.deleted_at) {
+    console.debug('No user found or user is deleted:', error);
+
     return undefined;
   }
 
@@ -20,6 +22,8 @@ export async function getUser() {
     .limit(1);
 
   if (uRes.length === 0 || !uRes[0].isVerified) {
+    console.debug('User not found in DB or not verified');
+
     return undefined;
   }
 

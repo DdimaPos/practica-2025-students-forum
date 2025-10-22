@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/db';
 import { comments } from '@/db/schema';
+import { revalidateCommentsCache } from '@/lib/cache';
 
 export async function POST(request: Request) {
   try {
@@ -37,6 +38,14 @@ export async function POST(request: Request) {
     console.log('Inserted comment:', result);
 
     const insertedComment = result[0];
+
+    console.log(`✅ Comment ${insertedComment.id} created for post ${post_id}`);
+
+    // Revalidate cache for comments
+    await revalidateCommentsCache(post_id.toString());
+
+    // Revalidate cache for comments
+    await revalidateCommentsCache(post_id.toString());
 
     return NextResponse.json(
       {
