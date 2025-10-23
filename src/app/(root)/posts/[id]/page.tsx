@@ -1,6 +1,8 @@
+import { unstable_cache } from 'next/cache';
 import Post from '@/features/PostContainer';
 import { getPostById } from '@/features/PostContainer/actions/getPostById';
 import CommentSection from '@/features/CommentsContainer';
+import { getUser } from '@/utils/getUser';
 
 export default async function PostPage({
   params,
@@ -8,7 +10,18 @@ export default async function PostPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const post = await getPostById(id);
+
+  const getCachedPost = unstable_cache(
+    async (postId: string) => getPostById(postId),
+    ['post'],
+    {
+      tags: [`post-${id}`],
+    }
+  );
+
+  const post = await getCachedPost(id);
+
+  const user = await getUser().catch(() => undefined);
 
   if (!post) {
     return (
@@ -20,7 +33,7 @@ export default async function PostPage({
 
   return (
     <div className='mt-5 max-w-4xl'>
-      <Post {...post} />
+      <Post {...post} userId={user?.id} />
 
       <CommentSection postId={post.id} />
     </div>

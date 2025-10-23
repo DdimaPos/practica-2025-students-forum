@@ -6,13 +6,7 @@ import Link from 'next/link';
 import { LogIn } from 'lucide-react';
 
 export default async function Navbar() {
-  let user;
-  try {
-    user = await getUser();
-  } catch (err) {
-    console.error('Failed to fetch user in Navbar:', err);
-    user = null;
-  }
+  const user = await getUser().catch(() => undefined);
 
   return (
     <nav className='fixed flex h-screen w-[25%] flex-col justify-center gap-15 border-r pl-[8%] text-[#818181]'>
