@@ -13,11 +13,12 @@ export default function CommentThread({
 }: {
   comment: CommentType & { repliesCount?: number; rating?: number };
   postId: number;
-  authorId: number | null;
+  authorId?: number;
 }) {
   const [replies, setReplies] = useState<CommentType[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [showReply, setShowReply] = useState(false);
+  const [optimisticReplies, setOptimisticReplies] = useState<CommentType[]>([]);
   const router = useRouter();
 
   const loadReplies = async () => {
@@ -25,6 +26,16 @@ export default function CommentThread({
     const data = await res.json();
     setReplies(data.comments);
     setLoaded(true);
+  };
+
+  const setOptimisticReply = (optimisticReply: CommentType) => {
+    setOptimisticReplies(prev => [...prev, optimisticReply]);
+  };
+
+  const replaceOptimisticReply = (tempId: number, realComment: CommentType) => {
+    setOptimisticReplies(prev =>
+      prev.map(reply => (reply.id === tempId ? realComment : reply))
+    );
   };
 
   const handleReplyClick = () => {
@@ -36,43 +47,58 @@ export default function CommentThread({
     setShowReply(prev => !prev);
   };
 
+  const allReplies = [...optimisticReplies, ...replies];
+
   return (
     <div className='ml-6'>
-      <CommentCard comment={comment} onReplyClick={handleReplyClick} />
-
-      {showReply && authorId && (
-        <ReplyContainer
-          postId={postId}
-          authorId={authorId}
-          parentCommentId={comment.id}
+      <div className='mb-3'>
+        <CommentCard
+          comment={comment}
+          onReplyClick={handleReplyClick}
+          hasReplyAttached={showReply && !!authorId}
         />
-      )}
 
-      {comment.repliesCount && comment.repliesCount > 0 && !loaded && (
-        <p className='mb-3 text-center text-sm text-gray-500'>
-          Show {comment.repliesCount} repl
-          {comment.repliesCount === 1 ? 'y' : 'ies'}
-          <button
-            onClick={loadReplies}
-            className='ml-2 text-blue-600 hover:underline'
-          >
-            Load replies
-          </button>
-        </p>
-      )}
+        {showReply && authorId && (
+          <ReplyContainer
+            postId={postId}
+            authorId={authorId}
+            parentCommentId={comment.id}
+            setOptimisticReply={setOptimisticReply}
+            replaceOptimisticReply={replaceOptimisticReply}
+          />
+        )}
+      </div>
 
-      {loaded && (
-        <div className='border-l-2 border-gray-200 pl-4'>
-          {replies.map(r => (
-            <CommentThread
-              key={r.id}
-              comment={r}
-              postId={postId}
-              authorId={authorId}
-            />
-          ))}
-        </div>
-      )}
+      <div className='flex flex-col gap-3 p-0.5'>
+        {comment.repliesCount &&
+          comment.repliesCount > 0 &&
+          !loaded &&
+          optimisticReplies.length === 0 && (
+            <p className='text-center text-sm text-gray-500 pb-2'>
+              Show {comment.repliesCount} repl
+              {comment.repliesCount === 1 ? 'y' : 'ies'}
+              <button
+                onClick={loadReplies}
+                className='ml-2 text-blue-600 hover:underline'
+              >
+                Load replies
+              </button>
+            </p>
+          )}
+
+        {(loaded || optimisticReplies.length > 0) && (
+          <div className='border-l-2 border-gray-200 pl-0'>
+            {allReplies.map(r => (
+              <CommentThread
+                key={r.id}
+                comment={r}
+                postId={postId}
+                authorId={authorId}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
