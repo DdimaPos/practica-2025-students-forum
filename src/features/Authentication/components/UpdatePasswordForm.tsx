@@ -1,8 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { FC, useActionState, useTransition } from 'react';
-import { OAuthGroup } from './OAuthGroup';
+import { FC, useActionState, useEffect, useTransition } from 'react';
 
 import type { FormState } from '../types';
 import { useFormStateToast } from '../hooks/useToast';
@@ -10,7 +8,6 @@ import { useFormStateToast } from '../hooks/useToast';
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -21,18 +18,27 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
+import { logout } from '../actions/logout';
 
 interface Props {
   onSubmit: (prevState: FormState, formData: FormData) => Promise<FormState>;
 }
 
-export const LoginForm: FC<Props> = ({ onSubmit }) => {
+export const UpdatePasswordForm: FC<Props> = ({ onSubmit }) => {
   const initialState: FormState = { success: false, message: '' };
   const [state, formAction] = useActionState(onSubmit, initialState);
 
   const [isPending, startTransition] = useTransition();
 
-  useFormStateToast(state, 'Signed up. Check your email for verification.');
+  useFormStateToast(state, 'Password reset successfully');
+
+  useEffect(() => {
+    if (state.success) {
+      setTimeout(() => {
+        logout();
+      }, 3000);
+    }
+  }, [state]);
 
   const formActionWithTransition = (formData: FormData) => {
     startTransition(() => {
@@ -44,40 +50,28 @@ export const LoginForm: FC<Props> = ({ onSubmit }) => {
     <Card className='w-full max-w-md'>
       <Toaster richColors position='top-center' />
       <CardHeader>
-        <CardTitle>Login to your account</CardTitle>
+        <CardTitle>Reset Your Password</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Enter below your new password that you will use to login
         </CardDescription>
-        <CardAction>
-          <Link href='/register'>
-            <Button variant='link'>Sign Up</Button>
-          </Link>
-        </CardAction>
       </CardHeader>
       <CardContent>
         <form id='loginform' action={formActionWithTransition}>
           <div className='flex flex-col gap-6'>
             <div className='grid gap-2'>
-              <Label htmlFor='email'>Email</Label>
-              <Input
-                id='email'
-                type='email'
-                name='email'
-                placeholder='mail@example.com'
-                required
-              />
+              <Label htmlFor='email'>New password</Label>
+              <Input id='password' name='password' type='password' required />
             </div>
             <div className='grid gap-2'>
               <div className='flex items-center'>
-                <Label htmlFor='password'>Password</Label>
-                <Link
-                  href='/forgot-password'
-                  className='ml-auto inline-block text-sm underline-offset-4 hover:underline'
-                >
-                  Forgot your password?
-                </Link>
+                <Label htmlFor='password'>Confirm password</Label>
               </div>
-              <Input id='password' name='password' type='password' required />
+              <Input
+                id='passwordConfirmation'
+                name='passwordConfirmation'
+                type='password'
+                required
+              />
             </div>
           </div>
         </form>
@@ -89,10 +83,9 @@ export const LoginForm: FC<Props> = ({ onSubmit }) => {
           className='w-full'
           disabled={isPending}
         >
-          {isPending ? 'Logging in...' : 'Login'}
+          {isPending ? 'Reseting...' : 'Reset'}
         </Button>
         <Separator />
-        <OAuthGroup />
       </CardFooter>
     </Card>
   );

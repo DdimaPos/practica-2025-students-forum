@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { enrollMFA } from '../actions/enrollMFA';
 import { createMfaChallenge } from '../actions/createMFAChallenge';
 import { verifyMFA } from '../actions/verifyMFA';
-import { AuthError } from '@supabase/supabase-js';
 
 export function EnrollMFA() {
   const [factorId, setFactorId] = useState<string | null>(null);
@@ -30,7 +29,7 @@ export function EnrollMFA() {
         'Scan the QR code with your authenticator app and enter the code.'
       );
     } catch (err: unknown) {
-      if (err instanceof AuthError) {
+      if (err instanceof Error) {
         setMessage(err.message);
       } else {
         setMessage('An unexpected error occurred during MFA enrollment.');

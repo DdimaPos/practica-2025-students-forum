@@ -1,14 +1,27 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { ArrowUp, ArrowDown, MessageCircle, Calendar } from 'lucide-react';
 import { Post_type } from '../types/Post_type';
 import ReplyContainer from './ReplyContainer';
 import { useState } from 'react';
 
-export default function Footer({ post }: { post: Post_type }) {
+export default function Footer({
+  post,
+  userId,
+}: {
+  post: Post_type;
+  userId: number | null;
+}) {
   const [showReply, setShowReply] = useState(false);
+  const router = useRouter();
 
   const handleMessage = () => {
+    if (!userId) {
+      router.push('/login');
+
+      return;
+    }
     setShowReply(prev => !prev);
   };
 
@@ -53,7 +66,9 @@ export default function Footer({ post }: { post: Post_type }) {
         </div>
       </div>
 
-      {showReply && <ReplyContainer postId={post.id} />}
+      {userId && showReply && (
+        <ReplyContainer postId={post.id} authorId={userId} />
+      )}
     </div>
   );
 }
