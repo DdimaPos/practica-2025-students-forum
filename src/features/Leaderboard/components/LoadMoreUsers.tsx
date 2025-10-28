@@ -12,7 +12,7 @@ type LoadMoreUsersProps = {
 };
 
 type UserCardProps = {
-  id: number;
+  id: string;
   firstName: string | null;
   lastName: string | null;
   profilePictureUrl: string | null;

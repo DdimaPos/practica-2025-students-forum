@@ -1,10 +1,10 @@
 export type Post_type = {
-  id: number;
+  id: string;
   title: string;
   content: string;
   postType: 'basic' | 'poll' | 'event' | null;
-  authorId: number | null;
-  channelId: number | null;
+  authorId: string | null;
+  channelId: string | null;
   isAnonymous: boolean | null;
   createdAt: Date | null;
   updatedAt: Date | null;

@@ -1,9 +1,9 @@
 export interface PostSearchResult {
-  id: number;
+  id: string;
   title: string;
   content: string;
   author: {
-    id: number | null;
+    id: string | null;
     firstName: string | null;
     lastName: string | null;
   };

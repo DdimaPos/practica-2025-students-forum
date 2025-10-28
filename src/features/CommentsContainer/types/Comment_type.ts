@@ -1,8 +1,8 @@
 export type CommentType = {
-  id: number;
-  postId: number | null;
-  authorId: number | null;
-  parentComment: number | null;
+  id: string;
+  postId: string | null;
+  authorId: string | null;
+  parentComment: string | null;
   content: string;
   isAnonymous: boolean | null;
   createdAt: Date | null;
