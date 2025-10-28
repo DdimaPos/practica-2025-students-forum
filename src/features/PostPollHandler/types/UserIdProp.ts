@@ -1,3 +1,3 @@
 export type UserIdProp = {
-  userId: number | null;
+  userId: string | null;
 };

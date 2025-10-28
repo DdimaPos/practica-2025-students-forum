@@ -8,15 +8,12 @@ import { UserIdProp } from './types/UserIdProp';
 
 export default function PostPollHandler({ userId }: UserIdProp) {
   return (
-    <div className='w-full'>
-
+    <div className='w-full max-h-[91vh] overflow-y-auto hide-scrollbar'>
       <Tabs defaultValue='post' className='w-full'>
         <TabsList className='grid w-full grid-cols-2'>
           <TabsTrigger value='post'>Create Post</TabsTrigger>
           <TabsTrigger value='poll'>Create Poll</TabsTrigger>
         </TabsList>
-
-        <div className='bg-border my-3 h-[1px] rounded-md'></div>
 
         <TabsContent value='post'>
           <CreatePostForm userId={userId} />
