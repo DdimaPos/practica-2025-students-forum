@@ -4,7 +4,7 @@ export default function CreatePollForm({ userId }: UserIdProp) {
   console.log('Creating post for user:', userId);
 
   return (
-    <div className='rounded-xl border p-4'>
+    <div className='rounded-xl border p-4 bg-background'>
       <h3 className='mb-2 font-medium'>Create a Poll</h3>
       <input
         type='text'

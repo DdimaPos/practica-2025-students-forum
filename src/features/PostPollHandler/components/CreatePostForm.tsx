@@ -1,18 +1,48 @@
 import { UserIdProp } from '../types/UserIdProp';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 export default function CreatePostForm({ userId }: UserIdProp) {
   console.log('Creating post for user:', userId);
 
   return (
-    <div className='rounded-xl border p-4'>
-      <h3 className='mb-2 font-medium'>Create a Post</h3>
-      <textarea
-        placeholder='Write your post...'
-        className='mb-3 w-full rounded-md border p-2'
-      />
-      <button className='bg-primary rounded-md px-4 py-2 text-white'>
-        Publish Post
-      </button>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Card Title</CardTitle>
+        <CardDescription>Card Description</CardDescription>
+        <CardAction>
+          {' '}
+          <Label className='hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950'>
+            <Checkbox
+              id='toggle-2'
+              className='data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700'
+            />
+            <div className='grid gap-1.5 font-normal'>
+              <p className='text-sm leading-none font-medium'>
+                Post anonymously
+              </p>
+              <p className='text-muted-foreground text-sm'>
+                If you will enable it, you will not see who answered you!
+              </p>
+            </div>
+          </Label>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <p>Card Content</p>
+      </CardContent>
+      <CardFooter>
+        <p>Card Footer</p>
+      </CardFooter>
+    </Card>
   );
 }
