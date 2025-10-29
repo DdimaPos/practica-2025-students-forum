@@ -1,6 +1,3 @@
-'use client';
-
-import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import CreatePostForm from './components/CreatePostForm';
 import CreatePollForm from './components/CreatePollForm';
