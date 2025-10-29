@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -18,42 +19,49 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, Send, Sparkles } from 'lucide-react';
 import ChannelSelectionDropdown from './ChannelSelectionDropdown';
 
+interface PostFormData {
+  title: string;
+  content: string;
+  channelId: string | null;
+  isAnonymous: boolean;
+}
+
 export default function CreatePostForm({ userId }: UserIdProp) {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [isAnonymous, setIsAnonymous] = useState(false);
-  const [channelId, setChannelId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<PostFormData>({
+    defaultValues: {
+      title: '',
+      content: '',
+      channelId: null,
+      isAnonymous: false,
+    },
+  });
 
-    if (!title.trim()) {
-      setError('Title is required');
+  const content = watch('content');
 
-      return;
-    }
-
-    if (!content.trim()) {
-      setError('Content is required');
-
-      return;
-    }
-
+  const onSubmit = async (data: PostFormData) => {
     setIsSubmitting(true);
     setError('');
     setSuccess(false);
 
     try {
       const postData = {
-        title: title.trim(),
-        content: content.trim(),
+        title: data.title.trim(),
+        content: data.content.trim(),
         post_type: 'basic',
         author_id: userId,
-        channel_id: channelId,
-        is_anonymous: isAnonymous,
+        channel_id: data.channelId,
+        is_anonymous: data.isAnonymous,
         is_active: true,
       };
 
@@ -74,10 +82,7 @@ export default function CreatePostForm({ userId }: UserIdProp) {
       const result = await response.json();
       console.log('Post created successfully:', result);
 
-      setTitle('');
-      setContent('');
-      setIsAnonymous(false);
-      setChannelId(null);
+      reset();
       setSuccess(true);
 
       setTimeout(() => setSuccess(false), 3000);
@@ -91,7 +96,7 @@ export default function CreatePostForm({ userId }: UserIdProp) {
 
   return (
     <Card className='from-background to-muted/20 border-0 bg-gradient-to-br shadow-lg'>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardHeader className='space-y-3 pb-6'>
           <div className='flex items-center gap-2'>
             <Sparkles className='text-primary h-5 w-5' />
@@ -115,12 +120,18 @@ export default function CreatePostForm({ userId }: UserIdProp) {
             </Label>
             <Input
               id='post-title'
-              value={title}
-              onChange={e => setTitle(e.target.value)}
+              {...register('title', {
+                required: 'Title is required',
+                validate: value =>
+                  value.trim().length > 0 || 'Title cannot be empty',
+              })}
               placeholder='Give your post an engaging title...'
               className='focus:ring-primary/20 h-12 text-base transition-all focus:ring-2'
               disabled={isSubmitting}
             />
+            {errors.title && (
+              <p className='text-destructive text-sm'>{errors.title.message}</p>
+            )}
           </div>
 
           <div className='space-y-2'>
@@ -133,35 +144,57 @@ export default function CreatePostForm({ userId }: UserIdProp) {
             </Label>
             <Textarea
               id='post-content'
-              value={content}
-              onChange={e => setContent(e.target.value)}
+              {...register('content', {
+                required: 'Content is required',
+                validate: value =>
+                  value.trim().length > 0 || 'Content cannot be empty',
+              })}
               className='focus:ring-primary/20 min-h-[160px] w-full flex-1 resize-none overflow-y-auto text-base transition-all focus:ring-2'
               placeholder="What's on your mind? Share your story..."
               disabled={isSubmitting}
             />
-            <p className='text-muted-foreground text-right text-xs'>
-              {content.length} characters
-            </p>
+            <div className='flex items-center justify-between'>
+              {errors.content && (
+                <p className='text-destructive text-sm'>
+                  {errors.content.message}
+                </p>
+              )}
+              <p className='text-muted-foreground ml-auto text-xs'>
+                {content?.length || 0} characters
+              </p>
+            </div>
           </div>
 
           <div className='space-y-3'>
             <Label className='text-sm font-semibold'>Channel</Label>
             <div className='border-muted-foreground/25 bg-muted/30 hover:border-muted-foreground/40 hover:bg-muted/40 flex items-center justify-center rounded-lg border-2 border-dashed p-6 text-center transition-colors'>
-              <ChannelSelectionDropdown
-                onSelectChannel={setChannelId}
-                disabled={isSubmitting}
+              <Controller
+                name='channelId'
+                control={control}
+                render={({ field }) => (
+                  <ChannelSelectionDropdown
+                    onSelectChannel={field.onChange}
+                    disabled={isSubmitting}
+                  />
+                )}
               />
             </div>
           </div>
 
           <div className='pt-2'>
             <Label className='group hover:bg-accent/50 hover:border-primary/30 has-[[aria-checked=true]]:border-primary has-[[aria-checked=true]]:bg-primary/5 flex cursor-pointer items-start gap-4 rounded-xl border-2 p-4 transition-all has-[[aria-checked=true]]:shadow-sm'>
-              <Checkbox
-                id='toggle-anonymous'
-                checked={isAnonymous}
-                onCheckedChange={checked => setIsAnonymous(checked === true)}
-                disabled={isSubmitting}
-                className='data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground mt-0.5'
+              <Controller
+                name='isAnonymous'
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    id='toggle-anonymous'
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isSubmitting}
+                    className='data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground mt-0.5'
+                  />
+                )}
               />
               <div className='flex-1 space-y-1'>
                 <p className='text-sm leading-none font-semibold'>
