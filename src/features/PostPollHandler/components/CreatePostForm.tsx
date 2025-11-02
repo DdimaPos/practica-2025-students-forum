@@ -1,22 +1,25 @@
 'use client';
 
+import { useState, useTransition } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { createPostAction } from '../actions/createPost';
+import { useFormStateToast } from '@/features/Authentication/hooks/useToast';
 import { UserIdProp } from '../types/UserIdProp';
+import { FormState } from '../types/FormState';
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
 } from '@/components/ui/card';
-import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, Send, Sparkles } from 'lucide-react';
+import { Send, Sparkles } from 'lucide-react';
 import ChannelSelectionDropdown from './ChannelSelectionDropdown';
 
 interface PostFormData {
@@ -27,9 +30,13 @@ interface PostFormData {
 }
 
 export default function CreatePostForm({ userId }: UserIdProp) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [formState, setFormState] = useState<FormState>({
+    message: '',
+    success: false,
+  });
+
+  useFormStateToast(formState, 'Post created successfully!');
 
   const {
     register,
@@ -49,49 +56,29 @@ export default function CreatePostForm({ userId }: UserIdProp) {
 
   const content = watch('content');
 
-  const onSubmit = async (data: PostFormData) => {
-    setIsSubmitting(true);
-    setError('');
-    setSuccess(false);
+  const onSubmit = (data: PostFormData) => {
+    setFormState({ message: '', success: false });
 
-    try {
-      const postData = {
-        title: data.title.trim(),
-        content: data.content.trim(),
+    startTransition(async () => {
+      const result = await createPostAction({
+        title: data.title,
+        content: data.content,
         post_type: 'basic',
         author_id: userId,
         channel_id: data.channelId,
         is_anonymous: data.isAnonymous,
         is_active: true,
-      };
-
-      console.log('Submitting post data:', postData);
-
-      const response = await fetch('/api/posts/addPost', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create post');
+      if (result.success) {
+        reset();
+        setFormState({ message: result.message, success: true });
+      } else {
+        setFormState({ message: result.message, success: false });
       }
 
-      const result = await response.json();
-      console.log('Post created successfully:', result);
-
-      reset();
-      setSuccess(true);
-
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error('Error creating post:', err);
-    } finally {
-      setIsSubmitting(false);
-    }
+      setTimeout(() => setFormState({ message: '', success: false }), 2000);
+    });
   };
 
   return (
@@ -115,19 +102,17 @@ export default function CreatePostForm({ userId }: UserIdProp) {
               htmlFor='post-title'
               className='flex items-center gap-2 text-sm font-semibold'
             >
-              Title
-              <span className='text-destructive'>*</span>
+              Title <span className='text-destructive'>*</span>
             </Label>
             <Input
               id='post-title'
               {...register('title', {
                 required: 'Title is required',
-                validate: value =>
-                  value.trim().length > 0 || 'Title cannot be empty',
+                validate: v => v.trim().length > 0 || 'Title cannot be empty',
               })}
               placeholder='Give your post an engaging title...'
+              disabled={isPending}
               className='focus:ring-primary/20 h-12 text-base transition-all focus:ring-2'
-              disabled={isSubmitting}
             />
             {errors.title && (
               <p className='text-destructive text-sm'>{errors.title.message}</p>
@@ -139,19 +124,17 @@ export default function CreatePostForm({ userId }: UserIdProp) {
               htmlFor='post-content'
               className='flex items-center gap-2 text-sm font-semibold'
             >
-              Content
-              <span className='text-destructive'>*</span>
+              Content <span className='text-destructive'>*</span>
             </Label>
             <Textarea
               id='post-content'
               {...register('content', {
                 required: 'Content is required',
-                validate: value =>
-                  value.trim().length > 0 || 'Content cannot be empty',
+                validate: v => v.trim().length > 0 || 'Content cannot be empty',
               })}
-              className='focus:ring-primary/20 min-h-[160px] w-full flex-1 resize-none overflow-y-auto text-base transition-all focus:ring-2'
+              disabled={isPending}
               placeholder="What's on your mind? Share your story..."
-              disabled={isSubmitting}
+              className='focus:ring-primary/20 min-h-[160px] w-full resize-none overflow-y-auto text-base transition-all focus:ring-2'
             />
             <div className='flex items-center justify-between'>
               {errors.content && (
@@ -174,7 +157,7 @@ export default function CreatePostForm({ userId }: UserIdProp) {
                 render={({ field }) => (
                   <ChannelSelectionDropdown
                     onSelectChannel={field.onChange}
-                    disabled={isSubmitting}
+                    disabled={isPending}
                   />
                 )}
               />
@@ -191,8 +174,7 @@ export default function CreatePostForm({ userId }: UserIdProp) {
                     id='toggle-anonymous'
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    disabled={isSubmitting}
-                    className='data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground mt-0.5'
+                    disabled={isPending}
                   />
                 )}
               />
@@ -209,35 +191,19 @@ export default function CreatePostForm({ userId }: UserIdProp) {
           </div>
         </CardContent>
 
-        <CardFooter className='flex flex-col gap-3 pt-6'>
-          {error && (
-            <div className='bg-destructive/10 border-destructive/20 text-destructive flex w-full items-center gap-2 rounded-lg border p-3'>
-              <AlertCircle className='h-4 w-4 shrink-0' />
-              <p className='text-sm font-medium'>{error}</p>
-            </div>
-          )}
-
-          {success && (
-            <div className='flex w-full items-center gap-2 rounded-lg border border-green-500/20 bg-green-500/10 p-3 text-green-600 dark:text-green-400'>
-              <Sparkles className='h-4 w-4 shrink-0' />
-              <p className='text-sm font-medium'>Post created successfully!</p>
-            </div>
-          )}
-
+        <CardFooter className='pt-6'>
           <Button
             type='submit'
-            disabled={isSubmitting}
+            disabled={isPending}
             className='h-12 w-full gap-2 text-base font-semibold shadow-lg transition-all hover:shadow-xl'
           >
-            {isSubmitting ? (
+            {isPending ? (
               <>
-                <span className='animate-spin'>⏳</span>
-                Creating Post...
+                <span className='animate-spin'>⏳</span> Creating Post...
               </>
             ) : (
               <>
-                <Send className='h-4 w-4' />
-                Publish Post
+                <Send className='h-4 w-4' /> Publish Post
               </>
             )}
           </Button>

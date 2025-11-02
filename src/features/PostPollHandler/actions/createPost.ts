@@ -1,11 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+'use server';
+
 import db from '@/db';
 import { posts } from '@/db/schema';
+import { revalidatePath } from 'next/cache';
 
-export async function POST(request: NextRequest) {
+export async function createPostAction(formData: {
+  title: string;
+  content: string;
+  post_type?: 'basic' | 'poll' | 'event';
+  author_id: string | null;
+  channel_id?: string | null;
+  is_anonymous?: boolean;
+  is_active?: boolean;
+}) {
   try {
-    const body = await request.json();
-
     const {
       title,
       content,
@@ -14,15 +22,11 @@ export async function POST(request: NextRequest) {
       channel_id,
       is_anonymous,
       is_active,
-    } = body;
+    } = formData;
 
     if (!title || !content || !author_id) {
-      return NextResponse.json(
-        {
-          error:
-            'Missing required fields: title, content, and author_id are required',
-        },
-        { status: 400 }
+      throw new Error(
+        'Missing required fields: title, content, and author_id are required'
       );
     }
 
@@ -39,22 +43,19 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    return NextResponse.json(
-      {
-        message: 'Post created successfully',
-        post: newPost,
-      },
-      { status: 201 }
-    );
+    revalidatePath('/');
+
+    return {
+      success: true,
+      message: 'Post created successfully',
+      post: newPost,
+    };
   } catch (error) {
     console.error('Error creating post:', error);
 
-    return NextResponse.json(
-      {
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    );
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Internal server error',
+    };
   }
 }
