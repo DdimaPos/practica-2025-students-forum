@@ -75,13 +75,9 @@ export default function ReplyContainer({
       } else {
         window.location.reload();
       }
-
-      // Always refresh to ensure server components are updated
-      console.log('🔄 Refreshing page to sync server components');
       router.refresh();
     } catch (err: unknown) {
       console.error(err);
-      // Could add toast notification here instead of alert
     } finally {
       setLoading(false);
     }

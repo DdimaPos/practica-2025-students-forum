@@ -3,12 +3,22 @@ import Post from '@/features/PostContainer';
 import { getPostById } from '@/features/PostContainer/actions/getPostById';
 import CommentSection from '@/features/CommentsContainer';
 import { getUser } from '@/utils/getUser';
+import { Metadata } from 'next';
 
-export default async function PostPage({
-  params,
-}: {
+interface Props {
   params: Promise<{ id: string }>;
-}) {
+}
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const post = await getPostById(id).catch(() => undefined);
+
+  return {
+    title: post?.title || 'Post not found',
+    description: `${post?.content}`,
+  };
+}
+
+export default async function PostPage({ params }: Props) {
   const { id } = await params;
 
   const getCachedPost = unstable_cache(
@@ -19,7 +29,7 @@ export default async function PostPage({
     }
   );
 
-  const post = await getCachedPost(id);
+  const post = await getCachedPost(id).catch(() => undefined);
 
   const user = await getUser().catch(() => undefined);
 
