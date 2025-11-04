@@ -19,6 +19,12 @@ export const metadata: Metadata = {
   verification: {
     google: 'Y_MDNX56q-y31pq0JJGX860RZHgEQYsEA7_VNV_2r6M',
   },
+  robots: 'all',
+  category: 'forum',
+  generator: 'nextjs',
+  openGraph: {
+    images: 'opengraph-image.png',
+  },
 };
 
 export default function RootLayout({

@@ -1,5 +1,6 @@
 import TabsNavigation from '@/features/Settings/components/TabsNavigation';
 import { createClient } from '@/utils/supabase/server';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 const categories = [
@@ -7,6 +8,11 @@ const categories = [
   { label: 'MFA Enrollment', value: 'mfa-enroll' },
   { label: 'MFA Management', value: 'mfa-manage' },
 ];
+
+export const metadata: Metadata = {
+  title: 'Peerplex | Settings',
+  description: 'settings page of the user',
+};
 
 export default async function SettingsLayout({
   children,
