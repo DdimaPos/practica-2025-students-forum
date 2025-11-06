@@ -1,6 +1,15 @@
-import {TopBar} from '@/components/generic/TopBar';
+import { TopBar } from '@/components/generic/TopBar';
+import { Metadata } from 'next';
 
-export default function AuthLayout({children}: {children: React.ReactNode}) {
+export const metadata: Metadata = {
+  description: 'authentication page',
+};
+
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <>
       <TopBar className='h-[5vh]' />
