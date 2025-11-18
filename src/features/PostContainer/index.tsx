@@ -59,7 +59,7 @@ export default function Post({ userId, ...post }: PostProps) {
                 #{post.channelName}
               </Link>
             )}
-            
+
             <div className='flex items-center justify-between gap-3'>
               <div className='flex gap-3'>
                 <Avatar>
@@ -97,7 +97,8 @@ export default function Post({ userId, ...post }: PostProps) {
         <div className='flex justify-between px-4 py-2 text-xs text-gray-500'>
           <div className='flex items-center gap-2'>
             <Calendar className='h-4 w-4' />
-            {post.createdAt && new Date(post.createdAt).toLocaleDateString()}
+            {post.createdAt &&
+              new Date(post.createdAt).toLocaleDateString('en-GB')}
           </div>
 
           <div className='flex items-center gap-2'>
