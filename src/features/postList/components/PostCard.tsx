@@ -19,6 +19,18 @@ export default function PostCard({
   rating,
   photo,
 }: PostProp) {
+  const handleUpvote = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Upvote clicked for post:', id);
+  };
+
+  const handleDownvote = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Downvote clicked for post:', id);
+  };
+
   return (
     <Link href={`/posts/${id}`}>
       <Card className='mb-2 cursor-pointer shadow-sm transition hover:shadow-md'>
@@ -43,9 +55,15 @@ export default function PostCard({
             {new Date(created_at).toLocaleString()}
           </div>
           <div className='flex items-center gap-2'>
-            <ArrowUp className='h-4 w-4 cursor-pointer hover:text-black' />
+            <ArrowUp 
+              className='h-4 w-4 cursor-pointer hover:text-black' 
+              onClick={handleUpvote}
+            />
             <span>{rating}</span>
-            <ArrowDown className='h-4 w-4 cursor-pointer hover:text-black' />
+            <ArrowDown 
+              className='h-4 w-4 cursor-pointer hover:text-black' 
+              onClick={handleDownvote}
+            />
           </div>
         </CardFooter>
       </Card>
