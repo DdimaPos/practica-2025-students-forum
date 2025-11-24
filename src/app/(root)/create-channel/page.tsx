@@ -7,6 +7,7 @@ import {
 import { getUser } from '@/utils/getUser';
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
+import HideSearchBarWrapper from '@/components/HideSearchBarWrapper';
 
 export const metadata: Metadata = {
   title: 'Create Channel',
@@ -26,12 +27,14 @@ export default async function CreateChannelPage() {
   ]);
 
   return (
-    <div className='container py-10'>
-      <CreateChannelForm
-        onSubmit={createChannel}
-        faculties={faculties}
-        specialities={specialities}
-      />
-    </div>
+    <HideSearchBarWrapper>
+      <div className='container py-10'>
+        <CreateChannelForm
+          onSubmit={createChannel}
+          faculties={faculties}
+          specialities={specialities}
+        />
+      </div>
+    </HideSearchBarWrapper>
   );
 }

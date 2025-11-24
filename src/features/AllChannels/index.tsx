@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import ChannelCard from './components/ChannelCard';
 import ChannelFilters from './components/ChannelFilters';
 import type { ChannelType } from '@/utils/getChannels';
+import { useSearchBarVisibility } from '@/contexts/SearchBarVisibilityContext';
 
 type AllChannelsContainerProps = {
   channels: ChannelType[];
@@ -14,23 +15,16 @@ export default function AllChannelsContainer({
 }: AllChannelsContainerProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('all');
+  const { setIsVisible } = useSearchBarVisibility();
 
-  // Hide the SearchBar component when this component mounts
   useEffect(() => {
-    const searchBar = document.querySelector('main > div:first-of-type');
-
-    if (searchBar) {
-      (searchBar as HTMLElement).style.display = 'none';
-    }
+    setIsVisible(false);
 
     return () => {
-      if (searchBar) {
-        (searchBar as HTMLElement).style.display = '';
-      }
+      setIsVisible(true);
     };
-  }, []);
+  }, [setIsVisible]);
 
-  // Filter channels based on search query and type
   const filteredChannels = useMemo(() => {
     return channels.filter(channel => {
       const matchesSearch = channel.name
