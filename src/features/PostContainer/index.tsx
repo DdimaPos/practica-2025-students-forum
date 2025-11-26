@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Post_type } from './types/Post_type';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ReplyContainer from './components/ReplyContainer';
+import PollDisplay from './components/PollDisplay';
 import {
   Card,
   CardHeader,
@@ -93,6 +94,10 @@ export default function Post({ userId, ...post }: PostProps) {
         </CardHeader>
 
         <CardDescription className='px-4 py-1'>{post.content}</CardDescription>
+
+        {post.postType === 'poll' && (
+          <PollDisplay postId={post.id} userId={userId} />
+        )}
 
         <div className='flex justify-between px-4 py-2 text-xs text-gray-500'>
           <div className='flex items-center gap-2'>
