@@ -29,7 +29,7 @@ export default function ChannelFilters({
       {/* Search */}
       <div className='flex-1'>
         <Label htmlFor='search'>Search Channels</Label>
-        <div className='relative'>
+        <div className='relative mt-3'>
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400' />
           <Input
             id='search'
@@ -45,6 +45,7 @@ export default function ChannelFilters({
       {/* Filter by Type */}
       <div className='w-full md:w-[200px]'>
         <Label htmlFor='type'>Filter by Type</Label>
+        <div className='mt-3'></div>
         <Select value={selectedType} onValueChange={onTypeChange}>
           <SelectTrigger id='type'>
             <SelectValue placeholder='All types' />
