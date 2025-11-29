@@ -6,4 +6,5 @@ export type PostProp = {
   created_at: string;
   rating: number;
   photo: string;
+  postType?: 'basic' | 'poll' | 'event' | null;
 };

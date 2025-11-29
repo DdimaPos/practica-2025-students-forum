@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Calendar, ArrowUp, ArrowDown } from 'lucide-react';
+import { Calendar, ArrowUp, ArrowDown, BarChart3 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Card,
@@ -18,6 +18,7 @@ export default function PostCard({
   created_at,
   rating,
   photo,
+  postType,
 }: PostProp) {
   const handleUpvote = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -41,7 +42,15 @@ export default function PostCard({
           </Avatar>
 
           <div className='flex-1'>
-            <p className='text-sm font-semibold'>@{author}</p>
+            <div className='flex items-center gap-2'>
+              <p className='text-sm font-semibold'>@{author}</p>
+              {postType === 'poll' && (
+                <span className='flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700'>
+                  <BarChart3 className='h-3 w-3' />
+                  Poll
+                </span>
+              )}
+            </div>
             <CardTitle className='text-base'>{title}</CardTitle>
             <CardDescription className='text-sm text-gray-700'>
               {content}
@@ -55,13 +64,13 @@ export default function PostCard({
             {new Date(created_at).toLocaleString()}
           </div>
           <div className='flex items-center gap-2'>
-            <ArrowUp 
-              className='h-4 w-4 cursor-pointer hover:text-black' 
+            <ArrowUp
+              className='h-4 w-4 cursor-pointer hover:text-black'
               onClick={handleUpvote}
             />
             <span>{rating}</span>
-            <ArrowDown 
-              className='h-4 w-4 cursor-pointer hover:text-black' 
+            <ArrowDown
+              className='h-4 w-4 cursor-pointer hover:text-black'
               onClick={handleDownvote}
             />
           </div>
@@ -70,3 +79,4 @@ export default function PostCard({
     </Link>
   );
 }
+
