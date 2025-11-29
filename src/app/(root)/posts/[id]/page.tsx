@@ -1,4 +1,3 @@
-import { unstable_cache } from 'next/cache';
 import Post from '@/features/PostContainer';
 import { getPostById } from '@/features/PostContainer/actions/getPostById';
 import CommentSection from '@/features/CommentsContainer';
@@ -21,15 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PostPage({ params }: Props) {
   const { id } = await params;
 
-  const getCachedPost = unstable_cache(
-    async (postId: string) => getPostById(postId),
-    ['post'],
-    {
-      tags: [`post-${id}`],
-    }
-  );
-
-  const post = await getCachedPost(id).catch(() => undefined);
+  const post = await getPostById(id).catch(() => undefined);
 
   const user = await getUser().catch(() => undefined);
 

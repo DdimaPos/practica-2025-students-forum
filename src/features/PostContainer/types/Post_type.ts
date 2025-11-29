@@ -5,6 +5,7 @@ export type Post_type = {
   postType: 'basic' | 'poll' | 'event' | null;
   authorId: string | null;
   channelId: string | null;
+  channelName: string | null;
   isAnonymous: boolean | null;
   createdAt: Date | null;
   updatedAt: Date | null;

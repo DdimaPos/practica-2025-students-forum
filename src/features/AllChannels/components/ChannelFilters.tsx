@@ -1,0 +1,65 @@
+'use client';
+
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Search } from 'lucide-react';
+
+type ChannelFiltersProps = {
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  selectedType: string;
+  onTypeChange: (value: string) => void;
+};
+
+export default function ChannelFilters({
+  searchQuery,
+  onSearchChange,
+  selectedType,
+  onTypeChange,
+}: ChannelFiltersProps) {
+  return (
+    <div className='mb-8 flex flex-col gap-4 md:flex-row md:items-end'>
+      {/* Search */}
+      <div className='flex-1'>
+        <Label htmlFor='search'>Search Channels</Label>
+        <div className='relative mt-3'>
+          <Search className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400' />
+          <Input
+            id='search'
+            type='text'
+            placeholder='Search by name...'
+            value={searchQuery}
+            onChange={e => onSearchChange(e.target.value)}
+            className='pl-10'
+          />
+        </div>
+      </div>
+
+      {/* Filter by Type */}
+      <div className='w-full md:w-[200px]'>
+        <Label htmlFor='type'>Filter by Type</Label>
+        <div className='mt-3'></div>
+        <Select value={selectedType} onValueChange={onTypeChange}>
+          <SelectTrigger id='type'>
+            <SelectValue placeholder='All types' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>All types</SelectItem>
+            <SelectItem value='general'>General</SelectItem>
+            <SelectItem value='academic'>Academic</SelectItem>
+            <SelectItem value='social'>Social</SelectItem>
+            <SelectItem value='announcements'>Announcements</SelectItem>
+            <SelectItem value='local'>Local</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}

@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db';
-import { posts, users, postReactions } from '@/db/schema';
+import { posts, users, postReactions, channels } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { Post_type } from '../types/Post_type';
 
@@ -14,6 +14,7 @@ export async function getPostById(id: string): Promise<Post_type | null> {
       postType: posts.postType,
       authorId: posts.authorId,
       channelId: posts.channelId,
+      channelName: channels.name,
       isAnonymous: posts.isAnonymous,
       createdAt: posts.createdAt,
       updatedAt: posts.updatedAt,
@@ -29,9 +30,10 @@ export async function getPostById(id: string): Promise<Post_type | null> {
     })
     .from(posts)
     .leftJoin(users, eq(users.id, posts.authorId))
+    .leftJoin(channels, eq(channels.id, posts.channelId))
     .leftJoin(postReactions, eq(postReactions.postId, posts.id))
     .where(eq(posts.id, id))
-    .groupBy(posts.id, users.firstName, users.lastName);
+    .groupBy(posts.id, users.firstName, users.lastName, channels.name);
 
   if (result.length === 0) return null;
 
@@ -48,6 +50,7 @@ export async function getPostById(id: string): Promise<Post_type | null> {
     postType: post.postType,
     authorId: post.authorId,
     channelId: post.channelId,
+    channelName: post.channelName,
     isAnonymous: post.isAnonymous,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
