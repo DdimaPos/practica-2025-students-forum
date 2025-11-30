@@ -7,17 +7,12 @@ import {
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 type Props = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ sort?: string }>;
 };
-
-export const revalidate = 60;
-
-export async function generateStaticParams() {
-
-  return [];
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
@@ -31,7 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `#${channel.name}`,
-    description: channel.description || `View posts in the ${channel.name} channel`,
+    description:
+      channel.description || `View posts in the ${channel.name} channel`,
   };
 }
 
