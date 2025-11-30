@@ -14,6 +14,7 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { ArrowUp, ArrowDown, MessageCircle, Calendar } from 'lucide-react';
+import { handleVote } from '../postList/actions/handleVote';
 
 interface PostProps extends Post_type {
   userId?: string | null;
@@ -34,11 +35,13 @@ export default function Post({ userId, ...post }: PostProps) {
   };
 
   const handleUpvote = () => {
-    console.log('Upvote clicked for post', post.id);
+    const result = handleVote(post.id, 'upvote');
+    console.log(result);
   };
 
   const handleDownvote = () => {
-    console.log('Downvote clicked for post', post.id);
+    const result = handleVote(post.id, 'downvote');
+    console.log(result);
   };
 
   const setOptimisticReply = () => {

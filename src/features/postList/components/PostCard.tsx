@@ -9,6 +9,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { PostProp } from '../types/post';
+import { handleVote } from '../actions/handleVote';
 
 export default function PostCard({
   id,
@@ -23,13 +24,17 @@ export default function PostCard({
   const handleUpvote = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Upvote clicked for post:', id);
+
+    const result = handleVote(id, 'upvote');
+    console.log(result);
   };
 
   const handleDownvote = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Downvote clicked for post:', id);
+
+    const result = handleVote(id, 'downvote');
+    console.log(result);
   };
 
   return (
@@ -79,4 +84,3 @@ export default function PostCard({
     </Link>
   );
 }
-
