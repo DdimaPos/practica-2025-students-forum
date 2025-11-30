@@ -43,6 +43,7 @@ export default function SearchBar() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      setShowDropdown(false);
       searchNow();
     } else if (e.key === 'Escape') {
       setShowDropdown(false);
@@ -58,6 +59,7 @@ export default function SearchBar() {
   };
 
   const handleFilterClick = () => {
+    setShowDropdown(false);
     searchNow();
   };
 
