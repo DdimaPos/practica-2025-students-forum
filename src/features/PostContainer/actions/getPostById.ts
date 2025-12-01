@@ -4,8 +4,11 @@ import db from '@/db';
 import { posts, users, postReactions, channels } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { Post_type } from '../types/Post_type';
+import { getUser } from '@/utils/getUser';
 
 export async function getPostById(id: string): Promise<Post_type | null> {
+  const user = await getUser();
+
   const result = await db
     .select({
       id: posts.id,
@@ -27,7 +30,16 @@ export async function getPostById(id: string): Promise<Post_type | null> {
       ), 0)`.as('rating'),
       firstName: users.firstName,
       lastName: users.lastName,
-    })
+      userReaction: user
+          ? sql<string | null>`MAX(
+              CASE
+                WHEN ${postReactions.userId} = ${user.id} 
+                THEN ${postReactions.reactionType}
+                ELSE NULL
+              END
+            )`.as('user_reaction')
+          : sql<string | null>`NULL`.as('user_reaction'),
+      })
     .from(posts)
     .leftJoin(users, eq(users.id, posts.authorId))
     .leftJoin(channels, eq(channels.id, posts.channelId))
@@ -56,5 +68,6 @@ export async function getPostById(id: string): Promise<Post_type | null> {
     updatedAt: post.updatedAt,
     rating: post.rating,
     authorName,
+    userReaction: post.userReaction as 'upvote' | 'downvote' | null,
   };
 }
