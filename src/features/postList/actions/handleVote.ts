@@ -1,6 +1,7 @@
 'use server';
 
 import { togglePostReaction } from './postVote';
+import { revalidatePath } from 'next/cache';
 import { getUser } from '@/utils/getUser';
 
 export async function handleVote(
@@ -16,6 +17,11 @@ export async function handleVote(
   }
 
   const result = await togglePostReaction(postId, user.id, reactionType);
+
+  
+  if (result.success) {
+    revalidatePath('/posts');
+  }
 
   return result;
 }
