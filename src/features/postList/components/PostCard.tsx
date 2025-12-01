@@ -69,15 +69,7 @@ export default function PostCard({
 
           <div className='flex-1'>
             <div className='flex items-center gap-2'>
-              <UserName
-                firstName={authorFirstName}
-                lastName={authorLastName}
-                userType={authorUserType}
-                isAnonymous={isAnonymous}
-                userId={authorId}
-                showLink={false}
-                className='text-sm font-semibold'
-              />
+              <CardTitle className='text-base'>{title}</CardTitle>
               {postType === 'poll' && (
                 <span className='flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700'>
                   <BarChart3 className='h-3 w-3' />
@@ -85,7 +77,18 @@ export default function PostCard({
                 </span>
               )}
             </div>
-            <CardTitle className='text-base'>{title}</CardTitle>
+            <div className='flex items-center gap-1 text-sm text-gray-500'>
+              <span>by</span>
+              <UserName
+                firstName={authorFirstName}
+                lastName={authorLastName}
+                userType={authorUserType}
+                isAnonymous={isAnonymous}
+                userId={authorId}
+                showLink={false}
+                className='font-medium'
+              />
+            </div>
             <CardDescription className='text-sm text-gray-700'>
               {content}
             </CardDescription>

@@ -91,7 +91,35 @@ export default function Post({ userId, ...post }: PostProps) {
         className={`gap-3 py-4 shadow-sm ${showReply && userId ? 'mb-0 rounded-b-none' : ''}`}
       >
         <CardHeader className='px-4'>
-          <div className='flex flex-col gap-2'>
+          <div className='flex items-end justify-between'>
+            <div className='flex items-start gap-3'>
+              <UserAvatar
+                profilePictureUrl={post.authorProfilePictureUrl}
+                firstName={post.authorFirstName}
+                lastName={post.authorLastName}
+                fallback={post.isAnonymous ? 'A' : undefined}
+              />
+              <div className='flex h-10 flex-col justify-between'>
+                {post.title && (
+                  <CardTitle className='text-xl leading-none font-bold'>
+                    {post.title}
+                  </CardTitle>
+                )}
+                {post.authorName && (
+                  <UserName
+                    firstName={post.authorFirstName}
+                    lastName={post.authorLastName}
+                    userType={post.authorUserType}
+                    isAnonymous={post.isAnonymous}
+                    userId={post.authorId}
+                    showLink={true}
+                    prefix='by'
+                    className='text-sm text-gray-500'
+                    linkClassName='hover:text-blue-600 hover:underline'
+                  />
+                )}
+              </div>
+            </div>
             {post.channelName && post.channelId && (
               <Link
                 href={`/channels/${post.channelId}`}
@@ -100,36 +128,6 @@ export default function Post({ userId, ...post }: PostProps) {
                 #{post.channelName}
               </Link>
             )}
-
-            <div className='flex items-center justify-between gap-3'>
-              <div className='flex gap-3'>
-                <UserAvatar
-                  profilePictureUrl={post.authorProfilePictureUrl}
-                  firstName={post.authorFirstName}
-                  lastName={post.authorLastName}
-                  fallback={post.isAnonymous ? 'A' : undefined}
-                />
-                {post.title && (
-                  <CardTitle className='text-xl font-bold'>
-                    {post.title}
-                  </CardTitle>
-                )}
-              </div>
-
-              {post.authorName && (
-                <UserName
-                  firstName={post.authorFirstName}
-                  lastName={post.authorLastName}
-                  userType={post.authorUserType}
-                  isAnonymous={post.isAnonymous}
-                  userId={post.authorId}
-                  showLink={true}
-                  prefix='by'
-                  className='text-sm text-gray-500'
-                  linkClassName='hover:text-blue-600 hover:underline'
-                />
-              )}
-            </div>
           </div>
         </CardHeader>
 

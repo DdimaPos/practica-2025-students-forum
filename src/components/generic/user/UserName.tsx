@@ -49,7 +49,7 @@ export function UserName({
   if (canLink) {
     return (
       <span className={cn('inline-flex items-center', className)}>
-        {prefix && `${prefix} `}
+        {prefix && <>{prefix}&nbsp;</>}
         <Link
           href={`/profile/${userId}`}
           className={cn('hover:text-blue-600 hover:underline', linkClassName)}

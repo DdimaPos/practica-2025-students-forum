@@ -50,7 +50,13 @@ export async function GET(request: Request) {
       .innerJoin(users, eq(users.id, posts.authorId))
       .leftJoin(postReactions, eq(postReactions.postId, posts.id))
       .where(eq(posts.isActive, true))
-      .groupBy(posts.id, users.firstName, users.lastName)
+      .groupBy(
+        posts.id,
+        users.firstName,
+        users.lastName,
+        users.userType,
+        users.profilePictureUrl
+      )
       .orderBy(desc(posts.createdAt), desc(posts.id))
       .limit(limit)
       .offset(offset);

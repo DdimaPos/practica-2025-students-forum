@@ -88,7 +88,7 @@ export default function ReplyContainer({
   };
 
   return (
-    <div className='rounded-b-lg border border-t-0 border-gray-200 bg-white p-3 shadow-sm'>
+    <div className='bg-card rounded-b-xl border border-t-0 p-3 shadow-sm'>
       <div className='flex gap-2'>
         <Textarea
           value={message}

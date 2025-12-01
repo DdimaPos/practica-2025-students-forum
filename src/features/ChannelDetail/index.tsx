@@ -7,6 +7,7 @@ import PostCard from '@/features/postList/components/PostCard';
 import type { ChannelDetail } from './actions/getChannelById';
 import type { ChannelPost, SortOption } from './actions/getChannelPosts';
 import { Hash, Users, Calendar } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 
 type ChannelDetailContainerProps = {
   channel: ChannelDetail;
@@ -60,7 +61,7 @@ export default function ChannelDetailContainer({
   return (
     <div className='container py-8'>
       {/* Channel Header */}
-      <div className='bg-card mb-8 rounded-lg border p-6 shadow-sm'>
+      <Card className='mb-8 p-6 shadow-sm'>
         <div className='flex items-start justify-between gap-4'>
           <div className='flex items-start gap-4'>
             <div className='bg-primary/10 flex h-16 w-16 items-center justify-center rounded-full'>
@@ -93,7 +94,7 @@ export default function ChannelDetailContainer({
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Posts Section */}
       <div className='mb-6 flex items-center justify-between'>
