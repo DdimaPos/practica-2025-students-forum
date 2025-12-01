@@ -1,4 +1,3 @@
-// MobileTopBar.tsx
 import Link from 'next/link';
 import { getUser } from '@/utils/getUser';
 import MobileMenu from './components/MobileMenu';

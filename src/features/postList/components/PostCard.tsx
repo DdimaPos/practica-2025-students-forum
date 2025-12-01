@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Calendar, ArrowUp, ArrowDown, BarChart3 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,6 +12,10 @@ import {
 } from '@/components/ui/card';
 import { PostProp } from '../types/post';
 import { handleVote } from '../actions/handleVote';
+import { useState } from 'react';
+import { changeDynamicRating } from '../helperFunctions/changeRating';
+import { VoteType } from '../types/VoteType';
+import { getInitialVoteType } from '../helperFunctions/getInitialVote';
 
 export default function PostCard({
   id,
@@ -20,21 +26,29 @@ export default function PostCard({
   rating,
   photo,
   postType,
+  userReaction,
 }: PostProp) {
-  const handleUpvote = (e: React.MouseEvent) => {
+  const [dynamicRating, setDynamicRating] = useState(rating);
+  const [voteType, setVoteType] = useState<VoteType>(
+    getInitialVoteType(userReaction)
+  );
+
+  const handleUpvote = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const result = handleVote(id, 'upvote');
-    console.log(result);
+    const result = await handleVote(id, 'upvote');
+    //console.log(result);
+    changeDynamicRating(result, setDynamicRating, setVoteType);
   };
 
-  const handleDownvote = (e: React.MouseEvent) => {
+  const handleDownvote = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const result = handleVote(id, 'downvote');
-    console.log(result);
+    const result = await handleVote(id, 'downvote');
+    //console.log(result);
+    changeDynamicRating(result, setDynamicRating, setVoteType);
   };
 
   return (
@@ -70,12 +84,16 @@ export default function PostCard({
           </div>
           <div className='flex items-center gap-2'>
             <ArrowUp
-              className='h-4 w-4 cursor-pointer hover:text-black'
+              className={`h-4 w-4 cursor-pointer hover:text-black ${
+                voteType === VoteType.upvote ? 'text-green-600' : ''
+              }`}
               onClick={handleUpvote}
             />
-            <span>{rating}</span>
+            <span>{dynamicRating}</span>
             <ArrowDown
-              className='h-4 w-4 cursor-pointer hover:text-black'
+              className={`h-4 w-4 cursor-pointer hover:text-black ${
+                voteType === VoteType.downvote ? 'text-red-600' : ''
+              }`}
               onClick={handleDownvote}
             />
           </div>

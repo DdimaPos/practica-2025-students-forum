@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { desc, eq, sql } from 'drizzle-orm';
 import db from '@/db';
 import { posts, users, postReactions } from '@/db/schema';
+import { getUser } from '@/utils/getUser';
 
 const DEFAULT_LIMIT = 10;
 
@@ -12,6 +13,8 @@ export async function GET(request: Request) {
       parseInt(searchParams.get('limit') || String(DEFAULT_LIMIT))
     );
     const offset = Math.max(0, parseInt(searchParams.get('offset') || '0'));
+
+    const user = await getUser();
 
     const results = await db
       .select({
@@ -28,6 +31,15 @@ export async function GET(request: Request) {
             ELSE 0
           END
         ), 0)`.as('rating'),
+        userReaction: user
+          ? sql<string | null>`MAX(
+              CASE
+                WHEN ${postReactions.userId} = ${user.id} 
+                THEN ${postReactions.reactionType}
+                ELSE NULL
+              END
+            )`.as('user_reaction')
+          : sql<string | null>`NULL`.as('user_reaction'),
       })
       .from(posts)
       .innerJoin(users, eq(users.id, posts.authorId))
@@ -46,6 +58,7 @@ export async function GET(request: Request) {
       created_at: result.createdAt!.toISOString(),
       rating: result.rating,
       photo: '',
+      userReaction: result.userReaction as 'upvote' | 'downvote' | null,
     }));
 
     return NextResponse.json({

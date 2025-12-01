@@ -34,13 +34,13 @@ export default function Post({ userId, ...post }: PostProps) {
     setShowReply(prev => !prev);
   };
 
-  const handleUpvote = () => {
-    const result = handleVote(post.id, 'upvote');
+  const handleUpvote = async () => {
+    const result = await handleVote(post.id, 'upvote');
     console.log(result);
   };
 
-  const handleDownvote = () => {
-    const result = handleVote(post.id, 'downvote');
+  const handleDownvote = async () => {
+    const result = await handleVote(post.id, 'downvote');
     console.log(result);
   };
 

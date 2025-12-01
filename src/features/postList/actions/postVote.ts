@@ -35,7 +35,7 @@ export async function togglePostReaction(
             )
           );
 
-        return { success: true, action: 'removed', reactionType: null };
+        return { success: true, action: 'removed', reactionType };
       }
       // If clicking different reaction type, update it
       else {
