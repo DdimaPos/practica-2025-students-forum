@@ -103,21 +103,6 @@ export const SignUpForm: FC<Props> = ({ onSubmit }) => {
             </div>
 
             <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
-              <Label htmlFor='userType' className='text-right'>
-                User Type
-              </Label>
-              <select
-                id='userType'
-                name='userType'
-                className='border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                defaultValue='student'
-              >
-                <option value='student'>Student</option>
-                <option value='professor'>Professor</option>
-              </select>
-            </div>
-
-            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
               <Label htmlFor='yearOfStudy' className='text-right'>
                 Year of Study
               </Label>
