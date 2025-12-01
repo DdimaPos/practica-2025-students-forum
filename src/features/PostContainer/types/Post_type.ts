@@ -10,6 +10,7 @@ export type Post_type = {
   createdAt: Date | null;
   updatedAt: Date | null;
   rating: number;
+  userReaction?: 'upvote' | 'downvote' | null;
   authorName: string;
 };
 

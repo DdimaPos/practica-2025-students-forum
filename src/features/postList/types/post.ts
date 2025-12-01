@@ -7,4 +7,5 @@ export type PostProp = {
   rating: number;
   photo: string;
   postType?: 'basic' | 'poll' | 'event' | null;
+  userReaction?: 'upvote' | 'downvote' | null;
 };
