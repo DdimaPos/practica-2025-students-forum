@@ -66,14 +66,20 @@ async function _signup(data: SignupFormData) {
     };
   }
 
-  console.log('user data: ', res.data.user);
+  // if email ends in *.utm.md, set userType to 'verified'
+  let userType: 'student' | 'verified' = 'student';
+  const emailDomain = data.email.split('@')[1];
+
+  if (/\.utm\.md$/i.test(emailDomain)) {
+    userType = 'verified';
+  }
 
   await db.insert(users).values({
     authId: res.data.user.id,
     email: data.email,
     firstName: data.firstName,
     lastName: data.lastName,
-    userType: data.userType || 'student',
+    userType: userType,
     bio: data.bio,
     yearOfStudy: data.yearOfStudy,
     isVerified: false,
