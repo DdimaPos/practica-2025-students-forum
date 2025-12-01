@@ -7,22 +7,28 @@ import { Calendar, MessageCircle, ArrowUp, ArrowDown } from 'lucide-react';
 interface CommentCardProps {
   comment: CommentType & { repliesCount?: number; rating?: number };
   onReplyClick?: () => void;
+  hasReplyAttached?: boolean;
 }
 
 export default function CommentCard({
   comment,
   onReplyClick,
+  hasReplyAttached = false,
 }: CommentCardProps) {
   return (
-    <Card className='mb-3 gap-0 shadow-sm'>
-      <CardHeader className='px-3 py-1'>
+    <Card
+      className={`gap-0 py-4 shadow-sm ${hasReplyAttached ? 'mb-0 rounded-b-none' : 'mb-3'}`}
+    >
+      <CardHeader className='px-4 py-0'>
         <CardTitle className='text-sm font-semibold text-gray-800'>
           {comment.authorName}
         </CardTitle>
       </CardHeader>
 
-      <CardContent className='px-3 py-1'>
-        <p className='text-gray-700'>{comment.content}</p>
+      <CardContent className='px-4 py-0'>
+        <p className='text-gray-700 text-wrap overflow-hidden'>
+          {comment.content}
+        </p>
 
         <div className='mt-2 flex justify-between text-xs text-gray-500'>
           <div className='flex items-center gap-2'>

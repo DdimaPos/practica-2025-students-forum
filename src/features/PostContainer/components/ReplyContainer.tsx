@@ -4,30 +4,45 @@ import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { CommentType } from '@/features/CommentsContainer/types/Comment_type';
+import { useRouter } from 'next/navigation';
 
 interface ReplyFormProps {
-  postId: number;
-  authorId: number;
-  parentCommentId?: number | null;
+  postId: string;
+  authorId: string;
+  parentCommentId?: string | null;
+  setOptimisticReply?: (reply: CommentType) => void;
+  replaceOptimisticReply?: (tempId: string, realComment: CommentType) => void;
 }
 
 export default function ReplyContainer({
   postId,
   authorId,
   parentCommentId = null,
+  setOptimisticReply,
+  replaceOptimisticReply,
 }: ReplyFormProps) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async () => {
     if (!message.trim()) return;
+
+    const tempId = String(Date.now());
+    const optimisticReply = {
+      id: tempId,
+      postId,
+      authorId,
+      parentComment: parentCommentId || null,
+      content: message.trim(),
+      isAnonymous: false,
+      createdAt: new Date(),
+      authorName: 'You',
+    };
+
+    setOptimisticReply?.(optimisticReply);
     setLoading(true);
-    setError(null);
-    setSuccess(false);
 
     try {
       const res = await fetch('/api/comments', {
@@ -37,7 +52,7 @@ export default function ReplyContainer({
           postId,
           authorId,
           parentCommentId: parentCommentId || null,
-          content: message.trim(),
+          content: optimisticReply.content,
           isAnonymous: false,
         }),
       });
@@ -47,25 +62,30 @@ export default function ReplyContainer({
         throw new Error(json?.error || 'Failed to send comment');
       }
 
-      setMessage('');
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      // Get the real comment data from API response
+      const responseData = await res.json();
+
+      if (responseData.comment && replaceOptimisticReply) {
+        // Replace optimistic comment with real data
+        const realComment = {
+          ...responseData.comment,
+          authorName: 'You', // Keep the current user's name
+        };
+        replaceOptimisticReply(tempId, realComment);
+      } else {
+        window.location.reload();
+      }
+      router.refresh();
     } catch (err: unknown) {
       console.error(err);
-
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Unknown error');
-      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      <div className='mt-4 flex gap-2 rounded-lg border border-gray-300 bg-white p-3'>
+    <div className='rounded-b-lg border border-t-0 border-gray-200 bg-white p-3 shadow-sm'>
+      <div className='flex gap-2'>
         <Textarea
           value={message}
           onChange={e => setMessage(e.target.value)}
@@ -84,22 +104,6 @@ export default function ReplyContainer({
           </Button>
         </div>
       </div>
-
-      {success && (
-        <Alert className='border-green-500 bg-green-50 text-green-700'>
-          <CheckCircle2 className='h-4 w-4' />
-          <AlertTitle>Success</AlertTitle>
-          <AlertDescription>Comment added successfully!</AlertDescription>
-        </Alert>
-      )}
-
-      {error && (
-        <Alert className='border-red-500 bg-red-50 text-red-700'>
-          <AlertCircle className='h-4 w-4' />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
     </div>
   );
 }

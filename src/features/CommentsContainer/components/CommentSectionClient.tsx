@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import CommentThread from './CommentThread';
-import type { CommentType} from '../types/Comment_type';
+import type { CommentType } from '../types/Comment_type';
 
 type CommentWithMeta = CommentType & { repliesCount: number; rating: number };
 
@@ -10,20 +10,18 @@ export default function CommentSectionClient({
   postId,
   initialComments,
   total,
-  userId
+  userId,
 }: {
-  postId: number;
+  postId: string;
   initialComments: CommentWithMeta[];
   total: number;
-  userId: number | null;
+  userId?: string;
 }) {
   const [comments, setComments] = useState(initialComments);
   const [offset, setOffset] = useState(initialComments.length);
   const [loading, setLoading] = useState(false);
 
   const limit = 5;
-
-
 
   async function loadMore() {
     setLoading(true);
@@ -50,9 +48,14 @@ export default function CommentSectionClient({
 
   return (
     <div>
-      <div className='border-l-2 border-gray-200 pl-4'>
+      <div className='border-l-2 border-gray-200'>
         {comments.map(c => (
-          <CommentThread key={c.id} postId={postId} comment={c} authorId={userId} />
+          <CommentThread
+            key={c.id}
+            postId={postId}
+            comment={c}
+            authorId={userId}
+          />
         ))}
       </div>
 

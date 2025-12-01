@@ -9,7 +9,7 @@ export async function getUsersLeaderboard(
   offset: number = 0
 ): Promise<{
   users: {
-    id: number;
+    id: string;
     firstName: string | null;
     lastName: string | null;
     profilePictureUrl: string | null;

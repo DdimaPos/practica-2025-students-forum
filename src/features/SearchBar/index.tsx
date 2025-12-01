@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { useSearchContext } from '@/features/search/context/SearchContext';
 import SearchDropdown from '@/features/search/components/SearchDropdown';
 import { useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function SearchBar() {
+  const router = useRouter();
   const {
     query,
     loading,
@@ -41,6 +43,7 @@ export default function SearchBar() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      setShowDropdown(false);
       searchNow();
     } else if (e.key === 'Escape') {
       setShowDropdown(false);
@@ -56,11 +59,16 @@ export default function SearchBar() {
   };
 
   const handleFilterClick = () => {
+    setShowDropdown(false);
     searchNow();
   };
 
   const handleClearSearch = () => {
     clearSearch();
+  };
+
+  const handlePostCreationClick = () => {
+    router.push('/posts/create-post');
   };
 
   return (
@@ -98,7 +106,12 @@ export default function SearchBar() {
         <SearchDropdown />
       </div>
 
-      <Button>Write a new post</Button>
+      <Button
+        onClick={handlePostCreationClick}
+        className='cursor-pointer transition-colors'
+      >
+        Write a new post
+      </Button>
     </div>
   );
 }

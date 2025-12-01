@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchContext } from '@/features/search/context/SearchContext';
 
 export type Post = {
-  id: number;
+  id: string;
   author: string;
   title: string;
   content: string;
@@ -63,13 +63,19 @@ export function usePosts() {
     fetchPosts(offsetRef.current, true);
   }, [fetchPosts]);
 
+  // Fetch regular posts on mount and when search is cleared
   useEffect(() => {
-    offsetRef.current = 0;
-    hasMoreRef.current = true;
-    fetchPosts(0);
-  }, [fetchPosts]);
+    // Only fetch regular posts if we're not in search mode
+    // Check if search was cleared (query is empty) or if we have no search results yet
+    if (!searchQuery) {
+      offsetRef.current = 0;
+      hasMoreRef.current = true;
+      fetchPosts(0);
+    }
+  }, [fetchPosts, searchQuery]);
 
-  const displayPosts = searchQuery && searchResults ? 
+  // Show search results if we have a query and results (even if empty array)
+  const displayPosts = searchQuery && searchResults !== undefined ? 
     searchResults.results.map(result => ({
       id: result.id,
       title: result.title,

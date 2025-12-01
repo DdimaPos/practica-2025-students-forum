@@ -2,12 +2,12 @@
 
 import db from '@/db';
 import { comments, users, commentReactions } from '@/db/schema';
-import { eq, isNull, and, sql } from 'drizzle-orm';
+import { eq, isNull, and, sql, desc } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { CommentType } from '../types/Comment_type';
 
 export async function getComments(
-  postId: number,
+  postId: string,
   limit = 5,
   offset = 0
 ): Promise<{
@@ -55,6 +55,7 @@ export async function getComments(
       users.firstName,
       users.lastName
     )
+    .orderBy(desc(comments.createdAt))
     .limit(limit)
     .offset(offset);
 

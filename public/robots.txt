@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /private
+
+Sitemap: https://peerplex-students-forum.vercel.app//sitemap.xml

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/generic/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -19,6 +20,12 @@ export const metadata: Metadata = {
   verification: {
     google: 'Y_MDNX56q-y31pq0JJGX860RZHgEQYsEA7_VNV_2r6M',
   },
+  robots: 'all',
+  category: 'forum',
+  generator: 'nextjs',
+  openGraph: {
+    images: 'opengraph-image.png',
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +42,7 @@ export default function RootLayout({
           enableSystem={false}
         >
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
