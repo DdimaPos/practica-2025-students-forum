@@ -6,6 +6,7 @@ import {
   specialities,
   userSpecialities,
   courses,
+  professors,
   courseProfessors,
   channels,
   posts,
@@ -33,7 +34,7 @@ export async function createMockClient() {
           return [];
         },
         setAll(cookies) {
-          console.log('🍪 mock cookies set:', cookies.length);
+          console.log('mock cookies set:', cookies.length);
 
           return;
         },
@@ -43,7 +44,7 @@ export async function createMockClient() {
 }
 
 async function truncateAllTables() {
-  console.log('🧹 cleaning up the mess...');
+  console.log('cleaning up the mess...');
 
   // order matters - delete children before parents
   await db.delete(pollVotes);
@@ -55,6 +56,7 @@ async function truncateAllTables() {
   await db.delete(channels);
   await db.delete(professorReviews);
   await db.delete(courseProfessors);
+  await db.delete(professors);
   await db.delete(courses);
   await db.delete(studentRatings);
   await db.delete(notifications);
@@ -64,11 +66,11 @@ async function truncateAllTables() {
   await db.delete(faculties);
   await db.delete(users);
 
-  console.log('✨ tables are squeaky clean!');
+  console.log('tables are squeaky clean!');
 }
 
 async function createAuthUsers() {
-  console.log('🔐 creating auth users...');
+  console.log('creating auth users...');
 
   const supabase = await createMockClient();
   const authUsers = [];
@@ -137,20 +139,20 @@ async function createAuthUsers() {
     }
   }
 
-  console.log(`✅ created ${authUsers.length} auth users`);
+  console.log(`created ${authUsers.length} auth users`);
 
   return authUsers;
 }
 
 async function seedDatabase() {
-  console.log('🌱 time to plant some data seeds...');
+  console.log('time to plant some data seeds...');
 
   try {
     // step 1: create auth users
     const authUsers = await createAuthUsers();
 
     // step 2: create faculties
-    console.log('🏛️ creating faculties...');
+    console.log('creating faculties...');
     const facultiesData = await db
       .insert(faculties)
       .values([
@@ -177,7 +179,7 @@ async function seedDatabase() {
       .returning();
 
     // step 3: create specialities
-    console.log('📚 creating specialities...');
+    console.log('creating specialities...');
     const specialitiesData = await db
       .insert(specialities)
       .values([
@@ -213,7 +215,7 @@ async function seedDatabase() {
       .returning();
 
     // step 4: create users
-    console.log('👥 creating users...');
+    console.log('creating users...');
     const usersData = await db
       .insert(users)
       .values([
@@ -223,7 +225,7 @@ async function seedDatabase() {
           lastName: authUsers[0].lastName,
           email: authUsers[0].email,
           userType: 'student',
-          bio: 'cs student who lives on coffee and memes ☕',
+          bio: 'cs student who lives on coffee and memes',
           yearOfStudy: 3,
           isVerified: true,
         },
@@ -233,7 +235,7 @@ async function seedDatabase() {
           lastName: authUsers[1].lastName,
           email: authUsers[1].email,
           userType: 'student',
-          bio: 'debugging life one semicolon at a time 🐛',
+          bio: 'debugging life one semicolon at a time',
           yearOfStudy: 2,
           isVerified: true,
         },
@@ -252,7 +254,7 @@ async function seedDatabase() {
           lastName: authUsers[3].lastName,
           email: authUsers[3].email,
           userType: 'student',
-          bio: 'tech enthusiast | hackathon survivor | pizza connoisseur 🍕',
+          bio: 'tech enthusiast | hackathon survivor | pizza connoisseur',
           yearOfStudy: 1,
           isVerified: true,
         },
@@ -260,7 +262,7 @@ async function seedDatabase() {
       .returning();
 
     // step 5: link users to specialities
-    console.log('🔗 linking users to specialities...');
+    console.log('linking users to specialities...');
     await db.insert(userSpecialities).values([
       {
         userId: usersData[0].id, // ana
@@ -283,7 +285,7 @@ async function seedDatabase() {
     ]);
 
     // step 6: create courses
-    console.log('📖 creating courses...');
+    console.log('creating courses...');
     const coursesData = await db
       .insert(courses)
       .values([
@@ -322,34 +324,66 @@ async function seedDatabase() {
       ])
       .returning();
 
-    // step 7: assign professors to courses
-    console.log('👩‍🏫 assigning professors...');
+    // step 7: create professors (external entities, not platform users)
+    console.log('creating professors...');
+    const professorsData = await db
+      .insert(professors)
+      .values([
+        {
+          firstName: 'Elena',
+          lastName: 'Popescu',
+          email: 'elena.popescu@utm.md',
+          department: 'Computer Science',
+          title: 'Professor',
+          facultyId: facultiesData[0].id,
+        },
+        {
+          firstName: 'Ion',
+          lastName: 'Rusu',
+          email: 'ion.rusu@utm.md',
+          department: 'Software Engineering',
+          title: 'Associate Professor',
+          facultyId: facultiesData[0].id,
+        },
+        {
+          firstName: 'Natalia',
+          lastName: 'Cojocaru',
+          email: 'natalia.cojocaru@utm.md',
+          department: 'Computer Science',
+          title: 'Lecturer',
+          facultyId: facultiesData[0].id,
+        },
+      ])
+      .returning();
+
+    // step 8: assign professors to courses
+    console.log('assigning professors to courses...');
     const courseProfessorsData = await db
       .insert(courseProfessors)
       .values([
         {
           courseId: coursesData[0].id,
-          professorId: usersData[2].id, // maria
+          professorId: professorsData[0].id, // elena - algorithms
           academicYear: '24/25',
           isPrimary: true,
         },
         {
           courseId: coursesData[1].id,
-          professorId: usersData[2].id, // maria
+          professorId: professorsData[1].id, // ion - oop
           academicYear: '24/25',
           isPrimary: true,
         },
         {
           courseId: coursesData[2].id,
-          professorId: usersData[2].id, // maria
+          professorId: professorsData[2].id, // natalia - web dev
           academicYear: '24/25',
           isPrimary: true,
         },
       ])
       .returning();
 
-    // step 8: create channels
-    console.log('📢 creating channels...');
+    // step 9: create channels
+    console.log('creating channels...');
     const channelsData = await db
       .insert(channels)
       .values([
@@ -387,8 +421,8 @@ async function seedDatabase() {
       ])
       .returning();
 
-    // step 9: create posts (5 per user = 20 total)
-    console.log('📝 creating posts...');
+    // step 10: create posts (5 per user = 20 total)
+    console.log('creating posts...');
     const postsData = [];
 
     // ana's posts
@@ -398,7 +432,7 @@ async function seedDatabase() {
         {
           title: 'anyone else struggling with pointers?',
           content:
-            'seriously, why do pointers have to be so confusing 😭 spent 3 hours debugging a segfault just to realize i forgot to malloc',
+            'seriously, why do pointers have to be so confusing spent 3 hours debugging a segfault just to realize i forgot to malloc',
           postType: 'basic',
           authorId: usersData[0].id,
           channelId: channelsData[1].id, // cs-students
@@ -440,7 +474,7 @@ async function seedDatabase() {
         {
           title: 'when your code works but you dont know why',
           content:
-            'that feeling when your algorithm passes all test cases but you have no idea how 🤡',
+            'that feeling when your algorithm passes all test cases but you have no idea how',
           postType: 'poll',
           authorId: usersData[0].id,
           channelId: channelsData[0].id, // general
@@ -476,7 +510,7 @@ async function seedDatabase() {
         {
           title: 'react vs vue: fight me',
           content:
-            'okay but seriously, vue is just better. cleaner syntax, easier learning curve, and the ecosystem is solid. change my mind 🥊',
+            'okay but seriously, vue is just better. cleaner syntax, easier learning curve, and the ecosystem is solid. change my mind',
           postType: 'basic',
           authorId: usersData[1].id,
           channelId: channelsData[0].id, // general
@@ -504,7 +538,7 @@ async function seedDatabase() {
         {
           title: 'looking for frontend internship',
           content:
-            'anyone know companies in chisinau hiring frontend interns? i know react, vue, and can make things look pretty ✨',
+            'anyone know companies in chisinau hiring frontend interns? i know react, vue, and can make things look pretty',
           postType: 'basic',
           authorId: usersData[1].id,
           channelId: channelsData[4].id, // chisinau-local
@@ -518,7 +552,7 @@ async function seedDatabase() {
         {
           title: 'git merge conflicts are evil',
           content:
-            'spent 2 hours resolving merge conflicts only to realize i was on the wrong branch the whole time 🤦‍♂️',
+            'spent 2 hours resolving merge conflicts only to realize i was on the wrong branch the whole time',
           postType: 'basic',
           authorId: usersData[1].id,
           channelId: channelsData[1].id, // cs-students
@@ -532,7 +566,7 @@ async function seedDatabase() {
         {
           title: 'free pizza at the cs lab!',
           content:
-            'professor brought pizza for everyone working late on projects. utm profs are the best 🍕',
+            'professor brought pizza for everyone working late on projects. utm profs are the best',
           postType: 'basic',
           authorId: usersData[1].id,
           channelId: channelsData[0].id, // general
@@ -596,7 +630,7 @@ async function seedDatabase() {
         {
           title: 'congratulations to hackathon winners!',
           content:
-            'amazing projects from this weekends hackathon. the level of creativity and technical skill was outstanding. proud of all participants! 👏',
+            'amazing projects from this weekends hackathon. the level of creativity and technical skill was outstanding. proud of all participants!',
           postType: 'basic',
           authorId: usersData[2].id,
           channelId: channelsData[3].id, // events
@@ -632,7 +666,7 @@ async function seedDatabase() {
         {
           title: 'first year is overwhelming help',
           content:
-            'everything is moving so fast and i feel like im drowning in assignments. any tips for surviving first year? 😰',
+            'everything is moving so fast and i feel like im drowning in assignments. any tips for surviving first year?',
           postType: 'basic',
           authorId: usersData[3].id,
           channelId: channelsData[0].id, // general
@@ -660,7 +694,7 @@ async function seedDatabase() {
         {
           title: 'utm campus is huge!',
           content:
-            'been here a month and still getting lost trying to find my classrooms. anyone else or is it just me being geographically challenged? 🗺️',
+            'been here a month and still getting lost trying to find my classrooms. anyone else or is it just me being geographically challenged?',
           postType: 'basic',
           authorId: usersData[3].id,
           channelId: channelsData[0].id, // general
@@ -674,7 +708,7 @@ async function seedDatabase() {
         {
           title: 'made my first working program!',
           content:
-            'just coded my first fibonacci calculator that actually works! its not much but im proud 🎉',
+            'just coded my first fibonacci calculator that actually works! its not much but im proud',
           postType: 'basic',
           authorId: usersData[3].id,
           channelId: channelsData[1].id, // cs-students
@@ -688,7 +722,7 @@ async function seedDatabase() {
         {
           title: 'study buddy needed',
           content:
-            'looking for someone to study with for the upcoming math exam. preferably someone patient with my questions 😅',
+            'looking for someone to study with for the upcoming math exam. preferably someone patient with my questions',
           postType: 'basic',
           authorId: usersData[3].id,
           channelId: channelsData[2].id, // study-groups
@@ -703,8 +737,8 @@ async function seedDatabase() {
       .returning();
     postsData.push(...alexPosts);
 
-    // step 10: create poll options for poll posts
-    console.log('📊 creating poll options...');
+    // step 11: create poll options for poll posts
+    console.log('creating poll options...');
     const pollPosts = postsData.filter(p => p.postType === 'poll');
 
     for (const pollPost of pollPosts) {
@@ -712,7 +746,7 @@ async function seedDatabase() {
         await db.insert(pollOptions).values([
           {
             postId: pollPost.id,
-            optionText: 'happens all the time 🤷‍♀️',
+            optionText: 'happens all the time',
             optionOrder: 1,
             voteCount: 12,
           },
@@ -724,7 +758,7 @@ async function seedDatabase() {
           },
           {
             postId: pollPost.id,
-            optionText: 'thats called magic ✨',
+            optionText: 'thats called magic',
             optionOrder: 3,
             voteCount: 8,
           },
@@ -761,8 +795,8 @@ async function seedDatabase() {
       }
     }
 
-    // step 11: create comments
-    console.log('💬 creating comments...');
+    // step 12: create comments
+    console.log('creating comments...');
     const commentsData = await db
       .insert(comments)
       .values([
@@ -787,7 +821,7 @@ async function seedDatabase() {
         {
           postId: postsData[5].id,
           authorId: usersData[0].id, // ana
-          content: 'react has better job market though 🤷‍♀️',
+          content: 'react has better job market though',
         },
         {
           postId: postsData[5].id,
@@ -817,7 +851,7 @@ async function seedDatabase() {
       .returning();
 
     // step 12: create reactions
-    console.log('👍 creating reactions...');
+    console.log('creating reactions...');
     await db.insert(postReactions).values([
       {
         userId: usersData[1].id,
@@ -880,22 +914,22 @@ async function seedDatabase() {
     ]);
 
     // step 13: create professor reviews
-    console.log('⭐ creating professor reviews...');
+    console.log('creating professor reviews...');
     await db.insert(professorReviews).values([
       {
         reviewerId: usersData[0].id, // ana
-        courseProfessorsId: courseProfessorsData[0].id, // maria - algorithms
+        courseProfessorsId: courseProfessorsData[0].id, // elena - algorithms
         overallRating: 5,
         teachingQuality: 5,
         communication: 4,
         helpfulness: 5,
         reviewText:
-          'prof smith is amazing! explains complex concepts clearly and is always willing to help',
+          'prof popescu is amazing! explains complex concepts clearly and is always willing to help',
         isAnonymous: false,
       },
       {
         reviewerId: usersData[1].id, // dmitri
-        courseProfessorsId: courseProfessorsData[1].id, // maria - oop
+        courseProfessorsId: courseProfessorsData[1].id, // ion - oop
         overallRating: 4,
         teachingQuality: 4,
         communication: 5,
@@ -907,7 +941,7 @@ async function seedDatabase() {
     ]);
 
     // step 14: create student ratings
-    console.log('🌟 creating student ratings...');
+    console.log('creating student ratings...');
     await db.insert(studentRatings).values([
       {
         ratedStudentId: usersData[0].id, // ana
@@ -926,7 +960,7 @@ async function seedDatabase() {
     ]);
 
     // step 15: create schedules
-    console.log('📅 skipping schedules...');
+    console.log('skipping schedules...');
     // await db.insert(userSchedules).values([
     //   {
     //     userId: usersData[0].id,
@@ -952,7 +986,7 @@ async function seedDatabase() {
     // ]);
 
     // step 16: create followers
-    console.log('👥 creating followers...');
+    console.log('creating followers...');
     await db.insert(userFollowers).values([
       { followerId: usersData[0].id, followingId: usersData[1].id }, // ana follows dmitri
       { followerId: usersData[1].id, followingId: usersData[0].id }, // dmitri follows ana
@@ -962,7 +996,7 @@ async function seedDatabase() {
     ]);
 
     // step 17: create notifications
-    console.log('🔔 creating notifications...');
+    console.log('creating notifications...');
     await db.insert(notifications).values([
       {
         userId: usersData[0].id,
@@ -986,8 +1020,8 @@ async function seedDatabase() {
       },
     ]);
 
-    console.log('🎉 database seeded successfully!');
-    console.log('📊 summary:');
+    console.log('database seeded successfully!');
+    console.log('summary:');
     console.log(`- ${usersData.length} users created`);
     console.log(`- ${facultiesData.length} faculties`);
     console.log(`- ${coursesData.length} courses`);
@@ -996,7 +1030,7 @@ async function seedDatabase() {
     console.log(`- ${commentsData.length} comments`);
     console.log('- reactions, reviews, and relationships galore!');
   } catch (error) {
-    console.error('💥 seeding failed:', error);
+    console.error('seeding failed:', error);
     throw error;
   }
 }
@@ -1006,7 +1040,7 @@ async function main() {
     process.env.NEXT_PUBLIC_SUPABASE_URL === undefined ||
     process.env.SUPABASE_SECRET_KEY === undefined
   ) {
-    console.error('❌ missing SUPABASE env vars, cannot continue');
+    console.error('missing SUPABASE env vars, cannot continue');
     console.error(
       'make sure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY are set in .env.local'
     );
