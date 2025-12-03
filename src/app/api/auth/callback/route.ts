@@ -52,12 +52,17 @@ export async function GET(request: Request) {
 
           const finalFirstName = user.user_metadata?.first_name || firstName;
           const finalLastName = user.user_metadata?.last_name || lastName;
+          const profilePictureUrl =
+            user.user_metadata?.avatar_url ||
+            user.user_metadata?.picture ||
+            null;
 
           await db.insert(users).values({
             authId: user.id,
             email: user.email,
             firstName: finalFirstName || null,
             lastName: finalLastName || null,
+            profilePictureUrl,
             userType,
             isVerified: false,
           });
