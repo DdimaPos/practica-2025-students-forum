@@ -1,1 +1,1 @@
-export { sanitize, isValidUuid, sanitizeSearch, rateLimit } from './sanitize';
+export { sanitize, isValidUuid, sanitizeSearch } from './sanitize';

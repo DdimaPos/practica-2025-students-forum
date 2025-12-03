@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import db from '@/db';
 import { comments } from '@/db/schema';
 import { revalidateCommentsCache } from '@/lib/cache';
-import { sanitize, isValidUuid, rateLimit } from '@/lib/security';
+import { sanitize, isValidUuid } from '@/lib/security';
 
 export async function POST(request: Request) {
   try {
@@ -21,16 +21,6 @@ export async function POST(request: Request) {
 
     if (!isValidUuid(postId) || !isValidUuid(authorId)) {
       return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 });
-    }
-
-    // 10 comments per minute per user
-    const { allowed } = rateLimit(`comment:${authorId}`, 10, 60000);
-
-    if (!allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please wait before commenting again.' },
-        { status: 429 }
-      );
     }
 
     if (parentCommentId && !isValidUuid(parentCommentId)) {

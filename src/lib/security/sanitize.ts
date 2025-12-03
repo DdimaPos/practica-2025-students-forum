@@ -47,39 +47,3 @@ export function sanitizeSearch(query: string): string {
     .replace(/['";`]/g, '')
     .slice(0, 200);
 }
-
-/**
- * Simple in-memory rate limiter
- * Tracks requests per IP/user and blocks if limit exceeded
- */
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-export function rateLimit(
-  key: string, 
-  maxRequests: number = 10, 
-  windowMs: number = 60000
-): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const record = rateLimitStore.get(key);
-
-  // Clean up expired entries periodically
-  if (Math.random() < 0.01) {
-    for (const [k, v] of rateLimitStore.entries()) {
-      if (now > v.resetTime) rateLimitStore.delete(k);
-    }
-  }
-
-  if (!record || now > record.resetTime) {
-    rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
-
-    return { allowed: true, remaining: maxRequests - 1 };
-  }
-
-  if (record.count >= maxRequests) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  record.count++;
-
-  return { allowed: true, remaining: maxRequests - record.count };
-}
