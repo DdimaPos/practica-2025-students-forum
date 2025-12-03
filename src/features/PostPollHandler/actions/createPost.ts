@@ -3,6 +3,7 @@
 import db from '@/db';
 import { posts } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
+import { sanitize } from '@/lib/security';
 
 export async function createPostAction(formData: {
   title: string;
@@ -30,11 +31,14 @@ export async function createPostAction(formData: {
       );
     }
 
+    const sanitizedTitle = sanitize(title);
+    const sanitizedContent = sanitize(content);
+
     const [newPost] = await db
       .insert(posts)
       .values({
-        title: title,
-        content: content,
+        title: sanitizedTitle,
+        content: sanitizedContent,
         postType: post_type || 'basic',
         authorId: author_id,
         channelId: channel_id || null,

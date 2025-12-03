@@ -3,6 +3,7 @@
 import db from '@/db';
 import { posts, pollOptions } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
+import { sanitize } from '@/lib/security';
 
 export async function createPollAction(formData: {
   title: string;
@@ -34,19 +35,23 @@ export async function createPollAction(formData: {
       throw new Error('At least 2 poll options are required');
     }
 
-    // Filter out empty options
-    const validOptions = poll_options.filter(opt => opt.trim().length > 0);
+    const validOptions = poll_options
+      .map(opt => sanitize(opt))
+      .filter(opt => opt.trim().length > 0);
 
     if (validOptions.length < 2) {
       throw new Error('At least 2 non-empty poll options are required');
     }
 
+    const sanitizedTitle = sanitize(title);
+    const sanitizedContent = sanitize(content);
+
     // Create the poll post
     const [newPost] = await db
       .insert(posts)
       .values({
-        title: title,
-        content: content,
+        title: sanitizedTitle,
+        content: sanitizedContent,
         postType: 'poll',
         authorId: author_id,
         channelId: channel_id || null,
