@@ -11,7 +11,7 @@ function encodeHtmlEntities(str: string): string {
 }
 
 /**
- * Decodes HTML entities that attackers might use to bypass filters
+ * Decodes HTML entities (single pass)
  */
 function decodeHtmlEntities(str: string): string {
   return str
@@ -21,13 +21,34 @@ function decodeHtmlEntities(str: string): string {
     .replace(/&quot;/gi, '"')
     .replace(/&#x27;/gi, "'")
     .replace(/&#39;/gi, "'")
-    .replace(/&#x2f;/gi, '/')
-    .replace(/&#47;/gi, '/')
     .replace(/&#x3c;/gi, '<')
     .replace(/&#60;/gi, '<')
     .replace(/&#x3e;/gi, '>')
     .replace(/&#62;/gi, '>');
 }
+
+/**
+ * Recursively decodes HTML entities until stable
+ * Catches multi-level encoded attacks like &amp;lt;script&amp;gt;
+ */
+function fullyDecodeHtmlEntities(str: string, maxIterations: number = 10): string {
+  let decoded = str;
+  let prev = '';
+  let iterations = 0;
+
+  while (decoded !== prev && iterations < maxIterations) {
+    prev = decoded;
+    decoded = decodeHtmlEntities(decoded);
+    iterations++;
+  }
+
+  return decoded;
+}
+
+/**
+ * Security Sanitization Utilities
+ * Protects against XSS attacks by stripping dangerous HTML/scripts
+ */
 
 /**
  * Strips HTML tags and encodes special characters to prevent XSS attacks
@@ -36,16 +57,18 @@ function decodeHtmlEntities(str: string): string {
 export function sanitize(input: string): string {
   if (!input || typeof input !== 'string') return '';
 
-  const cleaned = input
-    // decode HTML entities to catch encoded attacks
-    .replace(/&[#\w]+;/gi, (match) => decodeHtmlEntities(match))
+  // First: fully decode all HTML entities to catch multi-encoded attacks
+  const decoded = fullyDecodeHtmlEntities(input);
+
+  // Then: strip dangerous content
+  const cleaned = decoded
     // script tags and their content
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     // all other HTML tags
     .replace(/<[^>]*>/g, '')
     // event handlers that might slip through
     .replace(/on\w+\s*=/gi, '')
-    // javascript: URLs (including encoded variants)
+    // javascript: URLs
     .replace(/javascript:/gi, '')
     .replace(/data:/gi, '')
     .replace(/vbscript:/gi, '')
@@ -53,7 +76,7 @@ export function sanitize(input: string): string {
     .split(String.fromCharCode(0)).join('')
     .trim();
 
-  // remaining special characters to prevent any residual XSS
+  // Finally: encode special characters to prevent any residual XSS
   return encodeHtmlEntities(cleaned);
 }
 
