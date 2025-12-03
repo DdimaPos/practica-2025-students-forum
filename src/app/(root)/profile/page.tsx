@@ -37,7 +37,7 @@ export default async function Profile() {
       <main className='flex-1 p-6'>
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
           <section className='col-span-2 rounded-xl border bg-white p-8 shadow-sm'>
-            <div className='bg-background text-foreground'>
+            <div className='bg-background text-foreground flex flex-col items-center'>
               <Image
                 src={user.profilePictureUrl || '/window.svg'}
                 alt='Profile avatar'
