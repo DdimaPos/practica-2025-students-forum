@@ -46,6 +46,9 @@ export async function createPollAction(formData: {
     const sanitizedTitle = sanitize(title);
     const sanitizedContent = sanitize(content);
 
+    if (!sanitizedTitle.trim() || !sanitizedContent.trim()) {
+      throw new Error('Title and content cannot be empty after sanitization');
+    }
     // Create the poll post
     const [newPost] = await db
       .insert(posts)
