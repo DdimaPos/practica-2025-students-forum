@@ -34,9 +34,21 @@ async function _signup(data: SignupFormData) {
   }
 
   const supabase = await createClient();
+  const displayName =
+    data.firstName && data.lastName
+      ? `${data.firstName} ${data.lastName}`
+      : data.firstName || data.lastName || '';
+
   const res = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
+    options: {
+      data: {
+        display_name: displayName,
+        first_name: data.firstName,
+        last_name: data.lastName,
+      },
+    },
   });
 
   if (res.error) {
@@ -54,14 +66,20 @@ async function _signup(data: SignupFormData) {
     };
   }
 
-  console.log('user data: ', res.data.user);
+  // if email ends in *.utm.md, set userType to 'verified'
+  let userType: 'student' | 'verified' = 'student';
+  const emailDomain = data.email.split('@')[1];
+
+  if (/\.utm\.md$/i.test(emailDomain)) {
+    userType = 'verified';
+  }
 
   await db.insert(users).values({
     authId: res.data.user.id,
     email: data.email,
     firstName: data.firstName,
     lastName: data.lastName,
-    userType: data.userType || 'student',
+    userType: userType,
     bio: data.bio,
     yearOfStudy: data.yearOfStudy,
     isVerified: false,
