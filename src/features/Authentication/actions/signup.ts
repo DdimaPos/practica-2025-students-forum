@@ -57,11 +57,18 @@ async function _signup(data: SignupFormData) {
 
   console.log('user data: ', res.data.user);
 
+  const sanitizedFirstName = sanitize(data.firstName || '');
+  const sanitizedLastName = sanitize(data.lastName || '');
+
+  if (!sanitizedFirstName.trim() || !sanitizedLastName.trim()) {
+    return { error: 'First name and last name cannot be empty' };
+  }
+
   await db.insert(users).values({
     authId: res.data.user.id,
     email: data.email,
-    firstName: sanitize(data.firstName || ''),
-    lastName: sanitize(data.lastName || ''),
+    firstName: sanitizedFirstName,
+    lastName: sanitizedLastName,
     userType: data.userType || 'student',
     bio: data.bio ? sanitize(data.bio) : undefined,
     yearOfStudy: data.yearOfStudy,

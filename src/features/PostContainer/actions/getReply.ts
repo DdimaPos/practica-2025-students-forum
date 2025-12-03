@@ -17,6 +17,10 @@ export async function addReply(
 
   if(user){
     const sanitizedMessage = sanitize(message);
+
+    if (!sanitizedMessage.trim()) {
+      throw new Error('Reply message cannot be empty');
+    }
     
     await db.insert(comments).values({
     authorId: user.id,

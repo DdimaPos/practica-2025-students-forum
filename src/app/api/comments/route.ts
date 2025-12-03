@@ -30,6 +30,10 @@ export async function POST(request: Request) {
     // Sanitize content to prevent XSS
     const sanitizedContent = sanitize(content);
 
+    if (!sanitizedContent.trim()) {
+      return NextResponse.json({ error: 'Comment content cannot be empty' }, { status: 400 });
+    }
+
     const author_id = String(authorId);
     const post_id = String(postId);
     const parent_comment_id = parentCommentId ? String(parentCommentId) : null;

@@ -1,27 +1,60 @@
 /**
- * Security Sanitization Utilities
- * Protects against XSS attacks by stripping dangerous HTML/scripts
+ * Encodes HTML special characters to prevent XSS
  */
+function encodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
 
 /**
- * Strips HTML tags to prevent XSS attacks
+ * Decodes HTML entities that attackers might use to bypass filters
+ */
+function decodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#x27;/gi, "'")
+    .replace(/&#39;/gi, "'")
+    .replace(/&#x2f;/gi, '/')
+    .replace(/&#47;/gi, '/')
+    .replace(/&#x3c;/gi, '<')
+    .replace(/&#60;/gi, '<')
+    .replace(/&#x3e;/gi, '>')
+    .replace(/&#62;/gi, '>');
+}
+
+/**
+ * Strips HTML tags and encodes special characters to prevent XSS attacks
  * Use for all user-generated text content
  */
 export function sanitize(input: string): string {
   if (!input || typeof input !== 'string') return '';
 
-  return input
-    // Remove script tags and their content
+  const cleaned = input
+    // decode HTML entities to catch encoded attacks
+    .replace(/&[#\w]+;/gi, (match) => decodeHtmlEntities(match))
+    // script tags and their content
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    // Remove all other HTML tags
+    // all other HTML tags
     .replace(/<[^>]*>/g, '')
-    // Remove event handlers that might slip through
+    // event handlers that might slip through
     .replace(/on\w+\s*=/gi, '')
-    // Remove javascript: URLs
+    // javascript: URLs (including encoded variants)
     .replace(/javascript:/gi, '')
-    // Remove null bytes
+    .replace(/data:/gi, '')
+    .replace(/vbscript:/gi, '')
+    // null bytes
     .split(String.fromCharCode(0)).join('')
     .trim();
+
+  // remaining special characters to prevent any residual XSS
+  return encodeHtmlEntities(cleaned);
 }
 
 /**
