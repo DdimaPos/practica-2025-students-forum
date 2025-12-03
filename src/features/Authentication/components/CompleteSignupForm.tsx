@@ -1,14 +1,12 @@
 'use client';
+
 import { FC, useActionState, useTransition } from 'react';
 import type { FormState } from '../types';
-import Link from 'next/link';
 import { useFormStateToast } from '../hooks/useToast';
-import { TermsAndConditions } from './TermsAndConditions';
 
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -18,20 +16,22 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Toaster } from '@/components/ui/sonner';
-import { Separator } from '@/components/ui/separator';
-import { OAuthGroup } from './OAuthGroup';
 
 interface Props {
   onSubmit: (prevState: FormState, formData: FormData) => Promise<FormState>;
+  defaultValues?: {
+    firstName?: string;
+    lastName?: string;
+  };
 }
 
-export const SignUpForm: FC<Props> = ({ onSubmit }) => {
+export const CompleteSignupForm: FC<Props> = ({ onSubmit, defaultValues }) => {
   const initialState: FormState = { success: false, message: '' };
   const [state, formAction] = useActionState(onSubmit, initialState);
 
   const [isPending, startTransition] = useTransition();
 
-  useFormStateToast(state, 'Signed up. Check your email for verification.');
+  useFormStateToast(state, 'Profile completed successfully.');
 
   const formActionWithTransition = (formData: FormData) => {
     startTransition(() => {
@@ -43,18 +43,13 @@ export const SignUpForm: FC<Props> = ({ onSubmit }) => {
     <Card className='w-full max-w-md'>
       <Toaster richColors position='top-center' />
       <CardHeader>
-        <CardTitle>Create account</CardTitle>
+        <CardTitle>Complete your profile</CardTitle>
         <CardDescription>
-          Enter your email below to create your account
+          Please fill in the remaining details to finish setting up your account
         </CardDescription>
-        <CardAction>
-          <Link href='/login'>
-            <Button variant='link'>Log in</Button>
-          </Link>
-        </CardAction>
       </CardHeader>
       <CardContent>
-        <form id='signupform' action={formActionWithTransition}>
+        <form id='complete-signup-form' action={formActionWithTransition}>
           <div className='grid gap-8'>
             <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
               <Label htmlFor='firstName' className='text-right'>
@@ -65,6 +60,7 @@ export const SignUpForm: FC<Props> = ({ onSubmit }) => {
                 type='text'
                 name='firstName'
                 placeholder='Ion'
+                defaultValue={defaultValues?.firstName}
                 required
               />
             </div>
@@ -78,28 +74,9 @@ export const SignUpForm: FC<Props> = ({ onSubmit }) => {
                 type='text'
                 name='lastName'
                 placeholder='Moraru'
+                defaultValue={defaultValues?.lastName}
                 required
               />
-            </div>
-
-            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
-              <Label htmlFor='email' className='text-right'>
-                Email
-              </Label>
-              <Input
-                id='email'
-                type='email'
-                name='email'
-                placeholder='mail@example.com'
-                required
-              />
-            </div>
-
-            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
-              <Label htmlFor='password' className='text-right'>
-                Password
-              </Label>
-              <Input id='password' name='password' type='password' required />
             </div>
 
             <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
@@ -127,42 +104,18 @@ export const SignUpForm: FC<Props> = ({ onSubmit }) => {
                 placeholder='Tell us about yourself...'
               />
             </div>
-
-            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
-              <Label htmlFor='picture' className='text-right'>
-                Profile Pic
-              </Label>
-              <Input
-                className='bg-accent'
-                id='picture'
-                name='picture'
-                type='file'
-                accept='image/*'
-                onChange={e => {
-                  const file = e.target.files?.[0];
-
-                  if (file && file.size > 1024 * 1024) {
-                    alert('File size must be less than 1MB');
-                    e.target.value = '';
-                  }
-                }}
-              />
-            </div>
-            <TermsAndConditions />
           </div>
         </form>
       </CardContent>
-      <CardFooter className='flex-col gap-2'>
+      <CardFooter>
         <Button
           type='submit'
-          form='signupform'
+          form='complete-signup-form'
           className='w-full'
           disabled={isPending}
         >
-          {isPending ? 'Creating account...' : 'Create account'}
+          {isPending ? 'Saving...' : 'Complete signup'}
         </Button>
-        <Separator />
-        <OAuthGroup />
       </CardFooter>
     </Card>
   );

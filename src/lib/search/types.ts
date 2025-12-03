@@ -6,6 +6,8 @@ export interface PostSearchResult {
     id: string | null;
     firstName: string | null;
     lastName: string | null;
+    userType: 'student' | 'verified' | 'admin' | null;
+    profilePictureUrl: string | null;
   };
   createdAt: string;
 }

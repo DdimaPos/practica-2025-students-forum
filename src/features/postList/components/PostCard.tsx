@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Calendar, ArrowUp, ArrowDown, BarChart3 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar, UserName } from '@/components/generic/user';
 import {
   Card,
   CardHeader,
@@ -19,12 +19,16 @@ import { getInitialVoteType } from '../helperFunctions/getInitialVote';
 
 export default function PostCard({
   id,
-  author,
+  authorFirstName,
+  authorLastName,
+  authorUserType,
+  authorProfilePictureUrl,
+  authorId,
+  isAnonymous,
   title,
   content,
   created_at,
   rating,
-  photo,
   postType,
   userReaction,
 }: PostProp) {
@@ -55,14 +59,25 @@ export default function PostCard({
     <Link href={`/posts/${id}`}>
       <Card className='mb-2 cursor-pointer shadow-sm transition hover:shadow-md'>
         <CardHeader className='flex flex-row items-start gap-3'>
-          <Avatar className='h-10 w-10'>
-            <AvatarImage src={photo} alt={author} />
-            <AvatarFallback>{author.charAt(0).toUpperCase()}</AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            profilePictureUrl={authorProfilePictureUrl}
+            firstName={authorFirstName}
+            lastName={authorLastName}
+            fallback={isAnonymous ? 'A' : undefined}
+            className='h-10 w-10'
+          />
 
           <div className='flex-1'>
             <div className='flex items-center gap-2'>
-              <p className='text-sm font-semibold'>@{author}</p>
+              <UserName
+                firstName={authorFirstName}
+                lastName={authorLastName}
+                userType={authorUserType}
+                isAnonymous={isAnonymous}
+                userId={authorId}
+                showLink={false}
+                className='text-sm font-semibold'
+              />
               {postType === 'poll' && (
                 <span className='flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700'>
                   <BarChart3 className='h-3 w-3' />

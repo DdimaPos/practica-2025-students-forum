@@ -60,11 +60,11 @@ export default function ChannelDetailContainer({
   return (
     <div className='container py-8'>
       {/* Channel Header */}
-      <div className='mb-8 rounded-lg border bg-card p-6 shadow-sm'>
+      <div className='bg-card mb-8 rounded-lg border p-6 shadow-sm'>
         <div className='flex items-start justify-between gap-4'>
           <div className='flex items-start gap-4'>
-            <div className='flex h-16 w-16 items-center justify-center rounded-full bg-primary/10'>
-              <Hash className='h-8 w-8 text-primary' />
+            <div className='bg-primary/10 flex h-16 w-16 items-center justify-center rounded-full'>
+              <Hash className='text-primary h-8 w-8' />
             </div>
             <div>
               <div className='flex items-center gap-3'>
@@ -80,7 +80,7 @@ export default function ChannelDetailContainer({
                   {channel.description}
                 </p>
               )}
-              <div className='mt-4 flex items-center gap-6 text-sm text-muted-foreground'>
+              <div className='text-muted-foreground mt-4 flex items-center gap-6 text-sm'>
                 <div className='flex items-center gap-2'>
                   <Users className='h-4 w-4' />
                   <span>{channel.postCount} posts</span>
@@ -120,6 +120,12 @@ export default function ChannelDetailContainer({
               key={post.id}
               id={post.id}
               author={post.authorName}
+              authorFirstName={post.authorFirstName}
+              authorLastName={post.authorLastName}
+              authorUserType={post.authorUserType}
+              authorProfilePictureUrl={post.authorProfilePictureUrl}
+              authorId={post.authorId}
+              isAnonymous={post.isAnonymous}
               title={post.title}
               content={post.content}
               created_at={post.createdAt?.toISOString() || ''}

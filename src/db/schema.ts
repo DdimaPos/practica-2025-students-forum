@@ -18,7 +18,7 @@ import { authUsers } from 'drizzle-orm/supabase';
 // Enums
 export const userTypeEnum = pgEnum('user_type', [
   'student',
-  'professor',
+  'verified',
   'admin',
 ]);
 

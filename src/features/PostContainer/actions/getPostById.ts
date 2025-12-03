@@ -31,21 +31,30 @@ export async function getPostById(id: string): Promise<Post_type | null> {
       firstName: users.firstName,
       lastName: users.lastName,
       userReaction: user
-          ? sql<string | null>`MAX(
+        ? sql<string | null>`MAX(
               CASE
                 WHEN ${postReactions.userId} = ${user.id} 
                 THEN ${postReactions.reactionType}
                 ELSE NULL
               END
             )`.as('user_reaction')
-          : sql<string | null>`NULL`.as('user_reaction'),
-      })
+        : sql<string | null>`NULL`.as('user_reaction'),
+      userType: users.userType,
+      profilePictureUrl: users.profilePictureUrl,
+    })
     .from(posts)
     .leftJoin(users, eq(users.id, posts.authorId))
     .leftJoin(channels, eq(channels.id, posts.channelId))
     .leftJoin(postReactions, eq(postReactions.postId, posts.id))
     .where(eq(posts.id, id))
-    .groupBy(posts.id, users.firstName, users.lastName, channels.name);
+    .groupBy(
+      posts.id,
+      users.firstName,
+      users.lastName,
+      users.userType,
+      users.profilePictureUrl,
+      channels.name
+    );
 
   if (result.length === 0) return null;
 
@@ -69,5 +78,9 @@ export async function getPostById(id: string): Promise<Post_type | null> {
     rating: post.rating,
     authorName,
     userReaction: post.userReaction as 'upvote' | 'downvote' | null,
+    authorFirstName: post.firstName,
+    authorLastName: post.lastName,
+    authorUserType: post.userType,
+    authorProfilePictureUrl: post.profilePictureUrl,
   };
 }

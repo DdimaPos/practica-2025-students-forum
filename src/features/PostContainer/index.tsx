@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Post_type } from './types/Post_type';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar, UserName } from '@/components/generic/user';
 import ReplyContainer from './components/ReplyContainer';
 import PollDisplay from './components/PollDisplay';
 import {
@@ -103,10 +103,12 @@ export default function Post({ userId, ...post }: PostProps) {
 
             <div className='flex items-center justify-between gap-3'>
               <div className='flex gap-3'>
-                <Avatar>
-                  <AvatarImage src='https://tribuna.md/wp-content/uploads/2021/01/utm.jpg' />
-                  <AvatarFallback>U</AvatarFallback>
-                </Avatar>
+                <UserAvatar
+                  profilePictureUrl={post.authorProfilePictureUrl}
+                  firstName={post.authorFirstName}
+                  lastName={post.authorLastName}
+                  fallback={post.isAnonymous ? 'A' : undefined}
+                />
                 {post.title && (
                   <CardTitle className='text-xl font-bold'>
                     {post.title}
@@ -115,19 +117,17 @@ export default function Post({ userId, ...post }: PostProps) {
               </div>
 
               {post.authorName && (
-                <span className='text-sm text-gray-500'>
-                  by{' '}
-                  {post.authorId && !post.isAnonymous ? (
-                    <Link
-                      href={`/profile/${post.authorId}`}
-                      className='hover:text-blue-600 hover:underline'
-                    >
-                      {post.authorName}
-                    </Link>
-                  ) : (
-                    <span>{post.authorName}</span>
-                  )}
-                </span>
+                <UserName
+                  firstName={post.authorFirstName}
+                  lastName={post.authorLastName}
+                  userType={post.authorUserType}
+                  isAnonymous={post.isAnonymous}
+                  userId={post.authorId}
+                  showLink={true}
+                  prefix='by'
+                  className='text-sm text-gray-500'
+                  linkClassName='hover:text-blue-600 hover:underline'
+                />
               )}
             </div>
           </div>

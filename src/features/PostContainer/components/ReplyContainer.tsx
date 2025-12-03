@@ -30,7 +30,7 @@ export default function ReplyContainer({
     if (!message.trim()) return;
 
     const tempId = String(Date.now());
-    const optimisticReply = {
+    const optimisticReply: CommentType = {
       id: tempId,
       postId,
       authorId,
@@ -39,6 +39,10 @@ export default function ReplyContainer({
       isAnonymous: false,
       createdAt: new Date(),
       authorName: 'You',
+      authorFirstName: null,
+      authorLastName: null,
+      authorUserType: null,
+      authorProfilePictureUrl: null,
     };
 
     setOptimisticReply?.(optimisticReply);

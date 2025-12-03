@@ -16,6 +16,7 @@ type UserCardProps = {
   firstName: string | null;
   lastName: string | null;
   profilePictureUrl: string | null;
+  userType: 'student' | 'verified' | 'admin' | null;
   avgRating: number;
   ratingsCount: number;
 };
