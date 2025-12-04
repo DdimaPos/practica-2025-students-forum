@@ -3,6 +3,7 @@
 import db from '@/db';
 import { posts } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
+import { sanitize, isValidUuid } from '@/lib/security';
 
 export async function createPostAction(formData: {
   title: string;
@@ -30,11 +31,26 @@ export async function createPostAction(formData: {
       );
     }
 
+    if (!isValidUuid(author_id)) {
+      throw new Error('Invalid author ID format');
+    }
+
+    if (channel_id && !isValidUuid(channel_id)) {
+      throw new Error('Invalid channel ID format');
+    }
+
+    const sanitizedTitle = sanitize(title);
+    const sanitizedContent = sanitize(content);
+
+    if (!sanitizedTitle.trim() || !sanitizedContent.trim()) {
+      throw new Error('Title and content cannot be empty after sanitization');
+    }
+
     const [newPost] = await db
       .insert(posts)
       .values({
-        title: title,
-        content: content,
+        title: sanitizedTitle,
+        content: sanitizedContent,
         postType: post_type || 'basic',
         authorId: author_id,
         channelId: channel_id || null,
