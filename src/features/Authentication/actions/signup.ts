@@ -5,6 +5,7 @@ import { FormState, SignupFormData, signupFormSchema } from '../types';
 import db from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { sanitize } from '@/lib/security';
 
 async function checkUserExists(email: string) {
   const ures = await db.select().from(users).where(eq(users.email, email));
@@ -56,13 +57,20 @@ async function _signup(data: SignupFormData) {
 
   console.log('user data: ', res.data.user);
 
+  const sanitizedFirstName = sanitize(data.firstName || '');
+  const sanitizedLastName = sanitize(data.lastName || '');
+
+  if (!sanitizedFirstName.trim() || !sanitizedLastName.trim()) {
+    return { error: 'First name and last name cannot be empty' };
+  }
+
   await db.insert(users).values({
     authId: res.data.user.id,
     email: data.email,
-    firstName: data.firstName,
-    lastName: data.lastName,
+    firstName: sanitizedFirstName,
+    lastName: sanitizedLastName,
     userType: data.userType || 'student',
-    bio: data.bio,
+    bio: data.bio ? sanitize(data.bio) : undefined,
     yearOfStudy: data.yearOfStudy,
     isVerified: false,
     // profilePictureUrl: data.profilePictureUrl,
