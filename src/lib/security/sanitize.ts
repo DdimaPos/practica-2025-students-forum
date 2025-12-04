@@ -1,6 +1,4 @@
-/**
- * Encodes HTML special characters to prevent XSS
- */
+
 function encodeHtmlEntities(str: string): string {
   return str
     .replace(/&/g, '&amp;')
@@ -10,9 +8,6 @@ function encodeHtmlEntities(str: string): string {
     .replace(/'/g, '&#x27;');
 }
 
-/**
- * Decodes HTML entities (single pass)
- */
 function decodeHtmlEntities(str: string): string {
   return str
     .replace(/&lt;/gi, '<')
@@ -27,10 +22,7 @@ function decodeHtmlEntities(str: string): string {
     .replace(/&#62;/gi, '>');
 }
 
-/**
- * Recursively decodes HTML entities until stable
- * Catches multi-level encoded attacks like &amp;lt;script&amp;gt;
- */
+
 function fullyDecodeHtmlEntities(str: string, maxIterations: number = 10): string {
   let decoded = str;
   let prev = '';
@@ -45,22 +37,12 @@ function fullyDecodeHtmlEntities(str: string, maxIterations: number = 10): strin
   return decoded;
 }
 
-/**
- * Security Sanitization Utilities
- * Protects against XSS attacks by stripping dangerous HTML/scripts
- */
 
-/**
- * Strips HTML tags and encodes special characters to prevent XSS attacks
- * Use for all user-generated text content
- */
 export function sanitize(input: string): string {
   if (!input || typeof input !== 'string') return '';
 
-  // First: fully decode all HTML entities to catch multi-encoded attacks
   const decoded = fullyDecodeHtmlEntities(input);
 
-  // Then: strip dangerous content
   const cleaned = decoded
     // script tags and their content
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -76,13 +58,11 @@ export function sanitize(input: string): string {
     .split(String.fromCharCode(0)).join('')
     .trim();
 
-  // Finally: encode special characters to prevent any residual XSS
+  // encode special characters to prevent any residual XSS
   return encodeHtmlEntities(cleaned);
 }
 
-/**
- * Validates UUID format to prevent injection via malformed IDs
- */
+
 export function isValidUuid(uuid: string): boolean {
   if (!uuid || typeof uuid !== 'string') return false;
 
@@ -91,9 +71,7 @@ export function isValidUuid(uuid: string): boolean {
   return uuidPattern.test(uuid.trim());
 }
 
-/**
- * Sanitizes search queries - escapes SQL LIKE wildcards
- */
+
 export function sanitizeSearch(query: string): string {
   if (!query || typeof query !== 'string') return '';
 
