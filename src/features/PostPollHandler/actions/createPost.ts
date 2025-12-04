@@ -3,7 +3,7 @@
 import db from '@/db';
 import { posts } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
-import { sanitize } from '@/lib/security';
+import { sanitize, isValidUuid } from '@/lib/security';
 
 export async function createPostAction(formData: {
   title: string;
@@ -29,6 +29,14 @@ export async function createPostAction(formData: {
       throw new Error(
         'Missing required fields: title, content, and author_id are required'
       );
+    }
+
+    if (!isValidUuid(author_id)) {
+      throw new Error('Invalid author ID format');
+    }
+
+    if (channel_id && !isValidUuid(channel_id)) {
+      throw new Error('Invalid channel ID format');
     }
 
     const sanitizedTitle = sanitize(title);

@@ -5,7 +5,7 @@ import { channels } from '@/db/schema';
 import { getUser } from '@/utils/getUser';
 import type { FormState } from '../types';
 import { revalidatePath } from 'next/cache';
-import { sanitize } from '@/lib/security';
+import { sanitize, isValidUuid } from '@/lib/security';
 
 export async function createChannel(
   prevState: FormState,
@@ -28,6 +28,15 @@ export async function createChannel(
     const specialityId = formData.get('specialityId')?.toString() || null;
 
     const errors: FormState['errors'] = {};
+
+    // Validate UUID formats for optional IDs
+    if (facultyId && !isValidUuid(facultyId)) {
+      errors.facultyId = ['Invalid faculty ID format'];
+    }
+
+    if (specialityId && !isValidUuid(specialityId)) {
+      errors.specialityId = ['Invalid speciality ID format'];
+    }
 
     if (!name || name.length < 3) {
       errors.name = ['Channel name must be at least 3 characters'];
