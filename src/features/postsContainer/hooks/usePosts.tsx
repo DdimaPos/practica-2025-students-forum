@@ -26,39 +26,49 @@ export function usePosts() {
   const offsetRef = useRef(0);
   const searchQueryRef = useRef('');
 
-  const { results: searchResults, query: searchQuery, loading: searchLoading } = useSearchContext();
+  const {
+    results: searchResults,
+    query: searchQuery,
+    loading: searchLoading,
+  } = useSearchContext();
 
   useEffect(() => {
     searchQueryRef.current = searchQuery;
   }, [searchQuery]);
 
-  const fetchPosts = useCallback(async (currentOffset: number, append = false) => {
-    const setState = append ? setLoadingMore : setLoading;
-    setState(true);
-    loadingMoreRef.current = append;
+  const fetchPosts = useCallback(
+    async (currentOffset: number, append = false) => {
+      const setState = append ? setLoadingMore : setLoading;
+      setState(true);
+      loadingMoreRef.current = append;
 
-    try {
-      const response = await fetch(`/api/posts?limit=${POSTS_PER_PAGE}&offset=${currentOffset}`);
+      try {
+        const response = await fetch(
+          `/api/posts?limit=${POSTS_PER_PAGE}&offset=${currentOffset}`
+        );
 
-      if (!response.ok) throw new Error('Failed to fetch posts');
+        if (!response.ok) throw new Error('Failed to fetch posts');
 
-      const { posts: newPosts, hasMore: moreAvailable } = await response.json();
-      
-      setPosts(prev => append ? [...prev, ...newPosts] : newPosts);
-      setHasMore(moreAvailable);
-      hasMoreRef.current = moreAvailable;
-      
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    } finally {
-      setState(false);
-      loadingMoreRef.current = false;
-    }
-  }, []);
+        const { posts: newPosts, hasMore: moreAvailable } =
+          await response.json();
+
+        setPosts(prev => (append ? [...prev, ...newPosts] : newPosts));
+        setHasMore(moreAvailable);
+        hasMoreRef.current = moreAvailable;
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      } finally {
+        setState(false);
+        loadingMoreRef.current = false;
+      }
+    },
+    []
+  );
 
   const loadMore = useCallback(() => {
-    if (!hasMoreRef.current || loadingMoreRef.current || searchQueryRef.current) return;
-    
+    if (!hasMoreRef.current || loadingMoreRef.current || searchQueryRef.current)
+      return;
+
     offsetRef.current += POSTS_PER_PAGE;
     fetchPosts(offsetRef.current, true);
   }, [fetchPosts]);
@@ -75,24 +85,26 @@ export function usePosts() {
   }, [fetchPosts, searchQuery]);
 
   // Show search results if we have a query and results (even if empty array)
-  const displayPosts = searchQuery && searchResults !== undefined ? 
-    searchResults.results.map(result => ({
-      id: result.id,
-      title: result.title,
-      content: result.content,
-      author: `${result.author.firstName} ${result.author.lastName}`,
-      created_at: result.createdAt,
-      rating: 0,
-      photo: '',
-    })) : posts;
+  const displayPosts =
+    searchQuery && searchResults !== undefined
+      ? searchResults.results.map(result => ({
+          id: result.id,
+          title: result.title,
+          content: result.content,
+          author: `${result.author.firstName} ${result.author.lastName}`,
+          created_at: result.createdAt,
+          rating: 0,
+          photo: '',
+        }))
+      : posts;
 
   return {
-    posts: displayPosts, 
-    loading: searchQuery ? searchLoading : loading, 
+    posts: displayPosts,
+    loading: searchQuery ? searchLoading : loading,
     loadMore,
     hasMore: searchQuery ? false : hasMore,
     loadingMore,
-    isSearchMode: !!(searchQuery && searchResults), 
+    isSearchMode: !!(searchQuery && searchResults),
     searchResultsCount: searchResults?.results.length || 0,
   };
 }
