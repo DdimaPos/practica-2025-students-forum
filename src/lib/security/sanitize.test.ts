@@ -5,7 +5,9 @@ describe('sanitize', () => {
   describe('XSS prevention', () => {
     it('should strip script tags', () => {
       expect(sanitize('<script>alert(1)</script>')).toBe('');
-      expect(sanitize('hello<script>alert(1)</script>world')).toBe('helloworld');
+      expect(sanitize('hello<script>alert(1)</script>world')).toBe(
+        'helloworld'
+      );
     });
 
     it('should strip HTML tags', () => {
@@ -24,7 +26,9 @@ describe('sanitize', () => {
 
     it('should remove data: URLs', () => {
       // data: is stripped, and script tags are also stripped
-      expect(sanitize('data:text/html,<script>alert(1)</script>')).toBe('text/html,');
+      expect(sanitize('data:text/html,<script>alert(1)</script>')).toBe(
+        'text/html,'
+      );
     });
 
     it('should remove vbscript: URLs', () => {
@@ -39,7 +43,8 @@ describe('sanitize', () => {
     });
 
     it('should handle double-encoded HTML entities', () => {
-      const doubleEncoded = '&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt;';
+      const doubleEncoded =
+        '&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt;';
       const result = sanitize(doubleEncoded);
       expect(result).not.toContain('<script>');
       expect(result).not.toContain('</script>');
