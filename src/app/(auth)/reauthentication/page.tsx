@@ -1,5 +1,5 @@
-import { reauthenticate } from '@/features/Reauthentication/actions/reauthenticate';
-import { ReauthForm } from '@/features/Reauthentication';
+import { reauthenticate } from '@/features/Authentication/actions/reauthenticate';
+import { ReauthForm } from '@/features/Authentication/components/Reauthintecation';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 

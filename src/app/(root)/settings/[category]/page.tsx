@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { ManageMFAFactors } from '@/features/Mfa/components/ManageMFAFactors';
 import { createClient } from '@/utils/supabase/server';
 import { requireReauth } from '@/utils/auth/reauthentication';
-import AccountSettings from '@/features/AccountSettings';
+import AccountSettings from '@/features/Settings/components/AccountSettings';
 
 export default async function SettingsCategoryPage({
   params,

@@ -16,7 +16,19 @@ export async function reauthenticate(
 
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
+
+  const { data: aalLevel, error: aalError } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
+  if (userError || !user) {
+    redirect('/login');
+  }
+
+  if (aalError) {
+    return { success: false, message: aalError.message };
+  }
 
   if (!user?.email) {
     return { success: false, message: 'Not authenticated' };
@@ -29,6 +41,10 @@ export async function reauthenticate(
 
   if (error) {
     return { success: false, message: error.message };
+  }
+
+  if (aalLevel.nextLevel === 'aal2') {
+    redirect(`/reauth/mfa?page=/dashboard`);
   }
 
   redirect(redirectTo);

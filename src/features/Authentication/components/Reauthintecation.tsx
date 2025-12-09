@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { FC, useActionState, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import type { FormState } from '../Authentication/types';
-import { useFormStateToast } from '../Authentication/hooks/useToast';
+import type { FormState } from '../types';
+import { useFormStateToast } from '../hooks/useToast';
 
 import { Button } from '@/components/ui/button';
 import {
