@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Test, Lint, Deploy to Vercel
 
 on:
   push:
@@ -6,41 +6,62 @@ on:
       - '**' # glob pattern that matches all branches
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      # 1. Check out the repository code
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22' # Specify your project's Node.js version
+          node-version: '22'
+          cache: 'npm'
 
-      # 3. Install Vercel CLI
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Run linter
+        run: npm run lint
+
+  deploy:
+    needs: [test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: npm install --global vercel@49.1.2
 
-      # 4. Pull Vercel Project Settings
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
 
-      # 5. Build Project Artifacts
       - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --token=$VERCEL_TOKEN
 
-      # 6. Deploy to Vercel (PREVIEW)
       - name: Deploy Project to Vercel (Preview)
         if: github.ref != 'refs/heads/master'
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --token=$VERCEL_TOKEN
 
-      # 7. Deploy to Vercel (PRODUCTION)
       - name: Deploy Project to Vercel (Production)
         if: github.ref == 'refs/heads/master'
-        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prod --token=$VERCEL_TOKEN
 
     env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
