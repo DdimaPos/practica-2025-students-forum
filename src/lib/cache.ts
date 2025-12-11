@@ -11,6 +11,6 @@ export async function revalidateCommentsCache(postId: string) {
       `✅ Successfully revalidated comments-${postId} cache and path`
     );
   } catch (error) {
-    console.error(`❌ Failed to revalidate comments-${postId} cache:`, error);
+    console.error('❌ Failed to revalidate comments-%s cache:', postId, error);
   }
 }
