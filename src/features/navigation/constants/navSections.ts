@@ -15,7 +15,7 @@ export const navSections: NavItem[][] = [
   [
     { href: '/', label: 'Go to main', icon: House },
     { href: '/profile', label: 'Profile', icon: User },
-    { href: '/settings', label: 'Settings', icon: Settings },
+    { href: '/settings/account', label: 'Settings', icon: Settings },
   ],
   [
     //{ href: '/students', label: 'Students', icon: Users2 },
