@@ -7,7 +7,7 @@ const createDOMPurify = () => {
     // Browser environment
     return DOMPurify;
   } else {
-    // And here is created Node.js environment (for tests) 
+    // And here is created Node.js environment (for tests)
     const { window } = new JSDOM('');
 
     return DOMPurify(window);
@@ -18,11 +18,11 @@ const purify = createDOMPurify();
 
 export function sanitize(input: string): string {
   if (!input || typeof input !== 'string') return '';
-  
+
   return purify.sanitize(input, {
     ALLOWED_TAGS: [],
     ALLOWED_ATTR: [],
-    KEEP_CONTENT: true
+    KEEP_CONTENT: true,
   });
 }
 

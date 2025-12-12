@@ -7,7 +7,7 @@ export async function revalidateCommentsCache(postId: string) {
 
   console.log('🔄 Revalidating comments cache for post %s', postId);
   try {
-    revalidateTag(`comments-${newPostId}`, 'default');
+    revalidateTag(`comments-${newPostId}`);
     revalidatePath(`/posts/${newPostId}`);
     console.log(
       '✅ Successfully revalidated comments-%s cache and path',
