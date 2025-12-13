@@ -14,12 +14,19 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { ArrowUp, ArrowDown, MessageCircle, Calendar } from 'lucide-react';
+import { handleVote } from '../postList/actions/handleVote';
+import { VoteType } from '../postList/types/VoteType';
+import { getInitialVoteType } from '../postList/helperFunctions/getInitialVote';
+import { VoteResult } from '../postList/types/VoteResult';
 
 interface PostProps extends Post_type {
   userId?: string | null;
 }
 
 export default function Post({ userId, ...post }: PostProps) {
+  const [voteType, setVoteType] = useState<VoteType>(
+    getInitialVoteType(post.userReaction)
+  );
   const [showReply, setShowReply] = useState(false);
   const router = useRouter();
 
@@ -33,12 +40,45 @@ export default function Post({ userId, ...post }: PostProps) {
     setShowReply(prev => !prev);
   };
 
-  const handleUpvote = () => {
-    console.log('Upvote clicked for post', post.id);
+  const showVotedType = (result : VoteResult) => {
+    if (result.success === true) {
+      switch (result.reactionType) {
+        case VoteType.upvote:
+          if (result.action === 'updated') {
+            setVoteType(VoteType.upvote);
+          } else if (result.action === 'created') {
+            setVoteType(VoteType.upvote);
+          } else if (result.action === 'removed') {
+            setVoteType(VoteType.none);
+          }
+          break;
+        case VoteType.downvote:
+          if (result.action === 'updated') {
+            setVoteType(VoteType.downvote);
+          } else if (result.action === 'created') {
+            setVoteType(VoteType.downvote);
+          } else if (result.action === 'removed') {
+            setVoteType(VoteType.none);
+          }
+          break;
+        default:
+          console.log('Changing rating went wrong.');
+      }
+    }
+  }
+
+
+  const handleUpvote = async () => {
+    const result = await handleVote(post.id, 'upvote');
+    //console.log(result);
+
+    showVotedType(result);
   };
 
-  const handleDownvote = () => {
-    console.log('Downvote clicked for post', post.id);
+  const handleDownvote = async () => {
+    const result = await handleVote(post.id, 'downvote');
+    //console.log(result);
+    showVotedType(result);
   };
 
   const setOptimisticReply = () => {
@@ -117,14 +157,18 @@ export default function Post({ userId, ...post }: PostProps) {
 
             <button
               onClick={handleUpvote}
-              className='cursor-pointer hover:text-green-500'
+              className={`cursor-pointer hover:text-green-500 ${
+                voteType === VoteType.upvote ? 'text-green-600' : ''
+              }`}
             >
               <ArrowUp className='h-4 w-4' />
             </button>
             <span>{post.rating ?? 0}</span>
             <button
               onClick={handleDownvote}
-              className='cursor-pointer hover:text-red-500'
+              className={`cursor-pointer hover:text-red-500 ${
+                voteType === VoteType.downvote ? 'text-red-600' : ''
+              }`}
             >
               <ArrowDown className='h-4 w-4' />
             </button>
