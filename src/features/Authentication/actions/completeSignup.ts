@@ -5,21 +5,7 @@ import { redirect } from 'next/navigation';
 import db from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { z } from 'zod';
-import { FormState } from '../types';
-
-const completeSignupSchema = z.object({
-  firstName: z.string().min(1, { message: 'First name is required' }),
-  lastName: z.string().min(1, { message: 'Last name is required' }),
-  bio: z.string().optional(),
-  yearOfStudy: z
-    .string()
-    .transform(val => (val ? parseInt(val, 10) : undefined))
-    .refine(val => val === undefined || (val >= 1 && val <= 5), {
-      message: 'Year of study must be between 1 and 5',
-    })
-    .optional(),
-});
+import { FormState, signupFormSchema } from '../types';
 
 export async function completeSignup(
   _: FormState,
@@ -35,7 +21,7 @@ export async function completeSignup(
   }
 
   const data = Object.fromEntries(formData.entries());
-  const parsed = completeSignupSchema.safeParse(data);
+  const parsed = signupFormSchema.safeParse(data);
 
   if (!parsed.success) {
     return {
@@ -45,7 +31,7 @@ export async function completeSignup(
   }
 
   const existingUser = await db
-    .select()
+    .select({ id: users.id })
     .from(users)
     .where(eq(users.authId, user.id));
 

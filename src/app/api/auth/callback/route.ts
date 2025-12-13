@@ -31,8 +31,6 @@ export async function GET(request: Request) {
           .from(users)
           .where(eq(users.authId, user.id));
 
-        let needsProfileCompletion = false;
-
         if (existingUser.length === 0) {
           // if email ends in *.utm.md, set userType to 'verified'
           let userType: 'student' | 'verified' = 'student';
@@ -57,7 +55,7 @@ export async function GET(request: Request) {
             user.user_metadata?.picture ||
             null;
 
-          await db.insert(users).values({
+          const updated = await db.insert(users).values({
             authId: user.id,
             email: user.email,
             firstName: finalFirstName || null,
@@ -65,36 +63,24 @@ export async function GET(request: Request) {
             profilePictureUrl,
             userType,
             isVerified: false,
-          });
+          }).returning();
 
-          // Check if profile data is incomplete
-          if (!finalFirstName || !finalLastName) {
-            needsProfileCompletion = true;
+          if (updated.length > 0 && (updated[0].firstName === null || updated[0].lastName === null || updated[0].yearOfStudy === null || updated[0].bio === null)) {
+            next = '/complete-signup'
           }
+        }
+
+        const forwardedHost = request.headers.get('x-forwarded-host'); // original origin before load balancer
+        const isLocalEnv = process.env.NODE_ENV === 'development';
+
+        if (isLocalEnv) {
+          // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
+          return NextResponse.redirect(`${origin}${next}`);
+        } else if (forwardedHost) {
+          return NextResponse.redirect(`https://${forwardedHost}${next}`);
         } else {
-          // User exists, check if profile is complete
-          const dbUser = existingUser[0];
-
-          if (!dbUser.firstName || !dbUser.lastName) {
-            needsProfileCompletion = true;
-          }
+          return NextResponse.redirect(`${origin}${next}`);
         }
-
-        if (needsProfileCompletion) {
-          next = '/complete-signup';
-        }
-      }
-
-      const forwardedHost = request.headers.get('x-forwarded-host'); // original origin before load balancer
-      const isLocalEnv = process.env.NODE_ENV === 'development';
-
-      if (isLocalEnv) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-        return NextResponse.redirect(`${origin}${next}`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}${next}`);
       }
     }
   }

@@ -28,7 +28,7 @@ export default async function CompleteSignupPage() {
   const dbUser = existingUser[0];
 
   // If user already has complete profile, redirect to home
-  if (dbUser.firstName && dbUser.lastName) {
+  if (dbUser.firstName && dbUser.lastName && dbUser.yearOfStudy && dbUser.bio) {
     redirect('/');
   }
 
@@ -38,6 +38,8 @@ export default async function CompleteSignupPage() {
       defaultValues={{
         firstName: dbUser.firstName || '',
         lastName: dbUser.lastName || '',
+        yearOfStudy: dbUser.yearOfStudy || undefined,
+        bio: dbUser.bio || undefined,
       }}
     />
   );
