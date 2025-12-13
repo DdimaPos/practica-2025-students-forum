@@ -23,7 +23,7 @@ export async function getProfileStats(userId: string) {
       commentsCount: commentsCount[0]?.count || 0,
     };
   } catch (error) {
-    console.error('Error fetching profile stats:', error);
+    console.error(`Error fetching profile stats: ${error.message}`);
 
     return {
       postsCount: 0,

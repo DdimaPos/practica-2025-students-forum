@@ -37,7 +37,7 @@ export async function getUserPosts(userId: string, limit = 10, offset = 0) {
       hasMore: results.length === limit,
     };
   } catch (error) {
-    console.error('Error fetching user posts:', error);
+    console.error(`Error fetching user posts: ${error.message}`);
 
     return {
       posts: [],
