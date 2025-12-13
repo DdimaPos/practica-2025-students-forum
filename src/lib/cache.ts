@@ -3,14 +3,21 @@
 import { revalidateTag, revalidatePath } from 'next/cache';
 
 export async function revalidateCommentsCache(postId: string) {
-  console.log(`🔄 Revalidating comments cache for post ${postId}`);
+  const newPostId = postId.replace(/\n|\r/g, '');
+
+  console.log('🔄 Revalidating comments cache for post %s', postId);
   try {
-    revalidateTag(`comments-${postId}`);
-    revalidatePath(`/posts/${postId}`);
+    revalidateTag(`comments-${newPostId}`);
+    revalidatePath(`/posts/${newPostId}`);
     console.log(
-      `✅ Successfully revalidated comments-${postId} cache and path`
+      '✅ Successfully revalidated comments-%s cache and path',
+      newPostId
     );
   } catch (error) {
-    console.error(`❌ Failed to revalidate comments-${postId} cache:`, error);
+    console.error(
+      '❌ Failed to revalidate comments-%s cache:',
+      newPostId,
+      error
+    );
   }
 }

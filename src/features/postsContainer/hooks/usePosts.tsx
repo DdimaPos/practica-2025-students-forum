@@ -95,21 +95,21 @@ export function usePosts() {
   const displayPosts =
     searchQuery && searchResults !== undefined
       ? searchResults.results.map(result => ({
-          id: result.id,
-          title: result.title,
-          content: result.content,
-          author: `${result.author.firstName} ${result.author.lastName}`,
-          authorFirstName: result.author.firstName,
-          authorLastName: result.author.lastName,
-          authorUserType: result.author.userType,
-          authorProfilePictureUrl: result.author.profilePictureUrl,
-          authorId: result.author.id,
-          isAnonymous: null,
-          postType: null,
-          created_at: result.createdAt,
-          rating: 0,
-          photo: '',
-        }))
+        id: result.id,
+        title: result.title,
+        content: result.content,
+        author: `${result.author.firstName} ${result.author.lastName}`,
+        authorFirstName: result.author.firstName,
+        authorLastName: result.author.lastName,
+        authorUserType: result.author.userType,
+        authorProfilePictureUrl: result.author.profilePictureUrl,
+        authorId: result.author.id,
+        isAnonymous: null,
+        postType: null,
+        created_at: result.createdAt,
+        rating: 0,
+        photo: '',
+      }))
       : posts;
 
   return {

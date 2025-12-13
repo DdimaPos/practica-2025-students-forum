@@ -42,3 +42,9 @@ next-env.d.ts
 
 # supabase migrations
 /supabase
+
+# midterm files
+EXAM_GUIDE.md
+worklog-full.md
+worklog.md
+

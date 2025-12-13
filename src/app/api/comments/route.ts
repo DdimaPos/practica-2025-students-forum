@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import db from '@/db';
 import { comments } from '@/db/schema';
 import { revalidateCommentsCache } from '@/lib/cache';
+import { sanitize, isValidUuid } from '@/lib/security';
 
 export async function POST(request: Request) {
   try {
@@ -18,6 +19,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
+    if (!isValidUuid(postId) || !isValidUuid(authorId)) {
+      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 });
+    }
+
+    if (parentCommentId && !isValidUuid(parentCommentId)) {
+      return NextResponse.json({ error: 'Invalid parent comment ID' }, { status: 400 });
+    }
+
+    // Sanitize content to prevent XSS
+    const sanitizedContent = sanitize(content);
+
+    if (!sanitizedContent.trim()) {
+      return NextResponse.json({ error: 'Comment content cannot be empty' }, { status: 400 });
+    }
+
     const author_id = String(authorId);
     const post_id = String(postId);
     const parent_comment_id = parentCommentId ? String(parentCommentId) : null;
@@ -28,7 +44,7 @@ export async function POST(request: Request) {
         postId: post_id,
         parentCommentId: parent_comment_id,
         authorId: author_id,
-        content: content.trim(),
+        content: sanitizedContent,
         isAnonymous: Boolean(isAnonymous),
         createdAt: new Date(),
         updatedAt: null,

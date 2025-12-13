@@ -3,6 +3,7 @@
 import db from '@/db';
 import { posts, pollOptions } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
+import { sanitize, isValidUuid } from '@/lib/security';
 
 export async function createPollAction(formData: {
   title: string;
@@ -30,40 +31,58 @@ export async function createPollAction(formData: {
       );
     }
 
+    if (!isValidUuid(author_id)) {
+      throw new Error('Invalid author ID format');
+    }
+
+    if (channel_id && !isValidUuid(channel_id)) {
+      throw new Error('Invalid channel ID format');
+    }
+
     if (!poll_options || poll_options.length < 2) {
       throw new Error('At least 2 poll options are required');
     }
 
-    // Filter out empty options
-    const validOptions = poll_options.filter(opt => opt.trim().length > 0);
+    const validOptions = poll_options
+      .map(opt => sanitize(opt))
+      .filter(opt => opt.trim().length > 0);
 
     if (validOptions.length < 2) {
       throw new Error('At least 2 non-empty poll options are required');
     }
 
-    // Create the poll post
-    const [newPost] = await db
-      .insert(posts)
-      .values({
-        title: title,
-        content: content,
-        postType: 'poll',
-        authorId: author_id,
-        channelId: channel_id || null,
-        isAnonymous: is_anonymous || false,
-        isActive: is_active !== undefined ? is_active : true,
-      })
-      .returning();
+    const sanitizedTitle = sanitize(title);
+    const sanitizedContent = sanitize(content);
 
-    // Create poll options
-    const pollOptionsData = validOptions.map((optionText, index) => ({
-      postId: newPost.id,
-      optionText: optionText.trim(),
-      voteCount: 0,
-      optionOrder: index + 1,
-    }));
+    if (!sanitizedTitle.trim() || !sanitizedContent.trim()) {
+      throw new Error('Title and content cannot be empty after sanitization');
+    }
 
-    await db.insert(pollOptions).values(pollOptionsData);
+    const newPost = await db.transaction(async (tx) => {
+      const [post] = await tx
+        .insert(posts)
+        .values({
+          title: sanitizedTitle,
+          content: sanitizedContent,
+          postType: 'poll',
+          authorId: author_id,
+          channelId: channel_id || null,
+          isAnonymous: is_anonymous || false,
+          isActive: is_active !== undefined ? is_active : true,
+        })
+        .returning();
+
+      const pollOptionsData = validOptions.map((optionText, index) => ({
+        postId: post.id,
+        optionText: optionText.trim(),
+        voteCount: 0,
+        optionOrder: index + 1,
+      }));
+
+      await tx.insert(pollOptions).values(pollOptionsData);
+
+      return post;
+    });
 
     revalidatePath('/');
 

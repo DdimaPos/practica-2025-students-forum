@@ -2,6 +2,7 @@ import Navbar from '@/features/navigation';
 import MobileTopBar from '@/features/Topbar/MobileTopBar';
 import DesktopTopBar from '@/features/Topbar/DesktopTopBar';
 import { SearchProvider } from '@/features/search/context/SearchContext';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function RootLayout({
   children,
@@ -10,6 +11,9 @@ export default function RootLayout({
 }) {
   return (
     <SearchProvider>
+
+      <Toaster />
+
       <div className='hidden md:block'>
         <DesktopTopBar />
         <div className='flex'>
@@ -26,6 +30,7 @@ export default function RootLayout({
           {children}
         </main>
       </div>
+
     </SearchProvider>
   );
 }

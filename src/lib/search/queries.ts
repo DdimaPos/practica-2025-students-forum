@@ -2,15 +2,7 @@ import { ilike, and, desc, eq, or } from 'drizzle-orm';
 import db from '@/db';
 import { posts, users } from '@/db/schema';
 import type { PostSearchResult } from './types';
-
-function sanitizeSearchQuery(query: string): string {
-  if (!query || typeof query !== 'string') return '';
-
-  return query
-    .trim()
-    .replace(/[%_\\]/g, '\\$&')
-    .replace(/['";`-]/g, '');
-}
+import { sanitizeSearch } from '@/lib/security';
 
 export async function searchPosts(
   query: string,
@@ -20,7 +12,7 @@ export async function searchPosts(
 
   searchConditions.push(eq(posts.isActive, true));
 
-  const sanitizedQuery = sanitizeSearchQuery(query);
+  const sanitizedQuery = sanitizeSearch(query);
 
   if (sanitizedQuery) {
     searchConditions.push(
