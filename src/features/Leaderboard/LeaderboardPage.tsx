@@ -3,14 +3,12 @@ import Leaderboard from './components/Leaderboard';
 
 export default function LeaderboardPage() {
   return (
-    <div className='pt-5 hide-scrollbar'>
+    <div className='hide-scrollbar pt-5'>
       <Tabs defaultValue='users'>
         <TabsList>
           <TabsTrigger value='users'>Users</TabsTrigger>
           <TabsTrigger value='channels'>Channels</TabsTrigger>
         </TabsList>
-
-        <div className='bg-background h-1 rounded-md'></div>
 
         <TabsContent value='users'>
           <Leaderboard type='users' />

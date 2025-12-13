@@ -3,13 +3,15 @@ import LeaderboardContainer from '@/features/HPLeaderboardContainer';
 
 export default function HomePage() {
   return (
-    <div className='flex flex-col gap-4 pt-2 md:max-h-[87vh] md:flex-row md:justify-between md:gap-0'>
-      <div className='bg-background hide-scrollbar h-[50vh] w-full overflow-y-auto rounded-lg p-4 shadow-sm md:h-full md:w-6/9'>
+    <div className='flex flex-col gap-4 pt-2 md:flex-row md:gap-10'>
+      <div className='w-full md:w-2/3'>
         <PostsContainer />
       </div>
 
-      <div className='bg-background hide-scrollbar w-full overflow-y-auto rounded-lg p-4 shadow-sm md:w-auto md:bg-transparent md:p-0 md:shadow-none'>
-        <LeaderboardContainer />
+      <div className='hidden md:block md:w-1/3'>
+        <div className='sticky top-[89px]'>
+          <LeaderboardContainer />
+        </div>
       </div>
     </div>
   );

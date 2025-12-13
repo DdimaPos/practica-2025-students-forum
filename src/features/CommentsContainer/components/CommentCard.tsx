@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CommentType } from '../types/Comment_type';
+import { UserName } from '@/components/generic/user';
 import { Calendar, MessageCircle, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface CommentCardProps {
@@ -21,12 +22,19 @@ export default function CommentCard({
     >
       <CardHeader className='px-4 py-0'>
         <CardTitle className='text-sm font-semibold text-gray-800'>
-          {comment.authorName}
+          <UserName
+            firstName={comment.authorFirstName}
+            lastName={comment.authorLastName}
+            userType={comment.authorUserType}
+            isAnonymous={comment.isAnonymous}
+            userId={comment.authorId}
+            showLink={true}
+          />
         </CardTitle>
       </CardHeader>
 
       <CardContent className='px-4 py-0'>
-        <p className='text-gray-700 text-wrap overflow-hidden'>
+        <p className='overflow-hidden text-wrap text-gray-700'>
           {comment.content}
         </p>
 

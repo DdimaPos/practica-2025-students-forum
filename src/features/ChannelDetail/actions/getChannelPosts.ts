@@ -14,6 +14,10 @@ export type ChannelPost = {
   createdAt: Date | null;
   rating: number;
   authorName: string;
+  authorFirstName: string | null;
+  authorLastName: string | null;
+  authorUserType: 'student' | 'verified' | 'admin' | null;
+  authorProfilePictureUrl: string | null;
 };
 
 export type SortOption = 'newest' | 'oldest' | 'popular';
@@ -35,6 +39,8 @@ export async function getChannelPosts(
         createdAt: posts.createdAt,
         firstName: users.firstName,
         lastName: users.lastName,
+        userType: users.userType,
+        profilePictureUrl: users.profilePictureUrl,
         rating: sql<number>`COALESCE(SUM(
           CASE
             WHEN ${postReactions.reactionType} = 'upvote' THEN 1
@@ -47,7 +53,13 @@ export async function getChannelPosts(
       .leftJoin(users, eq(users.id, posts.authorId))
       .leftJoin(postReactions, eq(postReactions.postId, posts.id))
       .where(and(eq(posts.channelId, channelId), eq(posts.isActive, true)))
-      .groupBy(posts.id, users.firstName, users.lastName);
+      .groupBy(
+        posts.id,
+        users.firstName,
+        users.lastName,
+        users.userType,
+        users.profilePictureUrl
+      );
 
     let query;
 
@@ -74,6 +86,10 @@ export async function getChannelPosts(
         post.isAnonymous || !post.authorId
           ? 'Anonymous'
           : `${post.firstName ?? ''} ${post.lastName ?? ''}`.trim(),
+      authorFirstName: post.firstName,
+      authorLastName: post.lastName,
+      authorUserType: post.userType,
+      authorProfilePictureUrl: post.profilePictureUrl,
     }));
   } catch (error) {
     console.error('Error fetching channel posts:', channelId, sortBy, error);

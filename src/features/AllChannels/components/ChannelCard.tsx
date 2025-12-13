@@ -1,7 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 
 type ChannelCardProps = {
   id: string;
@@ -35,7 +40,7 @@ export default function ChannelCard({
 
   return (
     <Link href={`/channels/${id}`}>
-      <Card className='h-full cursor-pointer transition-all hover:shadow-lg hover:border-primary'>
+      <Card className='hover:border-primary h-full cursor-pointer shadow-sm transition-all hover:shadow-md'>
         <CardHeader>
           <div className='flex items-start justify-between gap-2'>
             <CardTitle className='text-xl'>{name}</CardTitle>

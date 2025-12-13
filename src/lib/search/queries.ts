@@ -6,15 +6,14 @@ import { sanitizeSearch } from '@/lib/security';
 
 export async function searchPosts(
   query: string,
-  limit?: number,
-): Promise<{ results: PostSearchResult[]; total: number}> {
-
+  limit?: number
+): Promise<{ results: PostSearchResult[]; total: number }> {
   const searchConditions = [];
-  
+
   searchConditions.push(eq(posts.isActive, true));
-  
+
   const sanitizedQuery = sanitizeSearch(query);
-  
+
   if (sanitizedQuery) {
     searchConditions.push(
       or(
@@ -33,15 +32,16 @@ export async function searchPosts(
       authorId: posts.authorId,
       authorFirstName: users.firstName,
       authorLastName: users.lastName,
+      authorUserType: users.userType,
+      authorProfilePictureUrl: users.profilePictureUrl,
     })
     .from(posts)
     .innerJoin(users, eq(users.id, posts.authorId))
     .where(and(...searchConditions))
     .orderBy(desc(posts.createdAt));
 
-  const results = limit && limit > 0 
-    ? await queryBuilder.limit(limit)
-    : await queryBuilder;
+  const results =
+    limit && limit > 0 ? await queryBuilder.limit(limit) : await queryBuilder;
 
   const finalResults = results;
 
@@ -53,6 +53,8 @@ export async function searchPosts(
       id: result.authorId!,
       firstName: result.authorFirstName,
       lastName: result.authorLastName,
+      userType: result.authorUserType,
+      profilePictureUrl: result.authorProfilePictureUrl,
     },
     createdAt: result.createdAt!.toISOString(),
   }));

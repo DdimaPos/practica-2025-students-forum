@@ -1,6 +1,8 @@
 import { ChartLineMultiple } from '@/features/Profile/chart-line-multiple';
 import PostsContainer from '@/features/postsContainer/PostsContainer';
-import Image from 'next/image';
+import { redirect } from 'next/navigation';
+import { getUser } from '@/utils/getUser';
+import { UserAvatar, UserName } from '@/components/generic/user';
 
 import { Metadata } from 'next';
 
@@ -8,28 +10,48 @@ export const metadata: Metadata = {
   description: 'Profile page of the user',
 };
 
-export default function Profile() {
+export default async function Profile() {
+  const user = await getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  const joinedDate = user.created_at
+    ? new Date(user.created_at).toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : 'Unknown';
+
   return (
     <div className='bg-background text-foreground'>
       <main className='flex-1 p-6'>
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
           <section className='col-span-2 rounded-xl border bg-white p-8 shadow-sm'>
             <div className='bg-background text-foreground'>
-              <Image
-                src='/window.svg'
-                alt='Profile avatar'
-                width={176}
-                height={176}
-                className='h-44 w-44 rounded-full object-cover'
+              <UserAvatar
+                profilePictureUrl={user.profilePictureUrl}
+                firstName={user.firstName}
+                lastName={user.lastName}
+                className='h-44 w-44'
               />
               <div className='text-center'>
                 <h1 className='text-2xl font-semibold'>
-                  Macho Man - you are alive!
+                  <UserName
+                    firstName={user.firstName}
+                    lastName={user.lastName}
+                    userType={user.userType}
+                  />
                 </h1>
-                <div className='bg-background text-foreground'>
-                  <p>Joined us: 24 july 2021</p>
-                  <p>Total posts: 2024</p>
-                  <p>Total comments: 1024</p>
+                {user.bio && (
+                  <p className='text-muted-foreground mt-2'>{user.bio}</p>
+                )}
+                <div className='bg-background text-foreground mt-4'>
+                  <p>Joined: {joinedDate}</p>
+                  {user.yearOfStudy && <p>Year of Study: {user.yearOfStudy}</p>}
+                  <p>Email: {user.email}</p>
                 </div>
               </div>
             </div>
@@ -49,4 +71,3 @@ export default function Profile() {
     </div>
   );
 }
-

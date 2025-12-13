@@ -6,11 +6,18 @@ import { useSearchContext } from '@/features/search/context/SearchContext';
 export type Post = {
   id: string;
   author: string;
+  authorFirstName: string | null;
+  authorLastName: string | null;
+  authorUserType: 'student' | 'verified' | 'admin' | null;
+  authorProfilePictureUrl: string | null;
+  authorId: string | null;
+  isAnonymous: boolean | null;
   title: string;
   content: string;
   created_at: string;
   rating: number;
   photo: string;
+  postType?: 'basic' | 'poll' | 'event' | null;
 };
 
 const POSTS_PER_PAGE = 10;
@@ -88,14 +95,21 @@ export function usePosts() {
   const displayPosts =
     searchQuery && searchResults !== undefined
       ? searchResults.results.map(result => ({
-          id: result.id,
-          title: result.title,
-          content: result.content,
-          author: `${result.author.firstName} ${result.author.lastName}`,
-          created_at: result.createdAt,
-          rating: 0,
-          photo: '',
-        }))
+        id: result.id,
+        title: result.title,
+        content: result.content,
+        author: `${result.author.firstName} ${result.author.lastName}`,
+        authorFirstName: result.author.firstName,
+        authorLastName: result.author.lastName,
+        authorUserType: result.author.userType,
+        authorProfilePictureUrl: result.author.profilePictureUrl,
+        authorId: result.author.id,
+        isAnonymous: null,
+        postType: null,
+        created_at: result.createdAt,
+        rating: 0,
+        photo: '',
+      }))
       : posts;
 
   return {

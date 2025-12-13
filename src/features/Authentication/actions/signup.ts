@@ -35,9 +35,21 @@ async function _signup(data: SignupFormData) {
   }
 
   const supabase = await createClient();
+  const displayName =
+    data.firstName && data.lastName
+      ? `${data.firstName} ${data.lastName}`
+      : data.firstName || data.lastName || '';
+
   const res = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
+    options: {
+      data: {
+        display_name: displayName,
+        first_name: data.firstName,
+        last_name: data.lastName,
+      },
+    },
   });
 
   if (res.error) {
@@ -55,7 +67,13 @@ async function _signup(data: SignupFormData) {
     };
   }
 
-  console.log('user data: ', res.data.user);
+  // if email ends in *.utm.md, set userType to 'verified'
+  let userType: 'student' | 'verified' = 'student';
+  const emailDomain = data.email.split('@')[1];
+
+  if (/\.utm\.md$/i.test(emailDomain)) {
+    userType = 'verified';
+  }
 
   const sanitizedFirstName = sanitize(data.firstName || '');
   const sanitizedLastName = sanitize(data.lastName || '');
@@ -67,13 +85,12 @@ async function _signup(data: SignupFormData) {
   await db.insert(users).values({
     authId: res.data.user.id,
     email: data.email,
-    firstName: sanitizedFirstName,
-    lastName: sanitizedLastName,
-    userType: data.userType || 'student',
+    firstName: data.firstName,
+    lastName: data.lastName,
+    userType: userType,
     bio: data.bio ? sanitize(data.bio) : undefined,
     yearOfStudy: data.yearOfStudy,
     isVerified: false,
-    // profilePictureUrl: data.profilePictureUrl,
   });
 
   return { error: undefined };

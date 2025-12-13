@@ -3,7 +3,7 @@ import ChannelsLeaderboard from './components/ChannelsLeaderboard';
 
 export default function LeaderboardContainer() {
   return (
-    <div>
+    <div className='space-y-4'>
       <UsersLeaderboard />
       <ChannelsLeaderboard />
     </div>

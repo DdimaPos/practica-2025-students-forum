@@ -12,5 +12,8 @@ export type Post_type = {
   rating: number;
   userReaction?: 'upvote' | 'downvote' | null;
   authorName: string;
+  authorFirstName: string | null;
+  authorLastName: string | null;
+  authorUserType: 'student' | 'verified' | 'admin' | null;
+  authorProfilePictureUrl: string | null;
 };
-
