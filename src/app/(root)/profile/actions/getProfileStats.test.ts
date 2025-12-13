@@ -69,7 +69,8 @@ describe('getProfileStats', () => {
       commentsCount: 0,
     });
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error fetching profile stats: Database connection failed'
+      'Error fetching profile stats:',
+      'Database connection failed'
     );
 
     consoleErrorSpy.mockRestore();

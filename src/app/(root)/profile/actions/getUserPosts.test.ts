@@ -141,7 +141,8 @@ describe('getUserPosts', () => {
       hasMore: false,
     });
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error fetching user posts: DB error'
+      'Error fetching user posts:',
+      'DB error'
     );
 
     consoleErrorSpy.mockRestore();
