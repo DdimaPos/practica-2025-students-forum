@@ -10,7 +10,10 @@ import { sanitize } from '@/lib/security';
 async function checkUserExists(email: string) {
   const ures = await db.select().from(users).where(eq(users.email, email));
 
-  return ures.length > 0 && ures[0].isVerified;
+  return {
+    exists: ures.length > 0,
+    verified: ures[0]?.isVerified || false,
+  };
 }
 
 // id: serial('id').primaryKey(),
@@ -27,7 +30,9 @@ async function checkUserExists(email: string) {
 // isVerified: boolean('is_verified').default(false),
 
 async function _signup(data: SignupFormData) {
-  if (await checkUserExists(data.email)) {
+  const { exists, verified } = await checkUserExists(data.email);
+
+  if (exists && verified) {
     return {
       error:
         'This email is already registered. Please login or reset your password',
@@ -75,23 +80,50 @@ async function _signup(data: SignupFormData) {
     userType = 'verified';
   }
 
-  const sanitizedFirstName = sanitize(data.firstName || '');
-  const sanitizedLastName = sanitize(data.lastName || '');
+  const sanitizedFirstName = sanitize(data.firstName);
+  const sanitizedLastName = sanitize(data.lastName);
 
-  if (!sanitizedFirstName.trim() || !sanitizedLastName.trim()) {
-    return { error: 'First name and last name cannot be empty' };
+  if (exists && !verified) {
+    await db
+      .update(users)
+      .set({
+        authId: res.data.user.id,
+        firstName: sanitizedFirstName,
+        lastName: sanitizedLastName,
+        userType: userType,
+        bio: sanitize(data.bio),
+        yearOfStudy: data.yearOfStudy,
+        isVerified: false,
+      })
+      .where(eq(users.email, data.email));
+
+    return { error: undefined };
   }
 
-  await db.insert(users).values({
-    authId: res.data.user.id,
-    email: data.email,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    userType: userType,
-    bio: data.bio ? sanitize(data.bio) : undefined,
-    yearOfStudy: data.yearOfStudy,
-    isVerified: false,
-  });
+  await db
+    .insert(users)
+    .values({
+      authId: res.data.user.id,
+      email: data.email,
+      firstName: sanitizedFirstName,
+      lastName: sanitizedLastName,
+      userType: userType,
+      bio: sanitize(data.bio),
+      yearOfStudy: data.yearOfStudy,
+      isVerified: false,
+    })
+    .onConflictDoUpdate({
+      target: users.email,
+      set: {
+        authId: res.data.user.id,
+        firstName: sanitizedFirstName,
+        lastName: sanitizedLastName,
+        userType: userType,
+        bio: sanitize(data.bio),
+        yearOfStudy: data.yearOfStudy,
+        isVerified: false,
+      },
+    });
 
   return { error: undefined };
 }

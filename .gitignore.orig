@@ -46,5 +46,12 @@ next-env.d.ts
 
 # midterm files
 EXAM_GUIDE.md
+<<<<<<< HEAD
 worklog-full.md
 worklog.md
+
+=======
+bun.lock
+worklog-full.md
+worklog.md
+>>>>>>> 1c0db3eadbced7bbba8271cd783deb4955f70ca0

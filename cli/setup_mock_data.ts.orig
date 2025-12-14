@@ -245,7 +245,11 @@ async function seedDatabase() {
           lastName: authUsers[2].lastName,
           email: authUsers[2].email,
           userType: 'verified',
+<<<<<<< HEAD
+          bio: 'professor of algorithms and existential dread',
+=======
           bio: 'teaching assistant | algorithms enthusiast | here to help',
+>>>>>>> 1c0db3eadbced7bbba8271cd783deb4955f70ca0
           isVerified: true,
         },
         {

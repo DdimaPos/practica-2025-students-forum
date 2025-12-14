@@ -22,6 +22,8 @@ interface Props {
   defaultValues?: {
     firstName?: string;
     lastName?: string;
+    yearOfStudy?: number;
+    bio?: string;
   };
 }
 
@@ -90,6 +92,8 @@ export const CompleteSignupForm: FC<Props> = ({ onSubmit, defaultValues }) => {
                 placeholder='1'
                 min='1'
                 max='5'
+                defaultValue={defaultValues?.yearOfStudy}
+                required
               />
             </div>
 
@@ -102,6 +106,8 @@ export const CompleteSignupForm: FC<Props> = ({ onSubmit, defaultValues }) => {
                 type='text'
                 name='bio'
                 placeholder='Tell us about yourself...'
+                defaultValue={defaultValues?.bio}
+                required
               />
             </div>
           </div>

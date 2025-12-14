@@ -113,6 +113,7 @@ export const SignUpForm: FC<Props> = ({ onSubmit }) => {
                 placeholder='1'
                 min='1'
                 max='5'
+                required
               />
             </div>
 
@@ -125,6 +126,7 @@ export const SignUpForm: FC<Props> = ({ onSubmit }) => {
                 type='text'
                 name='bio'
                 placeholder='Tell us about yourself...'
+                required
               />
             </div>
 
