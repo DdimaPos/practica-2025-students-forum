@@ -82,7 +82,7 @@ export default function CreatePostForm({ userId }: UserIdProp) {
   };
 
   return (
-    <Card className='from-background to-muted/20 border-0 bg-gradient-to-br shadow-lg'>
+    <Card className='rounded-lg shadow-sm'>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardHeader className='space-y-3 pb-6'>
           <div className='flex items-center gap-2'>
@@ -112,7 +112,7 @@ export default function CreatePostForm({ userId }: UserIdProp) {
               })}
               placeholder='Give your post an engaging title...'
               disabled={isPending}
-              className='focus:ring-primary/20 h-12 text-base transition-all focus:ring-2'
+              className='focus:ring-primary/20 h-12 bg-white text-base transition-all focus:ring-2'
             />
             {errors.title && (
               <p className='text-destructive text-sm'>{errors.title.message}</p>
@@ -134,7 +134,7 @@ export default function CreatePostForm({ userId }: UserIdProp) {
               })}
               disabled={isPending}
               placeholder="What's on your mind? Share your story..."
-              className='focus:ring-primary/20 min-h-[160px] w-full resize-none overflow-y-auto text-base transition-all focus:ring-2'
+              className='focus:ring-primary/20 min-h-[160px] w-full resize-none overflow-y-auto bg-white text-base transition-all focus:ring-2'
             />
             <div className='flex items-center justify-between'>
               {errors.content && (
@@ -150,22 +150,20 @@ export default function CreatePostForm({ userId }: UserIdProp) {
 
           <div className='space-y-3'>
             <Label className='text-sm font-semibold'>Channel</Label>
-            <div className='border-muted-foreground/25 bg-muted/30 hover:border-muted-foreground/40 hover:bg-muted/40 flex items-center justify-center rounded-lg border-2 border-dashed p-6 text-center transition-colors'>
-              <Controller
-                name='channelId'
-                control={control}
-                render={({ field }) => (
-                  <ChannelSelectionDropdown
-                    onSelectChannel={field.onChange}
-                    disabled={isPending}
-                  />
-                )}
-              />
-            </div>
+            <Controller
+              name='channelId'
+              control={control}
+              render={({ field }) => (
+                <ChannelSelectionDropdown
+                  onSelectChannel={field.onChange}
+                  disabled={isPending}
+                />
+              )}
+            />
           </div>
 
           <div className='pt-2'>
-            <Label className='group hover:bg-accent/50 hover:border-primary/30 has-[[aria-checked=true]]:border-primary has-[[aria-checked=true]]:bg-primary/5 flex cursor-pointer items-start gap-4 rounded-xl border-2 p-4 transition-all has-[[aria-checked=true]]:shadow-sm'>
+            <Label className='group hover:bg-accent/50 hover:border-primary/30 has-[[aria-checked=true]]:border-primary has-[[aria-checked=true]]:bg-primary/5 flex cursor-pointer items-start gap-4 rounded-xl border-2 bg-white p-4 transition-all has-[[aria-checked=true]]:shadow-sm'>
               <Controller
                 name='isAnonymous'
                 control={control}

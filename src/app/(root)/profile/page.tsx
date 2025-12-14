@@ -1,5 +1,6 @@
 import { ChartLineMultiple } from '@/features/Profile/chart-line-multiple';
-import PostsContainer from '@/features/postsContainer/PostsContainer';
+import UserPosts from './components/UserPosts';
+import { getUserPosts } from './actions/getUserPosts';
 import { redirect } from 'next/navigation';
 import { getUser } from '@/utils/getUser';
 import { UserAvatar, UserName } from '@/components/generic/user';
@@ -16,6 +17,8 @@ export default async function Profile() {
   if (!user) {
     redirect('/login');
   }
+
+  const { posts: userPosts } = await getUserPosts(user.id);
 
   const joinedDate = user.created_at
     ? new Date(user.created_at).toLocaleDateString('en-US', {
@@ -35,7 +38,7 @@ export default async function Profile() {
                 profilePictureUrl={user.profilePictureUrl}
                 firstName={user.firstName}
                 lastName={user.lastName}
-                className='h-44 w-44'
+                className='mx-auto h-44 w-44'
               />
               <div className='text-center'>
                 <h1 className='text-2xl font-semibold'>
@@ -65,7 +68,7 @@ export default async function Profile() {
         <h2 className='mt-8 text-center text-lg font-semibold'>Your Posts</h2>
 
         <section className='scrollbar-hide mt-4 max-h-[80vh] overflow-y-auto rounded-lg bg-white p-4 shadow-sm'>
-          <PostsContainer />
+          <UserPosts initialPosts={userPosts} />
         </section>
       </main>
     </div>

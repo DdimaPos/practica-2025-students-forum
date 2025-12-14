@@ -65,7 +65,6 @@ export async function GET(request: Request) {
       id: result.id,
       title: result.title,
       content: result.content,
-      author: `${result.authorFirstName} ${result.authorLastName}`,
       authorFirstName: result.authorFirstName,
       authorLastName: result.authorLastName,
       authorUserType: result.authorUserType,
@@ -75,7 +74,6 @@ export async function GET(request: Request) {
       postType: result.postType,
       created_at: result.createdAt!.toISOString(),
       rating: result.rating,
-      photo: '',
       userReaction: result.userReaction as 'upvote' | 'downvote' | null,
     }));
 

@@ -8,7 +8,7 @@ export type ChannelPost = {
   id: string;
   title: string;
   content: string;
-  postType: string;
+  postType: 'basic' | 'poll' | 'event' | null;
   authorId: string | null;
   isAnonymous: boolean;
   createdAt: Date | null;
@@ -77,7 +77,7 @@ export async function getChannelPosts(
       id: post.id,
       title: post.title,
       content: post.content,
-      postType: post.postType || 'basic',
+      postType: post.postType,
       authorId: post.authorId,
       isAnonymous: post.isAnonymous || false,
       createdAt: post.createdAt,

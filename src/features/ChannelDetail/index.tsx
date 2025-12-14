@@ -120,7 +120,6 @@ export default function ChannelDetailContainer({
             <PostCard
               key={post.id}
               id={post.id}
-              author={post.authorName}
               authorFirstName={post.authorFirstName}
               authorLastName={post.authorLastName}
               authorUserType={post.authorUserType}
@@ -131,7 +130,7 @@ export default function ChannelDetailContainer({
               content={post.content}
               created_at={post.createdAt?.toISOString() || ''}
               rating={post.rating}
-              photo=''
+              postType={post.postType}
             />
           ))}
         </div>
