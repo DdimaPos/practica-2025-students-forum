@@ -10,13 +10,17 @@ export default async function ChannelsLeaderboard() {
     <Card className='flex w-full flex-col gap-3 p-3 shadow-sm'>
       <p className='pl-3 text-lg font-bold'>Most Popular Channels</p>
       <div className='flex flex-col gap-3'>
-        {channels.map(channel => (
-          <ChannelCard
+        {channels.map((channel, index) => (
+          <div
             key={channel.id}
-            id={channel.id}
-            name={channel.name}
-            usersCount={channel.postsCount + channel.reactionsCount}
-          />
+            className={index >= 3 ? 'short:hidden hidden xl:block' : ''}
+          >
+            <ChannelCard
+              id={channel.id}
+              name={channel.name}
+              usersCount={channel.postsCount + channel.reactionsCount}
+            />
+          </div>
         ))}
       </div>
       <Link

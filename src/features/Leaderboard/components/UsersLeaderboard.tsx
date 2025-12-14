@@ -12,7 +12,7 @@ export default async function UsersLeaderboard() {
     <Card className='p-4 shadow-sm'>
       <h2 className='mb-4 text-xl font-bold'>Users Leaderboard</h2>
 
-      <div className='hide-scrollbar flex max-h-[67vh] flex-col gap-2 overflow-y-auto'>
+      <div className='hide-scrollbar flex max-h-[67vh] flex-col gap-3 overflow-y-auto'>
         {users.map(user => (
           <UserCard
             key={user.id}

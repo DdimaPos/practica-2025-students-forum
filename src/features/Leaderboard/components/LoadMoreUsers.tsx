@@ -39,7 +39,7 @@ export default function LoadMoreUsers({
   }
 
   return (
-    <div className='mt-4'>
+    <div>
       {users.map(user => (
         <UserCard
           key={user.id}
@@ -50,7 +50,7 @@ export default function LoadMoreUsers({
       ))}
 
       {offset < total && (
-        <div className='mt-4 text-center'>
+        <div className='mt-1 text-center'>
           <Button onClick={loadMore} disabled={loading}>
             {loading ? 'Loading...' : 'Load More'}
           </Button>

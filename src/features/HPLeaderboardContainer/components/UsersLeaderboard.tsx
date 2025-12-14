@@ -8,15 +8,21 @@ export default async function UsersLeaderboard() {
 
   return (
     <Card className='flex w-full flex-col gap-3 p-3 shadow-sm'>
-      <p className='pl-3 text-lg font-bold'>Top Rated Students</p>
+      <p className='pl-1 text-base font-semibold md:pl-3 md:text-lg'>
+        Top Rated Students
+      </p>
       <div className='flex flex-col gap-3'>
-        {users.map(user => (
-          <UserCard
+        {users.map((user, index) => (
+          <div
             key={user.id}
-            {...user}
-            firstName={user.firstName ?? 'Unknown'}
-            lastName={user.lastName ?? 'User'}
-          />
+            className={index >= 3 ? 'short:hidden hidden xl:block' : ''}
+          >
+            <UserCard
+              {...user}
+              firstName={user.firstName ?? 'Unknown'}
+              lastName={user.lastName ?? 'User'}
+            />
+          </div>
         ))}
       </div>
       <Link

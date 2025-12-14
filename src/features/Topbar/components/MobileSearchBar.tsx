@@ -65,15 +65,15 @@ export default function MobileSearchBar() {
   };
 
   return (
-    <div className='relative flex-1' ref={searchContainerRef}>
-      <div className='flex rounded-md border border-gray-300 bg-white px-3 py-1.5'>
+    <div className='relative flex-1 min-w-0' ref={searchContainerRef}>
+      <div className='flex rounded-md border border-gray-300 bg-white px-3 py-1.5 w-full'>
         <input
           type='text'
           placeholder='Search...'
           value={query}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          className='min-w-0 flex-1 text-sm placeholder-gray-500 outline-none'
+          className=' flex-1 text-sm placeholder-gray-500 outline-none min-w-0'
           disabled={loading}
         />
         <div className='flex items-center gap-2'>
@@ -86,11 +86,10 @@ export default function MobileSearchBar() {
             </button>
           )}
           <Filter
-            className={`h-4 w-4 cursor-pointer transition-colors ${
-              loading
-                ? 'animate-pulse text-blue-500'
-                : 'text-gray-500 hover:text-black'
-            }`}
+            className={`h-4 w-4 cursor-pointer transition-colors ${loading
+              ? 'animate-pulse text-blue-500'
+              : 'text-gray-500 hover:text-black'
+              }`}
             onClick={handleFilterClick}
           />
         </div>
