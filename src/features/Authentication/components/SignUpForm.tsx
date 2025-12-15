@@ -1,11 +1,11 @@
 'use client';
-import {FC, useActionState, useTransition} from 'react';
-import type {FormState} from '../types';
+import { FC, useActionState, useTransition } from 'react';
+import type { FormState } from '../types';
 import Link from 'next/link';
-import {useFormStateToast} from '../hooks/useToast';
-import {TermsAndConditions} from './TermsAndConditions';
+import { useFormStateToast } from '../hooks/useToast';
+import { TermsAndConditions } from './TermsAndConditions';
 
-import {Button} from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardAction,
@@ -15,18 +15,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
-import {Toaster} from '@/components/ui/sonner';
-import {Separator} from '@/components/ui/separator';
-import {OAuthGroup} from './OAuthGroup';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Toaster } from '@/components/ui/sonner';
+import { Separator } from '@/components/ui/separator';
+import { OAuthGroup } from './OAuthGroup';
 
 interface Props {
   onSubmit: (prevState: FormState, formData: FormData) => Promise<FormState>;
 }
 
-export const SignUpForm: FC<Props> = ({onSubmit}) => {
-  const initialState: FormState = {success: false, message: ''};
+export const SignUpForm: FC<Props> = ({ onSubmit }) => {
+  const initialState: FormState = { success: false, message: '' };
   const [state, formAction] = useActionState(onSubmit, initialState);
 
   const [isPending, startTransition] = useTransition();
@@ -57,14 +57,27 @@ export const SignUpForm: FC<Props> = ({onSubmit}) => {
         <form id='signupform' action={formActionWithTransition}>
           <div className='grid gap-8'>
             <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
-              <Label htmlFor='username' className='text-right'>
-                Username
+              <Label htmlFor='firstName' className='text-right'>
+                First Name
               </Label>
               <Input
-                id='username'
+                id='firstName'
                 type='text'
-                name='username'
-                placeholder='ion_moraru'
+                name='firstName'
+                placeholder='Ion'
+                required
+              />
+            </div>
+
+            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
+              <Label htmlFor='lastName' className='text-right'>
+                Last Name
+              </Label>
+              <Input
+                id='lastName'
+                type='text'
+                name='lastName'
+                placeholder='Moraru'
                 required
               />
             </div>
@@ -90,10 +103,52 @@ export const SignUpForm: FC<Props> = ({onSubmit}) => {
             </div>
 
             <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
+              <Label htmlFor='yearOfStudy' className='text-right'>
+                Year of Study
+              </Label>
+              <Input
+                id='yearOfStudy'
+                type='number'
+                name='yearOfStudy'
+                placeholder='1'
+                min='1'
+                max='5'
+                required
+              />
+            </div>
+
+            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
+              <Label htmlFor='bio' className='text-right'>
+                Bio
+              </Label>
+              <Input
+                id='bio'
+                type='text'
+                name='bio'
+                placeholder='Tell us about yourself...'
+                required
+              />
+            </div>
+
+            <div className='grid grid-cols-[100px_1fr] items-center gap-2'>
               <Label htmlFor='picture' className='text-right'>
                 Profile Pic
               </Label>
-              <Input className='bg-accent' id='picture' type='file' />
+              <Input
+                className='bg-accent'
+                id='picture'
+                name='picture'
+                type='file'
+                accept='image/*'
+                onChange={e => {
+                  const file = e.target.files?.[0];
+
+                  if (file && file.size > 1024 * 1024) {
+                    alert('File size must be less than 1MB');
+                    e.target.value = '';
+                  }
+                }}
+              />
             </div>
             <TermsAndConditions />
           </div>

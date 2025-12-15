@@ -18,7 +18,7 @@ import { authUsers } from 'drizzle-orm/supabase';
 // Enums
 export const userTypeEnum = pgEnum('user_type', [
   'student',
-  'professor',
+  'verified',
   'admin',
 ]);
 
@@ -127,6 +127,18 @@ export const courses = pgTable('courses', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+// Professors are external entities (not platform users) that students can review
+export const professors = pgTable('professors', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  firstName: varchar('first_name', { length: 100 }).notNull(),
+  lastName: varchar('last_name', { length: 100 }).notNull(),
+  email: varchar('email', { length: 200 }).unique(),
+  department: varchar('department', { length: 200 }),
+  title: varchar('title', { length: 100 }), // e.g., "Professor", "Associate Professor", "Lecturer"
+  facultyId: uuid('faculty_id').references(() => faculties.id),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
 export const courseProfessors = pgTable(
   'course_professors',
   {
@@ -134,7 +146,7 @@ export const courseProfessors = pgTable(
     courseId: uuid('course_id').references(() => courses.id, {
       onDelete: 'cascade',
     }),
-    professorId: uuid('professor_id').references(() => users.id, {
+    professorId: uuid('professor_id').references(() => professors.id, {
       onDelete: 'cascade',
     }),
     academicYear: varchar('academic_year', { length: 10 }),

@@ -27,6 +27,8 @@ export async function getComments(
       createdAt: comments.createdAt,
       firstName: users.firstName,
       lastName: users.lastName,
+      userType: users.userType,
+      profilePictureUrl: users.profilePictureUrl,
       total: sql<number>`COUNT(*) OVER()`.as('total'),
       repliesCount: sql<number>`COUNT(${child.id})`.as('repliesCount'),
       rating: sql<number>`
@@ -53,7 +55,9 @@ export async function getComments(
       comments.isAnonymous,
       comments.createdAt,
       users.firstName,
-      users.lastName
+      users.lastName,
+      users.userType,
+      users.profilePictureUrl
     )
     .orderBy(desc(comments.createdAt))
     .limit(limit)
@@ -78,6 +82,10 @@ export async function getComments(
       isAnonymous: row.isAnonymous,
       createdAt: row.createdAt,
       authorName,
+      authorFirstName: row.firstName,
+      authorLastName: row.lastName,
+      authorUserType: row.userType,
+      authorProfilePictureUrl: row.profilePictureUrl,
       repliesCount: row.repliesCount ?? 0,
       rating: row.rating ?? 0,
     };

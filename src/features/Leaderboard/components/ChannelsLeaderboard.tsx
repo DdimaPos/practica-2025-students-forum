@@ -1,16 +1,17 @@
 import ChannelCard from '@/features/HPLeaderboardContainer/components/ChannelCard';
 import { getChannelsLeaderboard } from '@/features/HPLeaderboardContainer/actions/getChannelsLeaderboard';
 import LoadMoreChannels from './LoadMoreChannels';
+import { Card } from '@/components/ui/card';
 
 export default async function ChannelsLeaderboard() {
   const limit = 10;
   const { channels, total } = await getChannelsLeaderboard(limit, 0);
 
   return (
-    <div className='bg-background rounded p-4 shadow-md'>
-      <h2 className='mb-4 text-xl font-bold'>Users Leaderboard</h2>
+    <Card className='p-4 shadow-sm'>
+      <h2 className='mb-4 text-xl font-bold'>Channels Leaderboard</h2>
 
-      <div className='hide-scrollbar h-[67vh] overflow-y-auto'>
+      <div className='hide-scrollbar flex max-h-[67vh] flex-col gap-3 overflow-y-auto'>
         {channels.map(channel => (
           <ChannelCard
             key={channel.id}
@@ -21,6 +22,6 @@ export default async function ChannelsLeaderboard() {
         ))}
         <LoadMoreChannels initialOffset={limit} limit={limit} total={total} />
       </div>
-    </div>
+    </Card>
   );
 }

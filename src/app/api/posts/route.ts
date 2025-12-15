@@ -22,6 +22,9 @@ export async function GET(request: Request) {
         title: posts.title,
         content: posts.content,
         createdAt: posts.createdAt,
+        authorId: posts.authorId,
+        isAnonymous: posts.isAnonymous,
+        postType: posts.postType,
         authorFirstName: users.firstName,
         authorLastName: users.lastName,
         rating: sql<number>`COALESCE(SUM(
@@ -40,12 +43,20 @@ export async function GET(request: Request) {
               END
             )`.as('user_reaction')
           : sql<string | null>`NULL`.as('user_reaction'),
+        authorUserType: users.userType,
+        authorProfilePictureUrl: users.profilePictureUrl,
       })
       .from(posts)
       .innerJoin(users, eq(users.id, posts.authorId))
       .leftJoin(postReactions, eq(postReactions.postId, posts.id))
       .where(eq(posts.isActive, true))
-      .groupBy(posts.id, users.firstName, users.lastName)
+      .groupBy(
+        posts.id,
+        users.firstName,
+        users.lastName,
+        users.userType,
+        users.profilePictureUrl
+      )
       .orderBy(desc(posts.createdAt), desc(posts.id))
       .limit(limit)
       .offset(offset);
@@ -54,10 +65,15 @@ export async function GET(request: Request) {
       id: result.id,
       title: result.title,
       content: result.content,
-      author: `${result.authorFirstName} ${result.authorLastName}`,
+      authorFirstName: result.authorFirstName,
+      authorLastName: result.authorLastName,
+      authorUserType: result.authorUserType,
+      authorProfilePictureUrl: result.authorProfilePictureUrl,
+      authorId: result.authorId,
+      isAnonymous: result.isAnonymous,
+      postType: result.postType,
       created_at: result.createdAt!.toISOString(),
       rating: result.rating,
-      photo: '',
       userReaction: result.userReaction as 'upvote' | 'downvote' | null,
     }));
 

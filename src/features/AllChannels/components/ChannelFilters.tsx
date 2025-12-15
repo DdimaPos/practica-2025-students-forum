@@ -27,38 +27,39 @@ export default function ChannelFilters({
   return (
     <div className='mb-8 flex flex-col gap-4 md:flex-row md:items-end'>
       {/* Search */}
-      <div className='flex-1'>
+      <div className='flex flex-col w-full gap-2'>
         <Label htmlFor='search'>Search Channels</Label>
-        <div className='relative mt-3'>
-          <Search className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400' />
+        <div className='flex flex-row items-center'>
           <Input
             id='search'
             type='text'
-            placeholder='Search by name...'
+            placeholder='search "study"'
             value={searchQuery}
             onChange={e => onSearchChange(e.target.value)}
-            className='pl-10'
+            className='pl-4 bg-white border border-gray-300 rounded-md'
           />
+          <Search className='h-5 w-5 text-gray-400 mr-3 right-8 relative' />
         </div>
       </div>
 
       {/* Filter by Type */}
-      <div className='w-full md:w-[200px]'>
+      <div className='w-fit md:w-[200px] flex flex-col gap-2'>
         <Label htmlFor='type'>Filter by Type</Label>
-        <div className='mt-3'></div>
-        <Select value={selectedType} onValueChange={onTypeChange}>
-          <SelectTrigger id='type'>
-            <SelectValue placeholder='All types' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>All types</SelectItem>
-            <SelectItem value='general'>General</SelectItem>
-            <SelectItem value='academic'>Academic</SelectItem>
-            <SelectItem value='social'>Social</SelectItem>
-            <SelectItem value='announcements'>Announcements</SelectItem>
-            <SelectItem value='local'>Local</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className='bg-white border border-gray-300 rounded-md'>
+          <Select value={selectedType} onValueChange={onTypeChange}>
+            <SelectTrigger id='type' className='w-full border-0 focus:ring-0'>
+              <SelectValue placeholder='All Types' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Types</SelectItem>
+              <SelectItem value='general'>General</SelectItem>
+              <SelectItem value='academic'>Academic</SelectItem>
+              <SelectItem value='social'>Social</SelectItem>
+              <SelectItem value='announcements'>Announcements</SelectItem>
+              <SelectItem value='local'>Local</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );

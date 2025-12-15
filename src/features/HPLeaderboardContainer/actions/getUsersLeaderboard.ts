@@ -13,6 +13,7 @@ export async function getUsersLeaderboard(
     firstName: string | null;
     lastName: string | null;
     profilePictureUrl: string | null;
+    userType: 'student' | 'verified' | 'admin' | null;
     avgRating: number;
     ratingsCount: number;
   }[];
@@ -27,13 +28,20 @@ export async function getUsersLeaderboard(
       firstName: users.firstName,
       lastName: users.lastName,
       profilePictureUrl: users.profilePictureUrl,
+      userType: users.userType,
       avgRating: avg.as('avgRating'),
       ratingsCount: count.as('ratingsCount'),
       total: sql<number>`COUNT(*) OVER()`.as('total'),
     })
     .from(users)
     .leftJoin(studentRatings, eq(studentRatings.ratedStudentId, users.id))
-    .groupBy(users.id, users.firstName, users.lastName, users.profilePictureUrl)
+    .groupBy(
+      users.id,
+      users.firstName,
+      users.lastName,
+      users.profilePictureUrl,
+      users.userType
+    )
     .orderBy(desc(avg), desc(count))
     .limit(limit)
     .offset(offset);
@@ -47,6 +55,7 @@ export async function getUsersLeaderboard(
     firstName: row.firstName || '',
     lastName: row.lastName || '',
     profilePictureUrl: row.profilePictureUrl,
+    userType: row.userType,
     avgRating: Number(row.avgRating ?? 0),
     ratingsCount: row.ratingsCount ?? 0,
   }));

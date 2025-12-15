@@ -2,11 +2,10 @@
 
 import Link from 'next/link';
 import { Calendar, ArrowUp, ArrowDown, BarChart3 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar, UserName } from '@/components/generic/user';
 import {
   Card,
   CardHeader,
-  CardTitle,
   CardDescription,
   CardFooter,
 } from '@/components/ui/card';
@@ -19,12 +18,16 @@ import { getInitialVoteType } from '../helperFunctions/getInitialVote';
 
 export default function PostCard({
   id,
-  author,
+  authorFirstName,
+  authorLastName,
+  authorUserType,
+  authorProfilePictureUrl,
+  authorId,
+  isAnonymous,
   title,
   content,
   created_at,
   rating,
-  photo,
   postType,
   userReaction,
 }: PostProp) {
@@ -53,28 +56,46 @@ export default function PostCard({
 
   return (
     <Link href={`/posts/${id}`}>
-      <Card className='mb-2 cursor-pointer shadow-sm transition hover:shadow-md'>
-        <CardHeader className='flex flex-row items-start gap-3'>
-          <Avatar className='h-10 w-10'>
-            <AvatarImage src={photo} alt={author} />
-            <AvatarFallback>{author.charAt(0).toUpperCase()}</AvatarFallback>
-          </Avatar>
+      <Card className='mb-2 cursor-pointer overflow-hidden shadow-sm transition hover:shadow-md'>
+        <CardHeader className='flex !grid-cols-1 flex-col gap-2'>
+          <div className='flex w-full min-w-0 flex-row items-start gap-3'>
+            <UserAvatar
+              profilePictureUrl={authorProfilePictureUrl}
+              firstName={authorFirstName}
+              lastName={authorLastName}
+              fallback={isAnonymous ? 'A' : undefined}
+              className='h-10 w-10 shrink-0'
+            />
 
-          <div className='flex-1'>
-            <div className='flex items-center gap-2'>
-              <p className='text-sm font-semibold'>@{author}</p>
-              {postType === 'poll' && (
-                <span className='flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700'>
-                  <BarChart3 className='h-3 w-3' />
-                  Poll
+            <div className='min-w-0 flex-1 overflow-hidden'>
+              <div className='flex w-full min-w-0 items-center gap-2'>
+                <span className='min-w-0 flex-1 overflow-hidden text-base font-semibold text-ellipsis whitespace-nowrap'>
+                  {title}
                 </span>
-              )}
+                {postType === 'poll' && (
+                  <span className='flex shrink-0 items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700'>
+                    <BarChart3 className='h-3 w-3' />
+                    Poll
+                  </span>
+                )}
+              </div>
+              <div className='flex items-center gap-1 text-sm text-gray-500'>
+                <span>by</span>
+                <UserName
+                  firstName={authorFirstName}
+                  lastName={authorLastName}
+                  userType={authorUserType}
+                  isAnonymous={isAnonymous}
+                  userId={authorId}
+                  showLink={false}
+                  className='font-medium'
+                />
+              </div>
             </div>
-            <CardTitle className='text-base'>{title}</CardTitle>
-            <CardDescription className='text-sm text-gray-700'>
-              {content}
-            </CardDescription>
           </div>
+          <CardDescription className='text-sm text-gray-700'>
+            {content}
+          </CardDescription>
         </CardHeader>
 
         <CardFooter className='flex items-center justify-between text-xs text-gray-500'>

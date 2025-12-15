@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import ChannelCard from './components/ChannelCard';
 import ChannelFilters from './components/ChannelFilters';
 import type { ChannelType } from '@/utils/getChannels';
@@ -14,21 +14,6 @@ export default function AllChannelsContainer({
 }: AllChannelsContainerProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('all');
-
-  // Hide the SearchBar component when this component mounts
-  useEffect(() => {
-    const searchBar = document.querySelector('main > div:first-of-type');
-
-    if (searchBar) {
-      (searchBar as HTMLElement).style.display = 'none';
-    }
-
-    return () => {
-      if (searchBar) {
-        (searchBar as HTMLElement).style.display = '';
-      }
-    };
-  }, []);
 
   // Filter channels based on search query and type
   const filteredChannels = useMemo(() => {
