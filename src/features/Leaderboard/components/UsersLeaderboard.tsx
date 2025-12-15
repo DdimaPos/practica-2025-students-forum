@@ -2,16 +2,17 @@
 import { getUsersLeaderboard } from '../../HPLeaderboardContainer/actions/getUsersLeaderboard';
 import UserCard from '../../HPLeaderboardContainer/components/UserCard';
 import LoadMoreUsers from './LoadMoreUsers';
+import { Card } from '@/components/ui/card';
 
 export default async function UsersLeaderboard() {
   const limit = 10;
   const { users, total } = await getUsersLeaderboard(limit, 0);
 
   return (
-    <div className='bg-background rounded p-4 shadow-md'>
+    <Card className='p-4 shadow-sm'>
       <h2 className='mb-4 text-xl font-bold'>Users Leaderboard</h2>
 
-      <div className='hide-scrollbar h-[67vh] overflow-y-auto'>
+      <div className='hide-scrollbar flex max-h-[67vh] flex-col gap-3 overflow-y-auto'>
         {users.map(user => (
           <UserCard
             key={user.id}
@@ -22,7 +23,6 @@ export default async function UsersLeaderboard() {
         ))}
         <LoadMoreUsers initialOffset={limit} limit={limit} total={total} />
       </div>
-
-    </div>
+    </Card>
   );
 }

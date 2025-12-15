@@ -5,7 +5,22 @@ import { redirect } from 'next/navigation';
 import db from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { FormState, signupFormSchema } from '../types';
+import { FormState } from '../types';
+import z from 'zod';
+
+const completeSignupFormSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  bio: z.string().min(1).max(160, {
+    message: 'Bio must be at most 160 characters long',
+  }),
+  yearOfStudy: z
+    .string()
+    .transform(val => (val ? parseInt(val, 10) : undefined))
+    .refine(val => val === undefined || (val >= 1 && val <= 5), {
+      message: 'Year of study must be between 1 and 5',
+    }),
+});
 
 export async function completeSignup(
   _: FormState,
@@ -21,7 +36,7 @@ export async function completeSignup(
   }
 
   const data = Object.fromEntries(formData.entries());
-  const parsed = signupFormSchema.safeParse(data);
+  const parsed = completeSignupFormSchema.safeParse(data);
 
   if (!parsed.success) {
     return {

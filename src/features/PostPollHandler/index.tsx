@@ -5,20 +5,25 @@ import { UserIdProp } from './types/UserIdProp';
 
 export default function PostPollHandler({ userId }: UserIdProp) {
   return (
-    <div className='hide-scrollbar max-h-[91vh] w-full overflow-y-auto'>
-      <Tabs defaultValue='post' className='w-full'>
-        <TabsList className='grid w-full grid-cols-2'>
-          <TabsTrigger value='post'>Create Post</TabsTrigger>
-          <TabsTrigger value='poll'>Create Poll</TabsTrigger>
-        </TabsList>
+    <Tabs defaultValue='post' className='w-full p-4 gap-4'>
+      <TabsList className='grid w-full grid-cols-2 gap-2'>
+        <TabsTrigger value='post'
+          className='p-2 border-gray-200 ring-gray-200 focus:ring-2 bg-gray-50'>
+          Create Post
+        </TabsTrigger>
+        <TabsTrigger
+          value='poll'
+          className='p-2 border-gray-200 ring-gray-200 focus:ring-2 bg-gray-50'>
+          Create Poll
+        </TabsTrigger>
+      </TabsList>
 
-        <TabsContent value='post'>
-          <CreatePostForm userId={userId} />
-        </TabsContent>
-        <TabsContent value='poll'>
-          <CreatePollForm userId={userId} />
-        </TabsContent>
-      </Tabs>
-    </div>
+      <TabsContent value='post'>
+        <CreatePostForm userId={userId} />
+      </TabsContent>
+      <TabsContent value='poll'>
+        <CreatePollForm userId={userId} />
+      </TabsContent>
+    </Tabs>
   );
 }

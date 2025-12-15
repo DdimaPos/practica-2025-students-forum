@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Post_type } from './types/Post_type';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar, UserName } from '@/components/generic/user';
 import ReplyContainer from './components/ReplyContainer';
 import PollDisplay from './components/PollDisplay';
 import {
@@ -91,7 +91,35 @@ export default function Post({ userId, ...post }: PostProps) {
         className={`gap-3 py-4 shadow-sm ${showReply && userId ? 'mb-0 rounded-b-none' : ''}`}
       >
         <CardHeader className='px-4'>
-          <div className='flex flex-col gap-2'>
+          <div className='flex items-end justify-between'>
+            <div className='flex items-start gap-3'>
+              <UserAvatar
+                profilePictureUrl={post.authorProfilePictureUrl}
+                firstName={post.authorFirstName}
+                lastName={post.authorLastName}
+                fallback={post.isAnonymous ? 'A' : undefined}
+              />
+              <div className='flex h-10 flex-col justify-between'>
+                {post.title && (
+                  <CardTitle className='text-xl leading-none font-bold'>
+                    {post.title}
+                  </CardTitle>
+                )}
+                {post.authorName && (
+                  <UserName
+                    firstName={post.authorFirstName}
+                    lastName={post.authorLastName}
+                    userType={post.authorUserType}
+                    isAnonymous={post.isAnonymous}
+                    userId={post.authorId}
+                    showLink={true}
+                    prefix='by'
+                    className='text-sm text-gray-500'
+                    linkClassName='hover:text-blue-600 hover:underline'
+                  />
+                )}
+              </div>
+            </div>
             {post.channelName && post.channelId && (
               <Link
                 href={`/channels/${post.channelId}`}
@@ -100,36 +128,6 @@ export default function Post({ userId, ...post }: PostProps) {
                 #{post.channelName}
               </Link>
             )}
-
-            <div className='flex items-center justify-between gap-3'>
-              <div className='flex gap-3'>
-                <Avatar>
-                  <AvatarImage src='https://tribuna.md/wp-content/uploads/2021/01/utm.jpg' />
-                  <AvatarFallback>U</AvatarFallback>
-                </Avatar>
-                {post.title && (
-                  <CardTitle className='text-xl font-bold'>
-                    {post.title}
-                  </CardTitle>
-                )}
-              </div>
-
-              {post.authorName && (
-                <span className='text-sm text-gray-500'>
-                  by{' '}
-                  {post.authorId && !post.isAnonymous ? (
-                    <Link
-                      href={`/profile/${post.authorId}`}
-                      className='hover:text-blue-600 hover:underline'
-                    >
-                      {post.authorName}
-                    </Link>
-                  ) : (
-                    <span>{post.authorName}</span>
-                  )}
-                </span>
-              )}
-            </div>
           </div>
         </CardHeader>
 

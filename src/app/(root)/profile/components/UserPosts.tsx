@@ -2,23 +2,14 @@
 
 import Posts from '@/features/postList';
 import { useState } from 'react';
-
-type Post = {
-  id: string;
-  author: string;
-  title: string;
-  content: string;
-  created_at: string;
-  rating: number;
-  photo: string;
-};
+import type { PostListItem } from '@/features/postList/types/post';
 
 type UserPostsProps = {
-  initialPosts: Post[];
+  initialPosts: PostListItem[];
 };
 
 export default function UserPosts({ initialPosts }: UserPostsProps) {
-  const [posts] = useState<Post[]>(initialPosts);
+  const [posts] = useState<PostListItem[]>(initialPosts);
 
   return (
     <Posts posts={posts} loading={false} hasMore={false} loadingMore={false} />

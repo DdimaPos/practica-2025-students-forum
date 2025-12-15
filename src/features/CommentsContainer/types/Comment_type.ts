@@ -7,4 +7,8 @@ export type CommentType = {
   isAnonymous: boolean | null;
   createdAt: Date | null;
   authorName: string;
+  authorFirstName: string | null;
+  authorLastName: string | null;
+  authorUserType: 'student' | 'verified' | 'admin' | null;
+  authorProfilePictureUrl: string | null;
 };

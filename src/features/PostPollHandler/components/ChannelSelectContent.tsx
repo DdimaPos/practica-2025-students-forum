@@ -43,7 +43,7 @@ export default function ChannelSelectContent({
 
   return (
     <Select onValueChange={handleValueChange} disabled={disabled}>
-      <SelectTrigger className='w-full'>
+      <SelectTrigger className='h-auto min-h-[3.5rem] w-full bg-white px-4 py-3'>
         <SelectValue placeholder='Select a channel' />
       </SelectTrigger>
       <SelectContent>
@@ -53,8 +53,12 @@ export default function ChannelSelectContent({
           </div>
         ) : (
           channels.map(channel => (
-            <SelectItem key={channel.id} value={channel.id}>
-              <div className='flex flex-col'>
+            <SelectItem
+              key={channel.id}
+              value={channel.id}
+              className='py-3 pr-8 pl-4'
+            >
+              <div className='flex flex-col items-start gap-0.5'>
                 <span className='font-medium'>{channel.name}</span>
                 {channel.description && (
                   <span className='text-muted-foreground text-xs'>

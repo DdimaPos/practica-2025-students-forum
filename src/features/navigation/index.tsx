@@ -9,7 +9,7 @@ export default async function Navbar() {
   const user = await getUser().catch(() => undefined);
 
   return (
-    <nav className='fixed flex h-screen w-[25%] flex-col justify-center gap-15 border-r pl-[8%] text-[#818181]'>
+    <nav className='fixed top-[73px] flex h-[calc(100vh-73px)] w-[25%] flex-col justify-center gap-15 bg-white/70 pl-[8%] text-[#818181] backdrop-blur-sm'>
       {navSections.map((section, sectionIndex) => (
         <div key={sectionIndex} className='flex flex-col gap-5'>
           {section.map((item, index) => (

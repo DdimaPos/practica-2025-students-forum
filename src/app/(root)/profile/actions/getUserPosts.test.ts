@@ -1,32 +1,48 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getUserPosts } from './getUserPosts';
 
+// Mock the final method in the chain
+const mockOffset = vi.fn();
+
 vi.mock('@/db', () => ({
   default: {
-    select: vi.fn(() => ({
-      from: vi.fn(() => ({
-        innerJoin: vi.fn(() => ({
-          where: vi.fn(() => ({
-            orderBy: vi.fn(() => ({
-              limit: vi.fn(() => ({
-                offset: vi.fn(),
-              })),
-            })),
-          })),
-        })),
-      })),
-    })),
+    select: () => ({
+      from: () => ({
+        innerJoin: () => ({
+          leftJoin: () => ({
+            where: () => ({
+              groupBy: () => ({
+                orderBy: () => ({
+                  limit: () => ({
+                    offset: mockOffset,
+                  }),
+                }),
+              }),
+            }),
+          }),
+        }),
+      }),
+    }),
   },
 }));
 
 vi.mock('@/db/schema', () => ({
   posts: {},
   users: {},
+  postReactions: {},
 }));
 
 vi.mock('drizzle-orm', () => ({
   eq: vi.fn(),
   desc: vi.fn(),
+  // sql is a tagged template literal that returns an object with .as() method
+  sql: new Proxy(() => ({ as: () => 'mocked_sql_column' }), {
+    get: () => () => ({ as: () => 'mocked_sql_column' }),
+  }),
+}));
+
+vi.mock('@/utils/getUser', () => ({
+  getUser: vi.fn().mockResolvedValue({ id: 'current-user-123' }),
 }));
 
 describe('getUserPosts', () => {
@@ -41,44 +57,39 @@ describe('getUserPosts', () => {
         title: 'Test Post',
         content: 'Content',
         createdAt: new Date('2023-01-01'),
+        postType: 'basic',
+        isAnonymous: false,
+        authorId: 'user-123',
         authorFirstName: 'John',
         authorLastName: 'Doe',
+        authorUserType: 'student',
+        authorProfilePictureUrl: null,
+        rating: 5,
+        userReaction: null,
       },
     ];
 
-    // Mock the offset to return the posts
-    const mockOffset = vi.fn().mockResolvedValue(mockPosts);
-    const db = (await import('@/db')).default;
-    db.select.mockReturnValue({
-      from: () => ({
-        innerJoin: () => ({
-          where: () => ({
-            orderBy: () => ({
-              limit: () => ({
-                offset: mockOffset,
-              }),
-            }),
-          }),
-        }),
-      }),
-    });
+    mockOffset.mockResolvedValueOnce(mockPosts);
 
     const result = await getUserPosts('user-123');
 
-    expect(result).toEqual({
-      posts: [
-        {
-          id: 'post-1',
-          title: 'Test Post',
-          content: 'Content',
-          author: 'John Doe',
-          created_at: '2023-01-01T00:00:00.000Z',
-          rating: 0,
-          photo: '',
-        },
-      ],
-      hasMore: false,
+    expect(result.posts).toHaveLength(1);
+    expect(result.posts[0]).toMatchObject({
+      id: 'post-1',
+      title: 'Test Post',
+      content: 'Content',
+      created_at: '2023-01-01T00:00:00.000Z',
+      rating: 5,
+      postType: 'basic',
+      isAnonymous: false,
+      authorId: 'user-123',
+      authorFirstName: 'John',
+      authorLastName: 'Doe',
+      authorUserType: 'student',
+      authorProfilePictureUrl: null,
+      userReaction: null,
     });
+    expect(result.hasMore).toBe(false);
   });
 
   it('should handle pagination correctly', async () => {
@@ -87,25 +98,18 @@ describe('getUserPosts', () => {
       title: 'Test',
       content: 'Content',
       createdAt: new Date(),
+      postType: 'basic',
+      isAnonymous: false,
+      authorId: 'user-123',
       authorFirstName: 'John',
       authorLastName: 'Doe',
+      authorUserType: 'student',
+      authorProfilePictureUrl: null,
+      rating: 0,
+      userReaction: null,
     });
 
-    const mockOffset = vi.fn().mockResolvedValue(mockPosts);
-    const db = (await import('@/db')).default;
-    db.select.mockReturnValue({
-      from: () => ({
-        innerJoin: () => ({
-          where: () => ({
-            orderBy: () => ({
-              limit: () => ({
-                offset: mockOffset,
-              }),
-            }),
-          }),
-        }),
-      }),
-    });
+    mockOffset.mockResolvedValueOnce(mockPosts);
 
     const result = await getUserPosts('user-123', 10, 0);
 
@@ -118,21 +122,7 @@ describe('getUserPosts', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    const mockOffset = vi.fn().mockRejectedValue(new Error('DB error'));
-    const db = (await import('@/db')).default;
-    db.select.mockReturnValue({
-      from: () => ({
-        innerJoin: () => ({
-          where: () => ({
-            orderBy: () => ({
-              limit: () => ({
-                offset: mockOffset,
-              }),
-            }),
-          }),
-        }),
-      }),
-    });
+    mockOffset.mockRejectedValueOnce(new Error('DB error'));
 
     const result = await getUserPosts('user-123');
 

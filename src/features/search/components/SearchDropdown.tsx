@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useSearchContext } from '@/features/search/context/SearchContext';
-import { Calendar, User } from 'lucide-react';
+import { UserAvatar, UserName } from '@/components/generic/user';
+import { Calendar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function SearchDropdown() {
@@ -49,9 +50,12 @@ export default function SearchDropdown() {
               className='cursor-pointer border-b border-gray-100 px-3 py-3 last:border-b-0 hover:bg-gray-50'
             >
               <div className='flex items-start gap-3'>
-                <div className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-200'>
-                  <User className='h-4 w-4 text-gray-500' />
-                </div>
+                <UserAvatar
+                  profilePictureUrl={post.author.profilePictureUrl}
+                  firstName={post.author.firstName}
+                  lastName={post.author.lastName}
+                  className='h-8 w-8 flex-shrink-0'
+                />
 
                 <div className='min-w-0 flex-1'>
                   <h4 className='truncate text-sm font-medium text-gray-900'>
@@ -68,9 +72,14 @@ export default function SearchDropdown() {
                     {post.content}
                   </p>
                   <div className='mt-2 flex items-center gap-4 text-xs text-gray-500'>
-                    <span>
-                      by {post.author.firstName} {post.author.lastName}
-                    </span>
+                    <UserName
+                      firstName={post.author.firstName}
+                      lastName={post.author.lastName}
+                      userType={post.author.userType}
+                      userId={post.author.id}
+                      showLink={false}
+                      prefix='by'
+                    />
                     <div className='flex items-center gap-1'>
                       <Calendar className='h-3 w-3' />
                       <span>

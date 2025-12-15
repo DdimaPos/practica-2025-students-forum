@@ -3,6 +3,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Height-based variant for short screens (720p, etc.) */
+@media (max-height: 800px) {
+  html {
+    font-size: 14px;
+  }
+
+  .short\:hidden {
+    display: none;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

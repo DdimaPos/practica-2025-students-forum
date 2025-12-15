@@ -30,7 +30,7 @@ export default function ReplyContainer({
     if (!message.trim()) return;
 
     const tempId = String(Date.now());
-    const optimisticReply = {
+    const optimisticReply: CommentType = {
       id: tempId,
       postId,
       authorId,
@@ -39,6 +39,10 @@ export default function ReplyContainer({
       isAnonymous: false,
       createdAt: new Date(),
       authorName: 'You',
+      authorFirstName: null,
+      authorLastName: null,
+      authorUserType: null,
+      authorProfilePictureUrl: null,
     };
 
     setOptimisticReply?.(optimisticReply);
@@ -84,7 +88,7 @@ export default function ReplyContainer({
   };
 
   return (
-    <div className='rounded-b-lg border border-t-0 border-gray-200 bg-white p-3 shadow-sm'>
+    <div className='bg-card rounded-b-xl border border-t-0 p-3 shadow-sm'>
       <div className='flex gap-2'>
         <Textarea
           value={message}
