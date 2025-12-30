@@ -4,21 +4,23 @@ import db from '@/db';
 import { posts, pollOptions } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
 import { sanitize, isValidUuid } from '@/lib/security';
+import { getUser } from '@/utils/getUser';
 
 export async function createPollAction(formData: {
   title: string;
   content: string;
-  author_id: string | null;
   channel_id?: string | null;
   is_anonymous?: boolean;
   is_active?: boolean;
   poll_options: string[];
 }) {
+  const user = await getUser();
+  const author_id = user?.id;
+
   try {
     const {
       title,
       content,
-      author_id,
       channel_id,
       is_anonymous,
       is_active,
@@ -58,7 +60,7 @@ export async function createPollAction(formData: {
       throw new Error('Title and content cannot be empty after sanitization');
     }
 
-    const newPost = await db.transaction(async (tx) => {
+    const newPost = await db.transaction(async tx => {
       const [post] = await tx
         .insert(posts)
         .values({

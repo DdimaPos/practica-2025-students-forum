@@ -1,5 +1,3 @@
-'use server';
-
 import db from '@/db';
 import { postReactions } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
