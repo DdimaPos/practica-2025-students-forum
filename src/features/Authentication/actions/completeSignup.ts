@@ -64,8 +64,10 @@ export async function completeSignup(
       lastName: parsed.data.lastName,
       bio: parsed.data.bio,
       yearOfStudy: parsed.data.yearOfStudy,
+      isVerified: true,
     })
     .where(eq(users.authId, user.id));
 
   redirect('/');
 }
+
