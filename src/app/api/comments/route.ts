@@ -3,13 +3,16 @@ import db from '@/db';
 import { comments } from '@/db/schema';
 import { revalidateCommentsCache } from '@/lib/cache';
 import { sanitize, isValidUuid } from '@/lib/security';
+import { getUser } from '@/utils/getUser';
 
 export async function POST(request: Request) {
+  const user = await getUser();
+  const authorId = user?.id;
+
   try {
     const body = await request.json();
     const {
       postId,
-      authorId,
       parentCommentId = null,
       content,
       isAnonymous = false,
@@ -24,14 +27,19 @@ export async function POST(request: Request) {
     }
 
     if (parentCommentId && !isValidUuid(parentCommentId)) {
-      return NextResponse.json({ error: 'Invalid parent comment ID' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid parent comment ID' },
+        { status: 400 }
+      );
     }
 
-    // Sanitize content to prevent XSS
     const sanitizedContent = sanitize(content);
 
     if (!sanitizedContent.trim()) {
-      return NextResponse.json({ error: 'Comment content cannot be empty' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Comment content cannot be empty' },
+        { status: 400 }
+      );
     }
 
     const author_id = String(authorId);
@@ -57,7 +65,6 @@ export async function POST(request: Request) {
 
     console.log(`✅ Comment ${insertedComment.id} created for post ${post_id}`);
 
-    // Revalidate cache for comments
     await revalidateCommentsCache(post_id.toString());
 
     return NextResponse.json(
