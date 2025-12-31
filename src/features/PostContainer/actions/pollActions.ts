@@ -2,7 +2,10 @@
 
 import db from '@/db';
 import { pollOptions, pollVotes } from '@/db/schema';
+import { rateLimits } from '@/lib/ratelimits';
+import { getFirstIP } from '@/utils/getFirstIp';
 import { eq, and } from 'drizzle-orm';
+import { headers } from 'next/headers';
 
 export interface PollOption {
   id: string;
@@ -58,6 +61,14 @@ export async function votePoll(
   pollOptionId: string,
   userId: string
 ): Promise<{ success: boolean; message: string }> {
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.postVote.limit(ip);
+
+  if (!success) {
+    return { success: false, message: 'Too many requests' };
+  }
+
   try {
     // Get the option to find the postId
     const option = await db

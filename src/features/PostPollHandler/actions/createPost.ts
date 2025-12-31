@@ -5,6 +5,9 @@ import { posts } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
 import { sanitize, isValidUuid } from '@/lib/security';
 import { getUser } from '@/utils/getUser';
+import { headers } from 'next/headers';
+import { getFirstIP } from '@/utils/getFirstIp';
+import { rateLimits } from '@/lib/ratelimits';
 
 export async function createPostAction(formData: {
   title: string;
@@ -14,6 +17,14 @@ export async function createPostAction(formData: {
   is_anonymous?: boolean;
   is_active?: boolean;
 }) {
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.createPost.limit(ip);
+
+  if (!success) {
+    return { success: false, message: 'Too many requests' };
+  }
+
   const user = await getUser();
   const author_id = user?.id;
 

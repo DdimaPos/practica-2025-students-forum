@@ -5,8 +5,20 @@ import { posts, users, postReactions, channels } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { Post_type } from '../types/Post_type';
 import { getUser } from '@/utils/getUser';
+import { headers } from 'next/headers';
+import { getFirstIP } from '@/utils/getFirstIp';
+import { rateLimits } from '@/lib/ratelimits';
+import { redirect } from 'next/navigation';
 
 export async function getPostById(id: string): Promise<Post_type | null> {
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.postView.limit(ip);
+
+  if (!success) {
+    redirect('/error');
+  }
+
   const user = await getUser();
 
   const result = await db

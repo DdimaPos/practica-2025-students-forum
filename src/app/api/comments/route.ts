@@ -4,8 +4,17 @@ import { comments } from '@/db/schema';
 import { revalidateCommentsCache } from '@/lib/cache';
 import { sanitize, isValidUuid } from '@/lib/security';
 import { getUser } from '@/utils/getUser';
+import { rateLimits } from '@/lib/ratelimits';
+import { getFirstIP } from '@/utils/getFirstIp';
 
 export async function POST(request: Request) {
+  const ip = getFirstIP(request.headers.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.comment.limit(ip);
+
+  if (!success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   const user = await getUser();
   const authorId = user?.id;
 

@@ -6,6 +6,9 @@ import db from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { sanitize } from '@/lib/security';
+import { headers } from 'next/headers';
+import { getFirstIP } from '@/utils/getFirstIp';
+import { rateLimits } from '@/lib/ratelimits';
 
 async function checkUserExists(email: string) {
   const ures = await db.select().from(users).where(eq(users.email, email));
@@ -132,6 +135,14 @@ export async function signup(
   _: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.register.limit(ip);
+
+  if (!success) {
+    return { success: false, message: 'Too many signup requests' };
+  }
+
   const data = Object.fromEntries(formData.entries());
 
   const parsed = signupFormSchema.safeParse(data);

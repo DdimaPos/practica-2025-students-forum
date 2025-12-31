@@ -1,6 +1,9 @@
 'use server';
 
+import { rateLimits } from '@/lib/ratelimits';
+import { getFirstIP } from '@/utils/getFirstIp';
 import { createClient } from '@/utils/supabase/server';
+import { headers } from 'next/headers';
 
 export interface VerifyMFAParams {
   factorId: string;
@@ -13,6 +16,14 @@ export async function verifyMFA({
   challengeId,
   code,
 }: VerifyMFAParams) {
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.verifyMFA.limit(ip);
+
+  if (!success) {
+    return { success: false, message: 'Too many requests' };
+  }
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.mfa.verify({
