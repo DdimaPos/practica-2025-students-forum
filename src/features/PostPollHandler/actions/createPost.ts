@@ -4,26 +4,22 @@ import db from '@/db';
 import { posts } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
 import { sanitize, isValidUuid } from '@/lib/security';
+import { getUser } from '@/utils/getUser';
 
 export async function createPostAction(formData: {
   title: string;
   content: string;
   post_type?: 'basic' | 'poll' | 'event';
-  author_id: string | null;
   channel_id?: string | null;
   is_anonymous?: boolean;
   is_active?: boolean;
 }) {
+  const user = await getUser();
+  const author_id = user?.id;
+
   try {
-    const {
-      title,
-      content,
-      post_type,
-      author_id,
-      channel_id,
-      is_anonymous,
-      is_active,
-    } = formData;
+    const { title, content, post_type, channel_id, is_anonymous, is_active } =
+      formData;
 
     if (!title || !content || !author_id) {
       throw new Error(
