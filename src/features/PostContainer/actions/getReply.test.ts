@@ -44,7 +44,7 @@ describe('addReply', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSanitize.mockImplementation((input: string) => input);
+    mockSanitize.mockImplementation((input?: string) => input ?? '');
     mockIsValidUuid.mockReturnValue(true);
 
     mockCreateClient.mockResolvedValue({

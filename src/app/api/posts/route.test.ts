@@ -1,6 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './route';
 import { NextRequest } from 'next/server';
+import type { rateLimits } from '@/lib/ratelimits';
+
+type RateLimitResponse = Awaited<
+  ReturnType<(typeof rateLimits)['postView']['limit']>
+>;
+
+vi.mock('@/lib/ratelimits', () => ({
+  rateLimits: {
+    postView: {
+      limit: vi.fn(() =>
+        Promise.resolve({
+          success: true,
+          limit: 10,
+          remaining: 9,
+          reset: Date.now() + 60000,
+        })
+      ),
+    },
+  },
+}));
 
 vi.mock('@/utils/getUser', () => ({
   getUser: vi.fn(() => Promise.resolve(null)),
@@ -101,7 +121,7 @@ describe('GET /api/posts – negative tests & fuzzing', () => {
     expect(response.status).not.toBe(500);
   });
 
-  it('should resist SQL injection attempts in query params', async () => {
+  it('verifies that the endpoint does not crash when receiving malformed or malicious query parameters.', async () => {
     const request = new NextRequest(
       'http://localhost:3000/api/posts?limit=10;DROP TABLE posts;'
     );
@@ -109,4 +129,33 @@ describe('GET /api/posts – negative tests & fuzzing', () => {
 
     expect(response.status).not.toBe(500);
   });
+
+  it('should return 429 when rate limit exceeded', async () => {
+    const { rateLimits } = await import('@/lib/ratelimits');
+
+    vi.mocked(rateLimits.postView.limit).mockResolvedValueOnce(
+      createRateLimitResponse(false)
+    );
+
+    const request = new NextRequest('http://localhost:3000/api/posts');
+    const response = await GET(request);
+
+    expect(response.status).toBe(429);
+  });
 });
+
+function createRateLimitResponse(success: boolean): RateLimitResponse {
+  const base = {
+    success,
+    limit: 10,
+    remaining: success ? 9 : 0,
+    reset: Date.now() + 60_000,
+  };
+
+  const response: RateLimitResponse = {
+    ...base,
+    pending: Promise.resolve(undefined as unknown as RateLimitResponse),
+  };
+
+  return response;
+}

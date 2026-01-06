@@ -1,6 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { handleVote } from './handleVote';
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn(async () => ({
+    get: vi.fn(() => '127.0.0.1'),
+  })),
+}));
+
+vi.mock('@/lib/ratelimits', () => ({
+  rateLimits: {
+    postVote: {
+      limit: vi.fn(async () => ({ success: true })),
+    },
+  },
+}));
+
 vi.mock('./postVote', () => ({
   togglePostReaction: vi.fn(),
 }));

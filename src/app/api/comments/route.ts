@@ -3,13 +3,25 @@ import db from '@/db';
 import { comments } from '@/db/schema';
 import { revalidateCommentsCache } from '@/lib/cache';
 import { sanitize, isValidUuid } from '@/lib/security';
+import { getUser } from '@/utils/getUser';
+import { rateLimits } from '@/lib/ratelimits';
+import { getFirstIP } from '@/utils/getFirstIp';
 
 export async function POST(request: Request) {
+  const ip = getFirstIP(request.headers.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.comment.limit(ip);
+
+  if (!success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
+  const user = await getUser();
+  const authorId = user?.id;
+
   try {
     const body = await request.json();
     const {
       postId,
-      authorId,
       parentCommentId = null,
       content,
       isAnonymous = false,
@@ -24,14 +36,19 @@ export async function POST(request: Request) {
     }
 
     if (parentCommentId && !isValidUuid(parentCommentId)) {
-      return NextResponse.json({ error: 'Invalid parent comment ID' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid parent comment ID' },
+        { status: 400 }
+      );
     }
 
-    // Sanitize content to prevent XSS
     const sanitizedContent = sanitize(content);
 
     if (!sanitizedContent.trim()) {
-      return NextResponse.json({ error: 'Comment content cannot be empty' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Comment content cannot be empty' },
+        { status: 400 }
+      );
     }
 
     const author_id = String(authorId);
@@ -57,7 +74,6 @@ export async function POST(request: Request) {
 
     console.log(`✅ Comment ${insertedComment.id} created for post ${post_id}`);
 
-    // Revalidate cache for comments
     await revalidateCommentsCache(post_id.toString());
 
     return NextResponse.json(

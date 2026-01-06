@@ -3,6 +3,29 @@ import { getPostById } from './getPostById';
 import db from '@/db';
 import { getUser } from '@/utils/getUser';
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn(async () => ({
+    get: (key: string) => {
+      if (key === 'x-forwarded-for') return '127.0.0.1';
+
+      return null;
+    },
+  })),
+}));
+
+vi.mock('@/lib/ratelimits', () => ({
+  rateLimits: {
+    postView: {
+      limit: vi.fn(async () => ({ success: true })),
+    },
+  },
+}));
+
+vi.mock('next/navigation', () => ({
+  redirect: vi.fn(),
+}));
+
+
 vi.mock('@/db', () => ({
   default: {
     select: vi.fn(),

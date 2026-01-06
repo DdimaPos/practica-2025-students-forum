@@ -4,7 +4,6 @@ import { useState, useTransition } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { createPollAction } from '../actions/createPoll';
 import { useFormStateToast } from '@/features/Authentication/hooks/useToast';
-import { UserIdProp } from '../types/UserIdProp';
 import { FormState } from '../types/FormState';
 import {
   Card,
@@ -30,7 +29,7 @@ interface PollFormData {
   pollOptions: { value: string }[];
 }
 
-export default function CreatePollForm({ userId }: UserIdProp) {
+export default function CreatePollForm() {
   const [isPending, startTransition] = useTransition();
   const [formState, setFormState] = useState<FormState>({
     message: '',
@@ -70,7 +69,6 @@ export default function CreatePollForm({ userId }: UserIdProp) {
       const result = await createPollAction({
         title: data.title,
         content: data.content,
-        author_id: userId,
         channel_id: data.channelId,
         is_anonymous: data.isAnonymous,
         is_active: true,

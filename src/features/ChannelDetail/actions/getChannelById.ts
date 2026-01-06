@@ -2,7 +2,11 @@
 
 import db from '@/db';
 import { channels, posts } from '@/db/schema';
+import { rateLimits } from '@/lib/ratelimits';
+import { getFirstIP } from '@/utils/getFirstIp';
 import { eq, and, count } from 'drizzle-orm';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export type ChannelDetail = {
   id: string;
@@ -16,6 +20,14 @@ export type ChannelDetail = {
 export async function getChannelById(
   channelId: string
 ): Promise<ChannelDetail | null> {
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.channelView.limit(ip);
+
+  if (!success) {
+    redirect('/error');
+  }
+
   try {
     const channelResult = await db
       .select({
