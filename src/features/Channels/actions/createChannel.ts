@@ -6,14 +6,25 @@ import { getUser } from '@/utils/getUser';
 import type { FormState } from '../types';
 import { revalidatePath } from 'next/cache';
 import { sanitize, isValidUuid } from '@/lib/security';
+import { getFirstIP } from '@/utils/getFirstIp';
+import { headers } from 'next/headers';
+import { rateLimits } from '@/lib/ratelimits';
 
 export async function createChannel(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.createChannel.limit(ip);
+
+  if (!success) {
+    return { success: false, message: 'Too many requests' };
+  }
+
   try {
     const user = await getUser().catch(() => undefined);
-    
+
     if (!user) {
       return {
         success: false,

@@ -1,6 +1,14 @@
-import { NextRequest } from 'next/server';
+import { rateLimits } from '@/lib/ratelimits';
+import { getFirstIP } from '@/utils/getFirstIp';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  const ip = getFirstIP(request.headers.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.cspReport.limit(ip);
+
+  if (!success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
   try {
     const data = await request.json();
     console.warn('CSP Violation Report:', data);

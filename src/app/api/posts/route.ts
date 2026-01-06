@@ -3,10 +3,19 @@ import { desc, eq, sql } from 'drizzle-orm';
 import db from '@/db';
 import { posts, users, postReactions } from '@/db/schema';
 import { getUser } from '@/utils/getUser';
+import { getFirstIP } from '@/utils/getFirstIp';
+import { rateLimits } from '@/lib/ratelimits';
 
 const DEFAULT_LIMIT = 10;
 
 export async function GET(request: Request) {
+  const ip = getFirstIP(request.headers.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.postView.limit(ip);
+
+  if (!success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const limit = Math.min(
