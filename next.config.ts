@@ -1,7 +1,6 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   async headers() {
     return [
       {
@@ -11,11 +10,11 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel-insights.com https://vercel.live",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel-insights.com https://vercel.live https://va.vercel-scripts.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.vercel.app https://*.vercel-static.com",
               "font-src 'self' https://*.vercel.app https://*.vercel-static.com data:",
-              "img-src 'self' data: blob: https://*.vercel-insights.com https://*.supabase.com",
-              "connect-src 'self' https://*.vercel-insights.com https://vitals.vercel-insights.com wss://*.vercel-insights.com",
+              "img-src 'self' data: blob: https://*.vercel-insights.com https://*.supabase.co https://i.pravatar.cc",
+              "connect-src 'self' https://*.vercel-insights.com https://vitals.vercel-insights.com wss://*.vercel-insights.com https://va.vercel-scripts.com",
               "media-src 'self'",
               "object-src 'none'",
               "frame-ancestors 'none'",
@@ -39,12 +38,9 @@ const nextConfig: NextConfig = {
             key: 'Permissions-Policy',
             value: [
               'accelerometer=()',
-              'ambient-light-sensor=()',
               'autoplay=()',
-              'battery=()',
               'camera=()',
               'display-capture=()',
-              'document-domain=()',
               'encrypted-media=()',
               'fullscreen=()',
               'geolocation=()',
