@@ -16,5 +16,5 @@ export default async function CreatePost() {
     redirect('/login');
   }
 
-  return <PostPollHandler userId={user.id} />;
+  return <PostPollHandler />;
 }

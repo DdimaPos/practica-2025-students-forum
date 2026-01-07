@@ -16,7 +16,7 @@ const createDOMPurify = () => {
 
 const purify = createDOMPurify();
 
-export function sanitize(input: string): string {
+export function sanitize(input?: string): string {
   if (!input || typeof input !== 'string') return '';
 
   return purify.sanitize(input, {
@@ -26,7 +26,7 @@ export function sanitize(input: string): string {
   });
 }
 
-export function isValidUuid(uuid: string): boolean {
+export function isValidUuid(uuid?: string): boolean {
   if (!uuid || typeof uuid !== 'string') return false;
 
   const uuidPattern =
@@ -35,7 +35,7 @@ export function isValidUuid(uuid: string): boolean {
   return uuidPattern.test(uuid.trim());
 }
 
-export function sanitizeSearch(query: string): string {
+export function sanitizeSearch(query?: string): string {
   if (!query || typeof query !== 'string') return '';
 
   return query

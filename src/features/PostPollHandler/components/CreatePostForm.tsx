@@ -4,7 +4,6 @@ import { useState, useTransition } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { createPostAction } from '../actions/createPost';
 import { useFormStateToast } from '@/features/Authentication/hooks/useToast';
-import { UserIdProp } from '../types/UserIdProp';
 import { FormState } from '../types/FormState';
 import {
   Card,
@@ -29,7 +28,7 @@ interface PostFormData {
   isAnonymous: boolean;
 }
 
-export default function CreatePostForm({ userId }: UserIdProp) {
+export default function CreatePostForm() {
   const [isPending, startTransition] = useTransition();
   const [formState, setFormState] = useState<FormState>({
     message: '',
@@ -64,7 +63,6 @@ export default function CreatePostForm({ userId }: UserIdProp) {
         title: data.title,
         content: data.content,
         post_type: 'basic',
-        author_id: userId,
         channel_id: data.channelId,
         is_anonymous: data.isAnonymous,
         is_active: true,
