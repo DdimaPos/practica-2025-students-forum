@@ -418,8 +418,8 @@ describe('getComments', () => {
         content: 'Test',
         isAnonymous: false,
         createdAt: new Date('2024-01-01'),
-        firstName: 'John  ',
-        lastName: '  Doe',
+        firstName: 'John    ',
+        lastName: '    Doe',
         userType: 'student',
         profilePictureUrl: null,
         total: 1,
@@ -450,6 +450,6 @@ describe('getComments', () => {
 
     const result = await getComments('post-1');
 
-    expect(result.comments[0].authorName).toBe('John     Doe');
+    expect(result.comments[0].authorName).toBe('John Doe');
   });
 });

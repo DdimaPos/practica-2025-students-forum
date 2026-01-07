@@ -71,7 +71,7 @@ export async function getComments(
     const authorName =
       row.isAnonymous || !row.authorId
         ? 'Anonymous'
-        : `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim();
+        : `${row.firstName?.trim() ?? ''} ${row.lastName?.trim() ?? ''}`.trim();
 
     return {
       id: row.id,
