@@ -1,7 +1,6 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   async headers() {
     return [
       {
@@ -11,16 +10,16 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://vercel-insights.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel-insights.com https://vercel.live https://va.vercel-scripts.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.vercel.app https://*.vercel-static.com",
               "font-src 'self' https://*.vercel.app https://*.vercel-static.com data:",
-              "img-src 'self' blob: data: https://*.supabase.co",
-              "connect-src 'self' https://*.supabase.co https://*.vercel.app https://*.vercel-insights.com https://vercel.live",
+              "img-src 'self' data: blob: https://*.vercel-insights.com https://*.supabase.co https://i.pravatar.cc",
+              "connect-src 'self' https://*.vercel-insights.com https://vitals.vercel-insights.com wss://*.vercel-insights.com https://va.vercel-scripts.com",
               "media-src 'self'",
               "object-src 'none'",
               "frame-ancestors 'none'",
-              "upgrade-insecure-requests",
-              "report-uri /api/csp-report"
+              'upgrade-insecure-requests',
+              'report-uri /api/csp-report',
             ].join('; '),
           },
           {
@@ -39,12 +38,9 @@ const nextConfig: NextConfig = {
             key: 'Permissions-Policy',
             value: [
               'accelerometer=()',
-              'ambient-light-sensor=()',
               'autoplay=()',
-              'battery=()',
               'camera=()',
               'display-capture=()',
-              'document-domain=()',
               'encrypted-media=()',
               'fullscreen=()',
               'geolocation=()',
@@ -59,12 +55,16 @@ const nextConfig: NextConfig = {
               'sync-xhr=()',
               'usb=()',
               'web-share=()',
-              'xr-spatial-tracking=()'
+              'xr-spatial-tracking=()',
             ].join(', '),
           },
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains;',
           }
         ],
       },

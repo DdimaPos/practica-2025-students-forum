@@ -3,11 +3,22 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { FormState } from '../types';
+import { headers } from 'next/headers';
+import { rateLimits } from '@/lib/ratelimits';
+import { getFirstIP } from '@/utils/getFirstIp';
 
 export async function login(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.login.limit(ip);
+
+  if (!success) {
+    return { success: false, message: 'Too many login requests' };
+  }
+
   const supabase = await createClient();
 
   const email = formData.get('email') as string;

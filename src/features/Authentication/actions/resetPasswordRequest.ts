@@ -1,6 +1,8 @@
 'use server';
 
 import { FormState } from '@/features/Authentication/types';
+import { rateLimits } from '@/lib/ratelimits';
+import { getFirstIP } from '@/utils/getFirstIp';
 import { createClient } from '@/utils/supabase/server';
 import { headers } from 'next/headers';
 
@@ -8,6 +10,14 @@ export async function resetPasswordRequest(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+  const { success } = await rateLimits.resetPassword.limit(ip);
+
+  if (!success) {
+    return { success: false, message: 'Too many requests' };
+  }
+
   const email = formData.get('email') as string;
 
   if (!email) {
@@ -15,7 +25,6 @@ export async function resetPasswordRequest(
   }
 
   const supabase = await createClient();
-  const headerList = await headers();
   const origin = headerList.get('origin');
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
