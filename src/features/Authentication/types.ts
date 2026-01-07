@@ -24,6 +24,20 @@ export const signupFormSchema = z.object({
   }),
 });
 
+export const completeSignupFormSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  bio: z.string().min(1).max(160, {
+    message: 'Bio must be at most 160 characters long',
+  }),
+  yearOfStudy: z
+    .string()
+    .transform(val => (val ? parseInt(val, 10) : undefined))
+    .refine(val => val === undefined || (val >= 1 && val <= 5), {
+      message: 'Year of study must be between 1 and 5',
+    }),
+});
+
 export type SignupFormData = z.infer<typeof signupFormSchema>;
 
 export enum ProviderTypes {
