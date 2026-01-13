@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { signupFormSchema } from '../types';
+import { signupFormSchema } from '../../types';
 
 describe('signupFormSchema', () => {
   it('should validate complete signup data', () => {
