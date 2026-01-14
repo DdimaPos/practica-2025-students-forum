@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import { togglePostReaction } from './postVote';
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/utils/getUser';
@@ -11,11 +12,21 @@ export async function handleVote(
   postId: string,
   reactionType: 'upvote' | 'downvote'
 ) {
+  const startTime = Date.now();
   const headerList = await headers();
   const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.postVote.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      action: 'handleVote',
+      post_id: postId,
+      reaction_type: reactionType,
+      ip_address: ip,
+      rate_limit_type: 'postVote',
+      duration: Date.now() - startTime,
+    });
+
     return { success: false, message: 'Too many requests' };
   }
 
@@ -31,6 +42,16 @@ export async function handleVote(
 
   if (result.success) {
     revalidatePath('/posts');
+
+    Sentry.logger.info('Vote handled', {
+      action: 'handleVote',
+      post_id: postId,
+      user_id: user.id,
+      reaction_type: reactionType,
+      vote_action: result.action,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
   }
 
   return result;
