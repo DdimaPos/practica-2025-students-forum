@@ -33,7 +33,13 @@ export async function handleVote(
   const user = await getUser();
 
   if (!user || !user.id) {
-    console.log('User not logged in. Cannot vote.');
+    Sentry.logger.warn('Unauthenticated vote attempt', {
+      action: 'handleVote',
+      post_id: postId,
+      reaction_type: reactionType,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
 
     return { success: false, error: 'User not authenticated' };
   }

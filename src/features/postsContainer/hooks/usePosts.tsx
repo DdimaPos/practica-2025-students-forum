@@ -1,5 +1,6 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchContext } from '@/features/search/context/SearchContext';
 import type { PostListItem } from '@/features/postList/types/post';
@@ -47,7 +48,10 @@ export function usePosts() {
         setHasMore(moreAvailable);
         hasMoreRef.current = moreAvailable;
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        Sentry.captureException(error, {
+          tags: { component: 'usePosts', operation: 'fetchPosts' },
+          extra: { offset: currentOffset, append },
+        });
       } finally {
         setState(false);
         loadingMoreRef.current = false;
