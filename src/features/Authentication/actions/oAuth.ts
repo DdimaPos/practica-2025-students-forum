@@ -1,9 +1,12 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { ProviderTypes } from '../types';
 import { SignInWithOAuthCredentials } from '@supabase/supabase-js';
+import { headers } from 'next/headers';
+import { getFirstIP } from '@/utils/getFirstIp';
 
 import {
   GOOGLE_AUTH_CONFIGURATION,
@@ -12,6 +15,10 @@ import {
 } from '../constants/oauthVariants';
 
 export const oAuth = async (provider: ProviderTypes) => {
+  const startTime = Date.now();
+  const headerList = await headers();
+  const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
+
   const supabase = await createClient();
 
   const configMap: Record<ProviderTypes, SignInWithOAuthCredentials> = {
@@ -23,13 +30,35 @@ export const oAuth = async (provider: ProviderTypes) => {
   const activeOAuthVariant = configMap[provider];
 
   if (!activeOAuthVariant) {
+    Sentry.logger.error('Invalid OAuth provider', {
+      action: 'oauth',
+      provider: provider,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
     redirect('/error');
   }
 
   const { data, error } =
     await supabase.auth.signInWithOAuth(activeOAuthVariant);
 
-  if (data.url) redirect(data.url);
+  if (data.url) {
+    Sentry.logger.info('OAuth initiated', {
+      action: 'oauth',
+      provider: provider,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
+    redirect(data.url);
+  }
 
-  if (error) redirect('/error');
+  if (error) {
+    Sentry.logger.error('OAuth failed', {
+      action: 'oauth',
+      provider: provider,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
+    redirect('/error');
+  }
 };

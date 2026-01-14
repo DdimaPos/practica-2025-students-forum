@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.vercel.app https://*.vercel-static.com",
               "font-src 'self' https://*.vercel.app https://*.vercel-static.com data:",
               "img-src 'self' data: blob: https://*.vercel-insights.com https://*.supabase.co https://i.pravatar.cc",
-              "connect-src 'self' https://*.vercel-insights.com https://vitals.vercel-insights.com wss://*.vercel-insights.com https://va.vercel-scripts.com",
+              "connect-src 'self' https://*.vercel-insights.com https://vitals.vercel-insights.com wss://*.vercel-insights.com https://va.vercel-scripts.com https://*.sentry.io https://*.ingest.de.sentry.io",
               "media-src 'self'",
               "object-src 'none'",
               "frame-ancestors 'none'",

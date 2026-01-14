@@ -4,6 +4,8 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { supabaseIntegration } from '@supabase/sentry-js-integration';
 
 Sentry.init({
   dsn: 'https://e583bd42c76ba86edef5271ddc65acf5@o4510709101232128.ingest.de.sentry.io/4510709101690960',
@@ -14,7 +16,27 @@ Sentry.init({
   // Enable logs to be sent to Sentry
   enableLogs: true,
 
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
+  debug: process.env.NODE_ENV === 'development',
+
   // Enable sending user PII (Personally Identifiable Information)
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
   sendDefaultPii: true,
+
+  // Add integrations for monitoring
+  integrations: [
+    // Supabase client monitoring (auth, storage, realtime)
+    supabaseIntegration(SupabaseClient, Sentry, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+    // WinterCG Fetch integration for edge runtime with deduplication
+    Sentry.winterCGFetchIntegration({
+      breadcrumbs: true,
+      shouldCreateSpanForRequest: (url: string) => {
+        return !url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`);
+      },
+    }),
+  ],
 });
