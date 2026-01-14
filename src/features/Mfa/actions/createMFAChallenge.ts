@@ -1,18 +1,49 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import { createClient } from '@/utils/supabase/server';
 
 export async function createMfaChallenge(factorId: string) {
-  const supabase = await createClient();
+  const startTime = Date.now();
 
-  const { data, error } = await supabase.auth.mfa.challenge({ factorId });
+  try {
+    const supabase = await createClient();
 
-  if (error) {
-    console.error('Challenge MFA error:', error.message);
-    throw new Error(error.message);
+    const { data, error } = await supabase.auth.mfa.challenge({ factorId });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    Sentry.logger.info('MFA challenge created', {
+      action: 'createMfaChallenge',
+      factor_id: factorId,
+      challenge_id: data.id,
+    });
+
+    Sentry.metrics.distribution('auth.createMfaChallenge',
+      Date.now() - startTime,
+      { unit: 'milliseconds' }
+    );
+
+    return {
+      challengeId: data.id,
+    };
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+
+    Sentry.logger.error('MFA challenge creation failed', {
+      action: 'createMfaChallenge',
+      factor_id: factorId,
+      error_message: error.message,
+      duration: Date.now() - startTime,
+    });
+
+    Sentry.captureException(error, {
+      tags: { action: 'createMfaChallenge' },
+      extra: { factor_id: factorId },
+    });
+
+    throw error;
   }
-
-  return {
-    challengeId: data.id,
-  };
 }

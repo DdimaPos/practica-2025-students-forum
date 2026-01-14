@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { useState, useEffect, useCallback } from 'react';
 
 interface UseFetchOptions {
@@ -33,7 +34,10 @@ export function useFetch<T>(
       setData(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error(`Error fetching ${url}:`, err);
+      Sentry.captureException(err, {
+        tags: { component: 'useFetch' },
+        extra: { url },
+      });
     } finally {
       setLoading(false);
     }

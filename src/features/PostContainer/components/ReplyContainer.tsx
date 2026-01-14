@@ -1,5 +1,6 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -81,7 +82,10 @@ export default function ReplyContainer({
       }
       router.refresh();
     } catch (err: unknown) {
-      console.error(err);
+      Sentry.captureException(err, {
+        tags: { component: 'ReplyContainer', operation: 'submitComment' },
+        extra: { post_id: postId, parent_comment_id: parentCommentId },
+      });
     } finally {
       setLoading(false);
     }

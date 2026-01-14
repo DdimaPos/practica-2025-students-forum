@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import { createClient } from '@/utils/supabase/server';
 import { FormState, SignupFormData, signupFormSchema } from '../types';
 import db from '@/db';
@@ -60,15 +61,27 @@ async function _signup(data: SignupFormData) {
     },
   });
 
-  if (res.error) {
-    return { error: res.error.message };
-  }
+  if (res.error || !res.data.user) {
+    Sentry.logger.error('Supabase Auth signUp error', {
+      action: 'signup',
+      error_message: res.error?.message || 'No user returned',
+      email_domain: data.email.split('@')[1],
+    });
 
-  if (!res.data.user) {
+    if (res.error) {
+      return { error: res.error.message };
+    }
+
     return { error: 'Sign up failed. Please try again.' };
   }
 
   if (!res.data.user.role || !res.data.user.confirmation_sent_at) {
+    Sentry.logger.error('Confirmation email not sent', {
+      action: 'signup',
+      error_message: 'No confirmation email sent',
+      email_domain: data.email.split('@')[1],
+    });
+
     return {
       error:
         'Confirmation email not sent. Please verify if your email is correct or an account already exists.',
@@ -135,11 +148,19 @@ export async function signup(
   _: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const startTime = Date.now();
+  Sentry.setTag('action', 'signup');
   const headerList = await headers();
   const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.register.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      ip_address: ip,
+      rate_limit_type: 'register',
+      duration: Date.now() - startTime,
+    });
+
     return { success: false, message: 'Too many signup requests' };
   }
 
@@ -148,7 +169,10 @@ export async function signup(
   const parsed = signupFormSchema.safeParse(data);
 
   if (!parsed.success) {
-    console.error('Validation error:', parsed.error);
+    Sentry.logger.warn('Signup validation failed', {
+      action: 'signup',
+      validation_errors: parsed.error.issues.map(i => i.message).join(', '),
+    });
 
     return {
       success: false,
@@ -159,22 +183,29 @@ export async function signup(
   const { error } = await _signup(parsed.data);
 
   if (error) {
-    console.error('Sign up error:', error);
-
     return {
       success: false,
       message: error,
     };
   }
 
+  Sentry.metrics.distribution('user.signup.duration', Date.now() - startTime, {
+    unit: 'millisecond',
+  });
+
+  Sentry.logger.info('User signed up', {
+    action: 'signup',
+    email_domain: parsed.data.email.split('@')[1],
+    user_type: /\.utm\.md$/i.test(parsed.data.email.split('@')[0])
+      ? 'verified'
+      : 'student',
+    has_bio: !!parsed.data.bio,
+    year_of_study: parsed.data.yearOfStudy,
+  });
+
   return {
     success: true,
     message:
       'Confirmation email sent! Please check your inbox to complete registration.',
   };
-
-  // Note: If Supabase project has email confirmation disabled,
-  // redirect the user
-  // revalidatePath('/', 'layout');
-  // redirect('/');
 }

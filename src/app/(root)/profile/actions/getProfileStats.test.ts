@@ -55,10 +55,6 @@ describe('getProfileStats', () => {
   });
 
   it('should handle database errors gracefully', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-
     // Mock database error
     mockWhere.mockRejectedValueOnce(new Error('Database connection failed'));
 
@@ -68,11 +64,5 @@ describe('getProfileStats', () => {
       postsCount: 0,
       commentsCount: 0,
     });
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error fetching profile stats:',
-      'Database connection failed'
-    );
-
-    consoleErrorSpy.mockRestore();
   });
 });

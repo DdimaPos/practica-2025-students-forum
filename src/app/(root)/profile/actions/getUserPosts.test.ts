@@ -118,10 +118,6 @@ describe('getUserPosts', () => {
   });
 
   it('should handle database errors gracefully', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-
     mockOffset.mockRejectedValueOnce(new Error('DB error'));
 
     const result = await getUserPosts('user-123');
@@ -130,11 +126,5 @@ describe('getUserPosts', () => {
       posts: [],
       hasMore: false,
     });
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error fetching user posts:',
-      'DB error'
-    );
-
-    consoleErrorSpy.mockRestore();
   });
 });

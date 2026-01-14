@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { ProviderTypes } from '../types';
@@ -12,6 +13,8 @@ import {
 } from '../constants/oauthVariants';
 
 export const oAuth = async (provider: ProviderTypes) => {
+  const startTime = Date.now();
+
   const supabase = await createClient();
 
   const configMap: Record<ProviderTypes, SignInWithOAuthCredentials> = {
@@ -23,13 +26,33 @@ export const oAuth = async (provider: ProviderTypes) => {
   const activeOAuthVariant = configMap[provider];
 
   if (!activeOAuthVariant) {
+    Sentry.logger.error('Invalid OAuth provider', {
+      action: 'oauth',
+      provider: provider,
+    });
     redirect('/error');
   }
+
+  Sentry.metrics.distribution('auth.oauth.initiate', Date.now() - startTime, {
+    unit: 'milliseconds',
+  });
 
   const { data, error } =
     await supabase.auth.signInWithOAuth(activeOAuthVariant);
 
-  if (data.url) redirect(data.url);
+  if (data.url) {
+    Sentry.logger.info('OAuth initiated', {
+      action: 'oauth',
+      provider: provider,
+    });
+    redirect(data.url);
+  }
 
-  if (error) redirect('/error');
+  if (error) {
+    Sentry.logger.error('OAuth failed', {
+      action: 'oauth',
+      provider: provider,
+    });
+    redirect('/error');
+  }
 };

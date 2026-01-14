@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import db from '@/db';
 import { channels, posts } from '@/db/schema';
 import { rateLimits } from '@/lib/ratelimits';
@@ -20,11 +21,18 @@ export type ChannelDetail = {
 export async function getChannelById(
   channelId: string
 ): Promise<ChannelDetail | null> {
+  const startTime = Date.now();
   const headerList = await headers();
   const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.channelView.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      action: 'getChannelById',
+      channel_id: channelId,
+      ip_address: ip,
+      rate_limit_type: 'channelView',
+    });
     redirect('/error');
   }
 
@@ -53,6 +61,10 @@ export async function getChannelById(
     const channel = channelResult[0];
     const postCount = Number(postCountResult[0]?.count || 0);
 
+    Sentry.metrics.distribution('channel.getById', Date.now() - startTime, {
+      unit: 'milliseconds',
+    });
+
     return {
       id: channel.id,
       name: channel.name,
@@ -61,8 +73,19 @@ export async function getChannelById(
       createdAt: channel.createdAt,
       postCount: postCount,
     };
-  } catch (error) {
-    console.error('Error fetching channel:', channelId, error);
+
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+
+    Sentry.logger.error('Channel fetch failed', {
+      action: 'getChannelById',
+      channel_id: channelId,
+      error_message: error.message,
+    });
+
+    Sentry.captureException(error, {
+      tags: { action: 'getChannelById' },
+    });
 
     return null;
   }
