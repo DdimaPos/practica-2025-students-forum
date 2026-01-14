@@ -60,7 +60,7 @@ export async function login(
       duration: Date.now() - startTime,
     });
 
-    return { success: false, message: 'Authentication error' };
+    return { success: false, message: 'could not get aal level' };
   }
 
   if (aalLevel.nextLevel === 'aal2') {
