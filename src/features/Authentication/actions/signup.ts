@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import { createClient } from '@/utils/supabase/server';
 import { FormState, SignupFormData, signupFormSchema } from '../types';
 import db from '@/db';
@@ -135,11 +136,19 @@ export async function signup(
   _: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const startTime = Date.now();
   const headerList = await headers();
   const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.register.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      action: 'signup',
+      ip_address: ip,
+      rate_limit_type: 'register',
+      duration: Date.now() - startTime,
+    });
+
     return { success: false, message: 'Too many signup requests' };
   }
 
@@ -148,7 +157,12 @@ export async function signup(
   const parsed = signupFormSchema.safeParse(data);
 
   if (!parsed.success) {
-    console.error('Validation error:', parsed.error);
+    Sentry.logger.warn('Signup validation failed', {
+      action: 'signup',
+      validation_errors: parsed.error.issues.map(i => i.message).join(', '),
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
 
     return {
       success: false,
@@ -159,13 +173,31 @@ export async function signup(
   const { error } = await _signup(parsed.data);
 
   if (error) {
-    console.error('Sign up error:', error);
+    Sentry.logger.error('Signup failed', {
+      action: 'signup',
+      error_message: error,
+      email_domain: parsed.data.email.split('@')[1],
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
 
     return {
       success: false,
       message: error,
     };
   }
+
+  Sentry.logger.info('User signed up', {
+    action: 'signup',
+    email_domain: parsed.data.email.split('@')[1],
+    user_type: /\.utm\.md$/i.test(parsed.data.email.split('@')[1])
+      ? 'verified'
+      : 'student',
+    has_bio: !!parsed.data.bio,
+    year_of_study: parsed.data.yearOfStudy,
+    ip_address: ip,
+    duration: Date.now() - startTime,
+  });
 
   return {
     success: true,

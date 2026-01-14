@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import db from '@/db';
 import { posts } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
@@ -17,11 +18,19 @@ export async function createPostAction(formData: {
   is_anonymous?: boolean;
   is_active?: boolean;
 }) {
+  const startTime = Date.now();
   const headerList = await headers();
   const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.createPost.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      action: 'createPost',
+      ip_address: ip,
+      rate_limit_type: 'createPost',
+      duration: Date.now() - startTime,
+    });
+
     return { success: false, message: 'Too many requests' };
   }
 
@@ -68,17 +77,45 @@ export async function createPostAction(formData: {
 
     revalidatePath('/');
 
+    Sentry.logger.info('Post created', {
+      action: 'createPost',
+      post_id: newPost.id,
+      post_type: post_type || 'basic',
+      user_id: author_id,
+      channel_id: channel_id || null,
+      is_anonymous: is_anonymous || false,
+      title_length: sanitizedTitle.length,
+      content_length: sanitizedContent.length,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
+
     return {
       success: true,
       message: 'Post created successfully',
       post: newPost,
     };
-  } catch (error) {
-    console.error('Error creating post:', error);
+  } catch (err) {
+    const isErrorObject = err instanceof Error;
+    const error = isErrorObject ? err : new Error(String(err));
+
+    Sentry.logger.error('Post creation failed', {
+      action: 'createPost',
+      error_message: error.message,
+      error_stack: error.stack,
+      user_id: author_id,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
+
+    Sentry.captureException(error, {
+      tags: { action: 'createPost' },
+      extra: { user_id: author_id, ip_address: ip },
+    });
 
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Internal server error',
+      message: isErrorObject ? error.message : 'Internal server error',
     };
   }
 }

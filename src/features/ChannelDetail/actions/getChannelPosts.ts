@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import db from '@/db';
 import { posts, users, postReactions } from '@/db/schema';
 import { eq, and, desc, asc, sql } from 'drizzle-orm';
@@ -27,6 +28,8 @@ export async function getChannelPosts(
   sortBy: SortOption = 'newest',
   limit: number = 50
 ): Promise<ChannelPost[]> {
+  const startTime = Date.now();
+
   try {
     const baseQuery = db
       .select({
@@ -73,6 +76,15 @@ export async function getChannelPosts(
 
     const result = await query.limit(limit);
 
+    Sentry.logger.info('Channel posts fetched', {
+      action: 'getChannelPosts',
+      channel_id: channelId,
+      sort_by: sortBy,
+      post_count: result.length,
+      limit,
+      duration: Date.now() - startTime,
+    });
+
     return result.map(post => ({
       id: post.id,
       title: post.title,
@@ -91,8 +103,22 @@ export async function getChannelPosts(
       authorUserType: post.userType,
       authorProfilePictureUrl: post.profilePictureUrl,
     }));
-  } catch (error) {
-    console.error('Error fetching channel posts:', channelId, sortBy, error);
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+
+    Sentry.logger.error('Channel posts fetch failed', {
+      action: 'getChannelPosts',
+      channel_id: channelId,
+      sort_by: sortBy,
+      error_message: error.message,
+      error_stack: error.stack,
+      duration: Date.now() - startTime,
+    });
+
+    Sentry.captureException(error, {
+      tags: { action: 'getChannelPosts' },
+      extra: { channel_id: channelId, sort_by: sortBy },
+    });
 
     return [];
   }

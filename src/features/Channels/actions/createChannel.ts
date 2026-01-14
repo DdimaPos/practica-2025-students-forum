@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import db from '@/db';
 import { channels } from '@/db/schema';
 import { getUser } from '@/utils/getUser';
@@ -14,11 +15,19 @@ export async function createChannel(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const startTime = Date.now();
   const headerList = await headers();
   const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.createChannel.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      action: 'createChannel',
+      ip_address: ip,
+      rate_limit_type: 'createChannel',
+      duration: Date.now() - startTime,
+    });
+
     return { success: false, message: 'Too many requests' };
   }
 
@@ -78,29 +87,59 @@ export async function createChannel(
       };
     }
 
-    await db.insert(channels).values({
-      name: name!,
-      description: description!,
-      channelType: channelType as
-        | 'general'
-        | 'academic'
-        | 'social'
-        | 'announcements'
-        | 'local',
-      facultyId: facultyId || undefined,
-      specialityId: specialityId || undefined,
-      createdBy: user.id,
-      isApproved: true, // auto approve for now
-    });
+    const [newChannel] = await db
+      .insert(channels)
+      .values({
+        name: name!,
+        description: description!,
+        channelType: channelType as
+          | 'general'
+          | 'academic'
+          | 'social'
+          | 'announcements'
+          | 'local',
+        facultyId: facultyId || undefined,
+        specialityId: specialityId || undefined,
+        createdBy: user.id,
+        isApproved: true, // auto approve for now
+      })
+      .returning();
 
     revalidatePath('/');
+
+    Sentry.logger.info('Channel created', {
+      action: 'createChannel',
+      channel_id: newChannel.id,
+      channel_type: channelType,
+      user_id: user.id,
+      has_faculty: !!facultyId,
+      has_speciality: !!specialityId,
+      name_length: name.length,
+      description_length: description.length,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
 
     return {
       success: true,
       message: 'Channel created successfully!',
     };
-  } catch (error) {
-    console.error('Error creating channel:', error);
+  } catch (err) {
+    const isErrorObject = err instanceof Error;
+    const error = isErrorObject ? err : new Error(String(err));
+
+    Sentry.logger.error('Channel creation failed', {
+      action: 'createChannel',
+      error_message: error.message,
+      error_stack: error.stack,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
+
+    Sentry.captureException(error, {
+      tags: { action: 'createChannel' },
+      extra: { ip_address: ip },
+    });
 
     return {
       success: false,

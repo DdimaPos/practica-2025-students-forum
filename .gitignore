@@ -48,3 +48,5 @@ next-env.d.ts
 EXAM_GUIDE.md
 worklog-full.md
 worklog.md
+# Sentry Config File
+.env.sentry-build-plugin

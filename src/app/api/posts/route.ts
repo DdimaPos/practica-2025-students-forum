@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { desc, eq, sql } from 'drizzle-orm';
 import db from '@/db';
 import { posts, users, postReactions } from '@/db/schema';
@@ -9,10 +10,17 @@ import { rateLimits } from '@/lib/ratelimits';
 const DEFAULT_LIMIT = 10;
 
 export async function GET(request: Request) {
+  const startTime = Date.now();
   const ip = getFirstIP(request.headers.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.postView.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      ip_address: ip,
+      endpoint: '/api/posts',
+      limit_type: 'post_view',
+    });
+
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
@@ -86,12 +94,48 @@ export async function GET(request: Request) {
       userReaction: result.userReaction as 'upvote' | 'downvote' | null,
     }));
 
+    // Wide event with full context
+    Sentry.logger.info('Posts fetched successfully', {
+      // Operation result
+      post_count: results.length,
+      has_more: results.length === limit,
+      status_code: 200,
+      duration: Date.now() - startTime,
+
+      // Request parameters
+      limit,
+      offset,
+      page_number: Math.floor(offset / limit) + 1,
+
+      // User context
+      user_id: user?.id,
+      is_authenticated: !!user,
+
+      // Request metadata
+      endpoint: '/api/posts',
+      method: 'GET',
+      ip_address: ip,
+    });
+
     return NextResponse.json({
       posts: transformedResults,
       hasMore: results.length === limit,
     });
-  } catch (error) {
-    console.error('Posts fetch error:', error);
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+
+    Sentry.logger.error('Posts fetch failed', {
+      error_message: error.message,
+      error_stack: error.stack,
+      endpoint: '/api/posts',
+      duration: Date.now() - startTime,
+      ip_address: ip,
+    });
+
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/posts' },
+      extra: { ip },
+    });
 
     return NextResponse.json(
       { error: 'Internal server error' },

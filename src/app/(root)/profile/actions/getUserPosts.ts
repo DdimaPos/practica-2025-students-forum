@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import db from '@/db';
 import { posts, users, postReactions } from '@/db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
@@ -11,6 +12,8 @@ export async function getUserPosts(
   limit = 10,
   offset = 0
 ): Promise<{ posts: PostListItem[]; hasMore: boolean }> {
+  const startTime = Date.now();
+
   try {
     const currentUser = await getUser();
 
@@ -81,13 +84,38 @@ export async function getUserPosts(
       userReaction: result.userReaction as 'upvote' | 'downvote' | null,
     }));
 
+    Sentry.logger.info('User posts fetched', {
+      action: 'getUserPosts',
+      user_id: userId,
+      viewer_id: currentUser?.id || null,
+      post_count: transformedResults.length,
+      limit,
+      offset,
+      has_more: results.length === limit,
+      duration: Date.now() - startTime,
+    });
+
     return {
       posts: transformedResults,
       hasMore: results.length === limit,
     };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error fetching user posts:', errorMessage);
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+
+    Sentry.logger.error('User posts fetch failed', {
+      action: 'getUserPosts',
+      user_id: userId,
+      limit,
+      offset,
+      error_message: error.message,
+      error_stack: error.stack,
+      duration: Date.now() - startTime,
+    });
+
+    Sentry.captureException(error, {
+      tags: { action: 'getUserPosts' },
+      extra: { user_id: userId, limit, offset },
+    });
 
     return {
       posts: [],

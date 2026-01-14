@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import db from '@/db';
 import { pollOptions, pollVotes } from '@/db/schema';
 import { rateLimits } from '@/lib/ratelimits';
@@ -19,6 +20,8 @@ export async function getPollOptions(
   postId: string,
   userId?: string | null
 ): Promise<PollOption[]> {
+  const startTime = Date.now();
+
   try {
     const options = await db
       .select({
@@ -45,13 +48,38 @@ export async function getPollOptions(
         .filter((id): id is string => id !== null);
     }
 
-    return options.map(option => ({
+    const result = options.map(option => ({
       ...option,
       voteCount: option.voteCount ?? 0,
       hasVoted: userVotes.includes(option.id),
     }));
-  } catch (error) {
-    console.error('Error fetching poll options:', error);
+
+    Sentry.logger.info('Poll options fetched', {
+      action: 'getPollOptions',
+      post_id: postId,
+      user_id: userId || null,
+      option_count: result.length,
+      user_has_voted: userVotes.length > 0,
+      duration: Date.now() - startTime,
+    });
+
+    return result;
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+
+    Sentry.logger.error('Poll options fetch failed', {
+      action: 'getPollOptions',
+      post_id: postId,
+      user_id: userId || null,
+      error_message: error.message,
+      error_stack: error.stack,
+      duration: Date.now() - startTime,
+    });
+
+    Sentry.captureException(error, {
+      tags: { action: 'getPollOptions' },
+      extra: { post_id: postId, user_id: userId },
+    });
 
     return [];
   }
@@ -61,11 +89,21 @@ export async function votePoll(
   pollOptionId: string,
   userId: string
 ): Promise<{ success: boolean; message: string }> {
+  const startTime = Date.now();
   const headerList = await headers();
   const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.postVote.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      action: 'votePoll',
+      poll_option_id: pollOptionId,
+      user_id: userId,
+      ip_address: ip,
+      rate_limit_type: 'postVote',
+      duration: Date.now() - startTime,
+    });
+
     return { success: false, message: 'Too many requests' };
   }
 
@@ -134,13 +172,39 @@ export async function votePoll(
       .set({ voteCount: newVoteCount })
       .where(eq(pollOptions.id, pollOptionId));
 
+    Sentry.logger.info('Poll vote recorded', {
+      action: 'votePoll',
+      poll_option_id: pollOptionId,
+      post_id: postId,
+      user_id: userId,
+      new_vote_count: newVoteCount,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
+
     return { success: true, message: 'Vote recorded successfully' };
-  } catch (error) {
-    console.error('Error voting on poll:', error);
+  } catch (err) {
+    const isErrorObject = err instanceof Error;
+    const error = isErrorObject ? err : new Error(String(err));
+
+    Sentry.logger.error('Poll vote failed', {
+      action: 'votePoll',
+      poll_option_id: pollOptionId,
+      user_id: userId,
+      error_message: error.message,
+      error_stack: error.stack,
+      ip_address: ip,
+      duration: Date.now() - startTime,
+    });
+
+    Sentry.captureException(error, {
+      tags: { action: 'votePoll' },
+      extra: { poll_option_id: pollOptionId, user_id: userId, ip_address: ip },
+    });
 
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to vote',
+      message: isErrorObject ? error.message : 'Failed to vote',
     };
   }
 }
