@@ -11,7 +11,6 @@ export default function RootLayout({
 }) {
   return (
     <SearchProvider>
-
       <Toaster />
 
       <div className='hidden md:block'>
@@ -26,11 +25,10 @@ export default function RootLayout({
 
       <div className='md:hidden'>
         <MobileTopBar />
-        <main className='bg-secondary min-h-screen px-4 pt-2 pb-4 w-full'>
+        <main className='bg-secondary min-h-screen w-full px-4 pt-2 pb-4'>
           {children}
         </main>
       </div>
-
     </SearchProvider>
   );
 }

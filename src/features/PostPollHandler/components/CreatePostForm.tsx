@@ -104,6 +104,7 @@ export default function CreatePostForm() {
             </Label>
             <Input
               id='post-title'
+              data-testid='post-title-input'
               {...register('title', {
                 required: 'Title is required',
                 validate: v => v.trim().length > 0 || 'Title cannot be empty',
@@ -120,6 +121,7 @@ export default function CreatePostForm() {
           <div className='space-y-2'>
             <Label
               htmlFor='post-content'
+              data-testid='post-content-input'
               className='flex items-center gap-2 text-sm font-semibold'
             >
               Content <span className='text-destructive'>*</span>
@@ -190,6 +192,7 @@ export default function CreatePostForm() {
         <CardFooter className='pt-6'>
           <Button
             type='submit'
+            data-testid='submit-post-button'
             disabled={isPending}
             className='h-12 w-full gap-2 text-base font-semibold shadow-lg transition-all hover:shadow-xl'
           >

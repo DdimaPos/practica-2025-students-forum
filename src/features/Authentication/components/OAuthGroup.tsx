@@ -10,7 +10,7 @@ import GithubIcon from '@/components/generic/icons/Github';
 
 export const OAuthGroup = () => {
   return (
-    <div className='flex w-full justify-center gap-1'>
+    <div data-testid='oauth-group' className='flex w-full justify-center gap-1'>
       <Button onClick={() => oAuth(ProviderTypes.GOOGLE)} variant='outline'>
         <GoogleIcon />
       </Button>
