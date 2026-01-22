@@ -50,9 +50,15 @@ vi.mock('@/utils/getFirstIp', () => ({
 }));
 
 vi.mock('next/headers', () => ({
-  headers: vi.fn(() => ({
-    get: vi.fn(() => '127.0.0.1'),
-  })),
+  headers: vi.fn(() =>
+    Promise.resolve({
+      get: (key: string) => {
+        if (key === 'x-forwarded-for') return '127.0.0.1';
+
+        return null;
+      },
+    })
+  ),
 }));
 
 vi.mock('@/lib/ratelimits', () => ({

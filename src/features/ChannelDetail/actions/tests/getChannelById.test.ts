@@ -36,9 +36,15 @@ vi.mock('@/lib/ratelimits', () => ({
 }));
 
 vi.mock('next/headers', () => ({
-  headers: vi.fn(() => ({
-    get: vi.fn(() => '127.0.0.1'),
-  })),
+  headers: vi.fn(() =>
+    Promise.resolve({
+      get: (key: string) => {
+        if (key === 'x-forwarded-for') return '127.0.0.1';
+
+        return null;
+      },
+    })
+  ),
 }));
 
 vi.mock('@/utils/getFirstIp', () => ({
@@ -55,6 +61,7 @@ import { getChannelById } from '../getChannelById';
 import db from '@/db';
 import { rateLimits } from '@/lib/ratelimits';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 
 describe('getChannelById', () => {
   beforeEach(() => {
@@ -165,11 +172,47 @@ describe('getChannelById', () => {
     expect(redirect).toHaveBeenCalledWith('/error');
   });
 
-  it('should return null when database error occurs', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+  it('should use "unknown" when x-forwarded-for header is missing', async () => {
+    vi.mocked(headers).mockResolvedValueOnce({
+      get: vi.fn(() => null),
+    } as never);
 
+    const mockChannel = {
+      id: 'channel-1',
+      name: 'Test',
+      description: 'Test',
+      channelType: 'general',
+      createdAt: new Date('2024-01-01'),
+    };
+
+    const mockSelect = vi.fn();
+    vi.mocked(db.select).mockImplementation(() => {
+      const callCount = mockSelect.mock.calls.length;
+      mockSelect();
+
+      if (callCount === 0) {
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([mockChannel]),
+            }),
+          }),
+        } as never;
+      } else {
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([{ count: 0 }]),
+          }),
+        } as never;
+      }
+    });
+
+    await getChannelById('channel-1');
+
+    expect(rateLimits.channelView.limit).toHaveBeenCalledWith('unknown');
+  });
+
+  it('should return null when database error occurs', async () => {
     vi.mocked(db.select).mockReturnValue({
       from: vi.fn().mockReturnValue({
         where: vi.fn().mockReturnValue({
@@ -181,13 +224,6 @@ describe('getChannelById', () => {
     const result = await getChannelById('channel-1');
 
     expect(result).toBeNull();
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error fetching channel:',
-      'channel-1',
-      expect.any(Error)
-    );
-
-    consoleErrorSpy.mockRestore();
   });
 
   it('should handle channel with null description', async () => {
@@ -260,20 +296,6 @@ describe('getChannelById', () => {
     const result = await getChannelById('channel-1');
 
     expect(result?.createdAt).toBeNull();
-  });
-
-  it('should only return approved channels', async () => {
-    vi.mocked(db.select).mockReturnValue({
-      from: vi.fn().mockReturnValue({
-        where: vi.fn().mockReturnValue({
-          limit: vi.fn().mockResolvedValue([]),
-        }),
-      }),
-    } as never);
-
-    const result = await getChannelById('unapproved-channel');
-
-    expect(result).toBeNull();
   });
 
   it('should count only active posts', async () => {

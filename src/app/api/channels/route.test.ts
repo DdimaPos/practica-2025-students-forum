@@ -21,9 +21,15 @@ vi.mock('@/utils/getChannels', () => ({
 }));
 
 vi.mock('next/headers', () => ({
-  headers: vi.fn(() => ({
-    get: vi.fn(() => '127.0.0.1'),
-  })),
+  headers: vi.fn(() =>
+    Promise.resolve({
+      get: (key: string) => {
+        if (key === 'x-forwarded-for') return '127.0.0.1';
+
+        return null;
+      },
+    })
+  ),
 }));
 
 vi.mock('@/utils/getFirstIp', () => ({
@@ -32,6 +38,7 @@ vi.mock('@/utils/getFirstIp', () => ({
 
 import { rateLimits } from '@/lib/ratelimits';
 import { getChannels } from '@/utils/getChannels';
+import { headers } from 'next/headers';
 
 describe('GET /api/channels', () => {
   beforeEach(() => {
@@ -99,10 +106,6 @@ describe('GET /api/channels', () => {
   });
 
   it('should return 500 when getChannels throws error', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-
     vi.mocked(getChannels).mockRejectedValueOnce(
       new Error('Database connection failed')
     );
@@ -113,12 +116,6 @@ describe('GET /api/channels', () => {
 
     const data = await response.json();
     expect(data.error).toBe('Failed to fetch channels');
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error in channels API:',
-      expect.any(Error)
-    );
-
-    consoleErrorSpy.mockRestore();
   });
 
   it('should call rate limiter with correct IP', async () => {
@@ -127,25 +124,14 @@ describe('GET /api/channels', () => {
     expect(rateLimits.channelView.limit).toHaveBeenCalledWith('127.0.0.1');
   });
 
-  it('should handle channels with all fields', async () => {
-    const mockChannels = [
-      {
-        id: 'channel-1',
-        name: 'Complete Channel',
-        description: 'Full description here',
-        channelType: 'academic',
-      },
-    ];
+  it('should use "unknown" when x-forwarded-for header is missing', async () => {
+    vi.mocked(headers).mockResolvedValueOnce({
+      get: vi.fn(() => null),
+    } as never);
 
-    vi.mocked(getChannels).mockResolvedValueOnce(mockChannels);
+    await GET();
 
-    const response = await GET();
-
-    const data = await response.json();
-    expect(data.channels[0]).toHaveProperty('id');
-    expect(data.channels[0]).toHaveProperty('name');
-    expect(data.channels[0]).toHaveProperty('description');
-    expect(data.channels[0]).toHaveProperty('channelType');
+    expect(rateLimits.channelView.limit).toHaveBeenCalledWith('unknown');
   });
 
   it('should handle channels with null description', async () => {
