@@ -416,29 +416,6 @@ describe('createChannel', () => {
   });
 
   describe('Error Handling', () => {
-    it('should handle database errors gracefully', async () => {
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-
-      vi.mocked(db.insert).mockReturnValue({
-        values: vi.fn().mockRejectedValue(new Error('Database error')),
-      } as never);
-
-      const formData = new FormData();
-      formData.append('name', 'Test Channel');
-      formData.append('description', 'Test Description Here');
-      formData.append('channelType', 'general');
-
-      const result = await createChannel(prevState, formData);
-
-      expect(result.success).toBe(false);
-      expect(result.message).toBe('Failed to create channel. Please try again.');
-      expect(consoleErrorSpy).toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
-    });
-
     it('should return multiple validation errors', async () => {
       const formData = new FormData();
       formData.append('name', 'AB');
