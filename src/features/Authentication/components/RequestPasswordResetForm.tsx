@@ -55,6 +55,7 @@ export const RequestPasswordResetForm: FC<Props> = ({ onSubmit }) => {
             <div className='grid gap-2'>
               <Label htmlFor='email'>Email</Label>
               <Input
+                data-testid='email-input'
                 id='email'
                 type='email'
                 name='email'

@@ -8,6 +8,7 @@ export default function PostPollHandler() {
       <TabsList className='grid w-full grid-cols-2 gap-2'>
         <TabsTrigger
           value='post'
+          data-testid='create-post-tab'
           className='border-gray-200 bg-gray-50 p-2 ring-gray-200 focus:ring-2'
         >
           Create Post
