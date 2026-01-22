@@ -5,7 +5,7 @@ import Link from 'next/link';
 export const TermsAndConditions = () => {
   return (
     <div className='flex items-center space-x-2'>
-      <Checkbox id='terms' name='terms' required />
+      <Checkbox data-testid="terms-and-conditions-checkbox" id='terms' name='terms' required />
       <Label htmlFor='terms' className='text-sm'>
         I agree to the{' '}
         <Link

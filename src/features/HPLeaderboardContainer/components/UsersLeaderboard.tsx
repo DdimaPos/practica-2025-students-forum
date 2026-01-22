@@ -26,6 +26,7 @@ export default async function UsersLeaderboard() {
         ))}
       </div>
       <Link
+        data-testid='leaderboard-students-link'
         className='pl-3 text-sm text-gray-500 hover:underline'
         href={`/leaderboard?tab=users`}
       >

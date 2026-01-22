@@ -88,6 +88,7 @@ export const SignUpForm: FC<Props> = ({ onSubmit }) => {
               </Label>
               <Input
                 id='email'
+                data-testid='register-email-input'
                 type='email'
                 name='email'
                 placeholder='mail@example.com'
@@ -99,7 +100,13 @@ export const SignUpForm: FC<Props> = ({ onSubmit }) => {
               <Label htmlFor='password' className='text-right'>
                 Password
               </Label>
-              <Input id='password' name='password' type='password' required />
+              <Input
+                data-testid='register-password-input'
+                id='password'
+                name='password'
+                type='password'
+                required
+              />
             </div>
 
             <div className='grid grid-cols-[100px_1fr] items-center gap-2'>

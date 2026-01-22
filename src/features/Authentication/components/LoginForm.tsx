@@ -65,6 +65,7 @@ export const LoginForm: FC<Props> = ({ onSubmit }) => {
                 name='email'
                 placeholder='mail@example.com'
                 required
+                data-testid='login-email-input'
               />
             </div>
             <div className='grid gap-2'>
@@ -77,7 +78,13 @@ export const LoginForm: FC<Props> = ({ onSubmit }) => {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id='password' name='password' type='password' required />
+              <Input
+                data-testid='login-password-input'
+                id='password'
+                name='password'
+                type='password'
+                required
+              />
             </div>
           </div>
         </form>
