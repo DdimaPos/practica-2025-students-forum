@@ -116,4 +116,15 @@ describe('getUserPosts', () => {
     expect(result.posts).toHaveLength(10);
     expect(result.hasMore).toBe(true);
   });
+
+  it('should handle database errors gracefully', async () => {
+    mockOffset.mockRejectedValueOnce(new Error('DB error'));
+
+    const result = await getUserPosts('user-123');
+
+    expect(result).toEqual({
+      posts: [],
+      hasMore: false,
+    });
+  });
 });

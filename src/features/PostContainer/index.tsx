@@ -1,5 +1,6 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -40,7 +41,7 @@ export default function Post({ userId, ...post }: PostProps) {
     setShowReply(prev => !prev);
   };
 
-  const showVotedType = (result : VoteResult) => {
+  const showVotedType = (result: VoteResult) => {
     if (result.success === true) {
       switch (result.reactionType) {
         case VoteType.upvote:
@@ -62,22 +63,23 @@ export default function Post({ userId, ...post }: PostProps) {
           }
           break;
         default:
-          console.log('Changing rating went wrong.');
+          Sentry.captureMessage('Unexpected reaction type in vote result', {
+            level: 'warning',
+            tags: { component: 'PostContainer', operation: 'showVotedType' },
+            extra: { reaction_type: result.reactionType },
+          });
       }
     }
-  }
-
+  };
 
   const handleUpvote = async () => {
     const result = await handleVote(post.id, 'upvote');
-    //console.log(result);
 
     showVotedType(result);
   };
 
   const handleDownvote = async () => {
     const result = await handleVote(post.id, 'downvote');
-    //console.log(result);
     showVotedType(result);
   };
 

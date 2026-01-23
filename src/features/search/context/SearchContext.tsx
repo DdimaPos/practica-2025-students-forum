@@ -1,5 +1,6 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import React, {
   createContext,
   useContext,
@@ -93,7 +94,10 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       setSuggestions(data);
       setShowDropdown(data.results.length > 0);
     } catch (error_) {
-      console.error('Suggestion search error:', error_);
+      Sentry.captureException(error_, {
+        tags: { component: 'SearchContext', operation: 'suggestionSearch' },
+        extra: { query: searchQuery },
+      });
       setSuggestions(undefined);
       setShowDropdown(false);
     } finally {

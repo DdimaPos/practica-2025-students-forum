@@ -8,6 +8,16 @@ vi.mock('@/utils/supabase/server', () => ({
   createClient: vi.fn(),
 }));
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn().mockResolvedValue({
+    get: vi.fn(),
+  }),
+}));
+
+vi.mock('@/utils/getFirstIp', () => ({
+  getFirstIP: vi.fn(),
+}));
+
 import { redirect } from 'next/navigation';
 import { ProviderTypes } from '../../types';
 import { oAuth } from '../oAuth';
@@ -15,11 +25,17 @@ import { createRedirectMock } from '@/test-utils/mocks/nextNavigation';
 import { RecursivePartial } from '@/utils/types/recursivePartial';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/server';
+import { headers } from 'next/headers';
+import { getFirstIP } from '@/utils/getFirstIp';
 
 describe('OAuth action', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(redirect).mockImplementation(createRedirectMock());
+    vi.mocked(headers).mockResolvedValue({
+      get: vi.fn(() => '127.0.0.1'),
+    } as never);
+    vi.mocked(getFirstIP).mockResolvedValue('127.0.0.1');
   });
 
   describe('OAuth config map picking', () => {

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/generic/theme-provider';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { SentrySession } from '@/components/generic/session-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -44,6 +45,7 @@ export default function RootLayout({
           {children}
         </ThemeProvider>
         <SpeedInsights />
+        <SentrySession />
       </body>
     </html>
   );

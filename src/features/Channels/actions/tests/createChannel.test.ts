@@ -3,7 +3,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/db', () => ({
   default: {
     insert: vi.fn(() => ({
-      values: vi.fn(() => Promise.resolve(undefined)),
+      values: vi.fn(() => ({
+        returning: vi.fn(() => Promise.resolve([{ id: 'mock-channel-id' }])),
+      })),
     })),
   },
 }));
@@ -416,6 +418,26 @@ describe('createChannel', () => {
   });
 
   describe('Error Handling', () => {
+    it('should handle database errors gracefully', async () => {
+      vi.mocked(db.insert).mockReturnValue({
+        values: vi.fn(() => ({
+          returning: vi.fn().mockRejectedValue(new Error('Database error')),
+        })),
+      } as never);
+
+      const formData = new FormData();
+      formData.append('name', 'Test Channel');
+      formData.append('description', 'Test Description Here');
+      formData.append('channelType', 'general');
+
+      const result = await createChannel(prevState, formData);
+
+      expect(result.success).toBe(false);
+      expect(result.message).toBe(
+        'Failed to create channel. Please try again.'
+      );
+    });
+
     it('should return multiple validation errors', async () => {
       const formData = new FormData();
       formData.append('name', 'AB');
@@ -434,7 +456,9 @@ describe('createChannel', () => {
   describe('Optional Fields', () => {
     it('should handle missing facultyId gracefully', async () => {
       vi.mocked(db.insert).mockReturnValue({
-        values: vi.fn().mockResolvedValue(undefined),
+        values: vi.fn(() => ({
+          returning: vi.fn(() => Promise.resolve([{ id: 'mock-channel-id' }])),
+        })),
       } as never);
 
       const formData = new FormData();
@@ -449,7 +473,9 @@ describe('createChannel', () => {
 
     it('should handle missing specialityId gracefully', async () => {
       vi.mocked(db.insert).mockReturnValue({
-        values: vi.fn().mockResolvedValue(undefined),
+        values: vi.fn(() => ({
+          returning: vi.fn(() => Promise.resolve([{ id: 'mock-channel-id' }])),
+        })),
       } as never);
 
       const formData = new FormData();

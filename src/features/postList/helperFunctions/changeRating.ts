@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { VoteType } from '../types/VoteType';
 import { VoteResult } from '../types/VoteResult';
 
@@ -33,7 +34,11 @@ export const changeDynamicRating = (
         }
         break;
       default:
-        console.log('Changing rating went wrong.');
+        Sentry.captureMessage('Unexpected reaction type during rating change', {
+          level: 'warning',
+          tags: { component: 'changeDynamicRating' },
+          extra: { reaction_type: result.reactionType },
+        });
     }
   }
 };

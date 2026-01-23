@@ -41,7 +41,6 @@ export default function PostCard({
     e.stopPropagation();
 
     const result = await handleVote(id, 'upvote');
-    //console.log(result);
     changeDynamicRating(result, setDynamicRating, setVoteType);
   };
 
@@ -50,7 +49,6 @@ export default function PostCard({
     e.stopPropagation();
 
     const result = await handleVote(id, 'downvote');
-    //console.log(result);
     changeDynamicRating(result, setDynamicRating, setVoteType);
   };
 
