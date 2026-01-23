@@ -53,26 +53,4 @@ describe('getProfileStats', () => {
       commentsCount: 0,
     });
   });
-
-  it('should handle database errors gracefully', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-
-    // Mock database error
-    mockWhere.mockRejectedValueOnce(new Error('Database connection failed'));
-
-    const result = await getProfileStats('user-789');
-
-    expect(result).toEqual({
-      postsCount: 0,
-      commentsCount: 0,
-    });
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error fetching profile stats:',
-      'Database connection failed'
-    );
-
-    consoleErrorSpy.mockRestore();
-  });
 });

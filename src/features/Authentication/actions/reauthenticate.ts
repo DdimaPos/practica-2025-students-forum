@@ -19,12 +19,12 @@ export async function reauthenticate(
     error: userError,
   } = await supabase.auth.getUser();
 
-  const { data: aalLevel, error: aalError } =
-    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-
   if (userError || !user) {
     redirect('/login');
   }
+
+  const { data: aalLevel, error: aalError } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
 
   if (aalError) {
     return { success: false, message: aalError.message };
@@ -44,7 +44,7 @@ export async function reauthenticate(
   }
 
   if (aalLevel.nextLevel === 'aal2') {
-    redirect(`/reauth/mfa?page=/dashboard`);
+    redirect('/reauth/mfa?page=/dashboard');
   }
 
   redirect(redirectTo);
