@@ -50,6 +50,9 @@ EXAM_GUIDE.md
 worklog-full.md
 worklog.md
 
+# Sentry Config File
+.env.sentry-build-plugin
+
 # Playwright
 /test-results/
 /playwright-report/

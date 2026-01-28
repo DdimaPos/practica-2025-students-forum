@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import db from '@/db';
 import { comments } from '@/db/schema';
 import { revalidateCommentsCache } from '@/lib/cache';
@@ -8,10 +9,17 @@ import { rateLimits } from '@/lib/ratelimits';
 import { getFirstIP } from '@/utils/getFirstIp';
 
 export async function POST(request: Request) {
+  const startTime = Date.now();
   const ip = getFirstIP(request.headers.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.comment.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      ip_address: ip,
+      endpoint: '/api/comments',
+      limit_type: 'comment_creation',
+    });
+
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
@@ -68,13 +76,27 @@ export async function POST(request: Request) {
       })
       .returning();
 
-    console.log('Inserted comment:', result);
-
     const insertedComment = result[0];
 
-    console.log(`✅ Comment ${insertedComment.id} created for post ${post_id}`);
-
     await revalidateCommentsCache(post_id.toString());
+
+    Sentry.logger.info('Comment created successfully', {
+      endpoint: '/api/comments',
+      comment_id: insertedComment.id,
+      is_anonymous: Boolean(isAnonymous),
+      post_id: post_id,
+      parent_comment_id: parent_comment_id,
+      content_length: sanitizedContent.length,
+      is_reply: parentCommentId !== null,
+    });
+
+    Sentry.metrics.distribution('comment.creation.duration', Date.now() - startTime, {
+      unit: 'milliseconds',
+    });
+
+    Sentry.metrics.distribution('comment.creation.content_length', sanitizedContent.length, {
+      unit: 'characters',
+    });
 
     return NextResponse.json(
       {
@@ -93,7 +115,16 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (err) {
-    console.error('Error in /api/comments POST', err);
+    const error = err instanceof Error ? err : new Error(String(err));
+
+    Sentry.logger.error('Comment creation failed', {
+      endpoint: '/api/comments',
+      error_message: error.message,
+    });
+
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/comments' },
+    });
 
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }

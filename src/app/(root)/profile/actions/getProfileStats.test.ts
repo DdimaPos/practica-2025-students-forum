@@ -53,4 +53,16 @@ describe('getProfileStats', () => {
       commentsCount: 0,
     });
   });
+
+  it('should handle database errors gracefully', async () => {
+    // Mock database error
+    mockWhere.mockRejectedValueOnce(new Error('Database connection failed'));
+
+    const result = await getProfileStats('user-789');
+
+    expect(result).toEqual({
+      postsCount: 0,
+      commentsCount: 0,
+    });
+  });
 });

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { desc, eq, sql } from 'drizzle-orm';
 import db from '@/db';
 import { posts, users, postReactions } from '@/db/schema';
@@ -9,12 +10,22 @@ import { rateLimits } from '@/lib/ratelimits';
 const DEFAULT_LIMIT = 10;
 
 export async function GET(request: Request) {
+  const startTime = Date.now();
+  Sentry.setTag('endpoint', '/api/posts');
   const ip = getFirstIP(request.headers.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.postView.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      ip_address: ip,
+      endpoint: '/api/posts',
+      limit_type: 'post_view',
+    });
+
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
+
+  const user = await getUser();
 
   try {
     const { searchParams } = new URL(request.url);
@@ -22,8 +33,6 @@ export async function GET(request: Request) {
       parseInt(searchParams.get('limit') || String(DEFAULT_LIMIT))
     );
     const offset = Math.max(0, parseInt(searchParams.get('offset') || '0'));
-
-    const user = await getUser();
 
     const results = await db
       .select({
@@ -82,6 +91,7 @@ export async function GET(request: Request) {
       isAnonymous: result.isAnonymous,
       postType: result.postType,
       created_at: result.createdAt!.toISOString(),
+      duration: Date.now() - startTime,
       rating: result.rating,
       userReaction: result.userReaction as 'upvote' | 'downvote' | null,
     }));
@@ -90,8 +100,16 @@ export async function GET(request: Request) {
       posts: transformedResults,
       hasMore: results.length === limit,
     });
-  } catch (error) {
-    console.error('Posts fetch error:', error);
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    Sentry.logger.error('Error fetching posts', {
+      message: error.message,
+      parameters: Object.fromEntries(new URL(request.url).searchParams),
+    });
+    Sentry.captureException(error, {
+      tags: { endpoint: '/api/posts' },
+      extra: { parameters: Object.fromEntries(new URL(request.url).searchParams) },
+    });
 
     return NextResponse.json(
       { error: 'Internal server error' },

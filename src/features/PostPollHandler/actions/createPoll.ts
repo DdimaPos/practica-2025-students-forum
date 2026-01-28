@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import db from '@/db';
 import { posts, pollOptions } from '@/db/schema';
 import { revalidatePath } from 'next/cache';
@@ -17,11 +18,18 @@ export async function createPollAction(formData: {
   is_active?: boolean;
   poll_options: string[];
 }) {
+  const startTime = Date.now();
   const headerList = await headers();
   const ip = getFirstIP(headerList.get('x-forwarded-for') ?? 'unknown');
   const { success } = await rateLimits.createPost.limit(ip);
 
   if (!success) {
+    Sentry.logger.warn('Rate limit exceeded', {
+      action: 'createPoll',
+      ip_address: ip,
+      rate_limit_type: 'createPost',
+    });
+
     return { success: false, message: 'Too many requests' };
   }
 
@@ -99,17 +107,43 @@ export async function createPollAction(formData: {
 
     revalidatePath('/');
 
+    Sentry.logger.info('Poll created', {
+      action: 'createPoll',
+      post_id: newPost.id,
+      channel_id: channel_id || null,
+      is_anonymous: is_anonymous || false,
+      poll_options_count: validOptions.length,
+      title_length: sanitizedTitle.length,
+      content_length: sanitizedContent.length,
+    });
+
+    Sentry.metrics.distribution('poll.creation.duration', Date.now() - startTime, {
+      unit: 'milliseconds',
+    });
+
     return {
       success: true,
       message: 'Poll created successfully',
       data: newPost,
     };
-  } catch (error) {
-    console.error('Error creating poll:', error);
+  } catch (err) {
+    const isErrorObject = err instanceof Error;
+    const error = isErrorObject ? err : new Error(String(err));
+
+    Sentry.logger.error('Poll creation failed', {
+      action: 'createPoll',
+      channel_id: formData.channel_id || null,
+      error_message: error.message,
+    });
+
+    Sentry.captureException(error, {
+      tags: { action: 'createPoll' },
+      extra: { channel_id: formData.channel_id || null },
+    });
 
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to create poll',
+      message: isErrorObject ? error.message : 'Failed to create poll',
     };
   }
 }

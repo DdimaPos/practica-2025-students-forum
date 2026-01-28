@@ -73,7 +73,7 @@ describe('logic actions scenarios', () => {
 
     expect(await login(formState, formData)).toEqual({
       success: false,
-      message: 'error',
+      message: 'Invalid credentials',
     });
   });
 
